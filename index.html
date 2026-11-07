@@ -681,7 +681,68 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
       return v;
     }
   };
-  window.claude = { use: async name => (name === "sample" && ready ? sample : null) };
+  // ===== Grup oylaması: Cloudflare D1 ile ortak veri =====
+  const DB_BASE = AI_URL.replace(/\/ai$/, "");
+  const DEV = (() => { let id = null; try { id = localStorage.getItem("gidelim-dev"); } catch(e) {}
+    if (!id || !/^[A-Za-z0-9_\-]{4,80}$/.test(id)) { const a = new Uint32Array(4); crypto.getRandomValues(a); id = "u" + Array.from(a, x => x.toString(36)).join(""); try { localStorage.setItem("gidelim-dev", id); } catch(e) {} }
+    return id; })();
+  const myPolls = () => { try { return JSON.parse(localStorage.getItem("gidelim-mypolls") || "[]"); } catch(e) { return []; } };
+  const savePolls = a => { try { localStorage.setItem("gidelim-mypolls", JSON.stringify(a.slice(0, 40))); } catch(e) {} };
+  const addPoll = id => { const a = myPolls().filter(x => x !== id); a.unshift(id); savePolls(a); };
+  const dropPoll = id => savePolls(myPolls().filter(x => x !== id));
+  const dcache = { polls: {}, options: {}, votes: {}, comments: {}, expenses: {} };
+  const subs = {}; let synced = false, syncing = null, queue = Promise.resolve(), pending = 0;
+  const snapOf = col => ({ docs: Object.entries(dcache[col] || {}).map(([id, d]) => ({ id, exists: true, data: () => d })) });
+  const emit = col => (subs[col] || []).forEach(s => { try { s.cb(snapOf(col)); } catch(e) {} });
+  async function post(path, body){
+    const r = await fetch(DB_BASE + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    let j = {}; try { j = await r.json(); } catch(e) {}
+    if (!r.ok) throw { code: j.error || (r.status === 429 ? "slow_down" : "upstream"), status: r.status };
+    return j;
+  }
+  function sync(){
+    if (syncing) return syncing;
+    syncing = (async () => {
+      try {
+        await queue;
+        const out = await post("/db/sync", { ids: myPolls() });
+        if (pending) return;
+        Object.keys(dcache).forEach(col => { dcache[col] = {}; (out[col] || []).forEach(x => dcache[col][x.id] = x.data); });
+        synced = true; Object.keys(dcache).forEach(emit);
+      } catch(e) {
+        if (!synced) Object.values(subs).forEach(list => list.forEach(s => s.err && s.err(e)));
+      } finally { syncing = null; }
+    })();
+    return syncing;
+  }
+  function write(op, col, id, data){
+    if (op === "set") dcache[col][id] = data;
+    else if (op === "update") dcache[col][id] = { ...(dcache[col][id] || {}), ...data };
+    else delete dcache[col][id];
+    if (col === "polls") { if (op === "delete") dropPoll(id); else addPoll(id); }
+    emit(col); pending++;
+    const p = queue.then(() => post("/db/write", { op, col, id, data })).finally(() => { pending--; if (!pending) setTimeout(sync, 300); });
+    queue = p.catch(() => {});
+    return p;
+  }
+  const docRef = path => { const i = path.indexOf("/"); const col = path.slice(0, i), id = path.slice(i + 1);
+    return { set: d => write("set", col, id, d), update: d => write("update", col, id, d), delete: () => write("delete", col, id) }; };
+  const dbShim = {
+    collection: col => ({
+      onSnapshot(cb, err){ (subs[col] ||= []).push({ cb, err }); if (synced) cb(snapOf(col)); else sync(); return () => { subs[col] = (subs[col] || []).filter(s => s.cb !== cb); }; },
+      doc: id => docRef(col + "/" + id)
+    }),
+    doc: docRef
+  };
+  const userShim = { id: async () => DEV, profiles: async ids => post("/db/profiles", { ids }) };
+  window.gidelimJoinPoll = id => { if (/^[A-Za-z0-9_\-]{4,80}$/.test(id)) { addPoll(id); sync(); } };
+  window.gidelimSetName = name => { try { localStorage.setItem("gidelim-name", name); } catch(e) {} return post("/db/me", { id: DEV, name }); };
+  window.gidelimName = () => { try { return localStorage.getItem("gidelim-name") || ""; } catch(e) { return ""; } };
+  // Grup ekranı açıkken birkaç saniyede bir yenile
+  setInterval(() => { const g = document.getElementById("v-group"); if (ready && synced && g && !g.hidden && document.visibilityState === "visible") sync(); }, 4000);
+  document.addEventListener("visibilitychange", () => { const g = document.getElementById("v-group"); if (ready && document.visibilityState === "visible" && g && !g.hidden) sync(); });
+
+  window.claude = { use: async name => !ready ? null : name === "sample" ? sample : name === "db" ? dbShim : name === "user" ? userShim : null };
   // Açılışta yapay zeka sunucusunu uyandır (Gemini'ye istek atmaz, ücretsiz)
   if (ready) setTimeout(() => { fetch(AI_URL.replace(/\/ai$/, "/"), { mode: "cors" }).catch(() => {}); }, 0);
   // Uygulamayı telefonda sakla: hızlı açılış ve internetsiz kullanım
@@ -754,6 +815,8 @@ const EN = {
   "📍 Konumumu bul":"📍 Use my location","📍 Konumun bulunuyor…":"📍 Finding you…","Bu cihaz konum paylaşmıyor.":"This device can’t share its location.","Konum bulunamadı, elle yazabilirsin.":"Couldn’t find your location — you can type it in.","Konum izni verilmedi. Telefon ayarlarından izin verebilirsin.":"Location permission denied. You can allow it in your phone settings.",
   "aranıyor…":"— searching…","Daha fazla yer geliyor…":"More places coming…","Bilgiler hazırlanıyor…":"Getting the details…","Çok hızlı istek gönderildi. Birkaç saniye bekleyip tekrar dene.":"Too many requests. Wait a few seconds and try again.",
   "Nereye gidiyoruz?":"Where are we going?",
+  "Grup oylaması için veritabanı henüz bağlı değil. Cloudflare’de Worker’a DB bağlantısını ekle.":"The group vote database isn’t connected yet. Add the DB binding to the Worker in Cloudflare.","Bu site veritabanına yetkili değil. Cloudflare’deki ALLOWED_ORIGINS ayarını kontrol et.":"This site isn’t allowed to use the database. Check ALLOWED_ORIGINS in Cloudflare.","Grup verisine şu an ulaşılamıyor. Biraz sonra tekrar dene.":"Can’t reach group data right now. Try again in a moment.",
+  "👋 Arkadaşların seni nasıl görsün?":"👋 How should friends see you?","Oylamalarda adın bu şekilde görünecek. Sonradan değiştirebilirsin.":"This is how your name appears in votes. You can change it later.","Adın ya da takma adın":"Your name or nickname","Adın":"Your name","Devam":"Continue","Oylama yükleniyor…":"Loading the vote…","👥 Arkadaşlarını çağırmak için oylamayı aç ve 📤 Davet et’e dokun. Oylamaları sadece davet bağlantısı olanlar görebilir.":"👥 To invite friends, open a vote and tap 📤 Invite. Only people with the invite link can see a vote.","değiştir":"change",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1075,7 +1138,7 @@ function lsSave(){ ls.set("nereye-saved", saved); }
 async function initStore(){
   saved = ls.get("nereye-saved", {}) || {}; refresh();
   try {
-    const [db, user] = await Promise.all([window.claude?.use("db"), window.claude?.use("user")]);
+    const [db, user] = [null, null];
     const id = user ? await user.id() : null;
     if (!db || !id) { $("#savedhint").textContent = "Listen bu cihazda tutuluyor."; return; }
     col = db.collection("data/users/" + id);
@@ -1999,7 +2062,7 @@ async function initGroup(){
     myId = await user.id();
     if (!myId) { gState = "off"; gRender(); return; }
     gdb = db; guser = user;
-    const onErr = e => { gState = "err"; gErr = e?.code === "permission_denied" || e?.code === "not_granted" ? "Bu oylamaları görme iznin yok. Uygulamanın sahibinden erişim iste." : "Grup verisine şu an ulaşılamıyor."; gRender(); };
+    const onErr = e => { gState = "err"; gErr = e?.code === "no_db" ? L("Grup oylaması için veritabanı henüz bağlı değil. Cloudflare’de Worker’a DB bağlantısını ekle.") : e?.code === "forbidden" ? L("Bu site veritabanına yetkili değil. Cloudflare’deki ALLOWED_ORIGINS ayarını kontrol et.") : L("Grup verisine şu an ulaşılamıyor. Biraz sonra tekrar dene."); gRender(); };
     db.collection("polls").onSnapshot(sn => { polls = {}; sn.docs.forEach(d => { if (d.exists) polls[d.id] = d.data(); }); gState = "ready"; gRender(); }, onErr);
     db.collection("options").onSnapshot(sn => { options = {}; sn.docs.forEach(d => { if (d.exists) options[d.id] = d.data(); }); gRender(); }, onErr);
     db.collection("votes").onSnapshot(sn => { votes = {}; sn.docs.forEach(d => { if (d.exists) votes[d.id] = d.data(); }); gRender(); }, onErr);
@@ -2023,8 +2086,22 @@ function gRender(){
   const area = $("#g-area"); area.innerHTML = "";
   if (gState === "loading") { const g = el("div","grid"); g.style.marginTop = "16px"; g.append(el("div","skel"), el("div","skel")); area.append(g); return; }
   if (gState === "off") { area.append(el("div","gnote","🗳️ Grup oylaması web sürümüne çok yakında geliyor. Şimdilik Keşfet, Asistan ve Listem hazır!")); return; }
-  if (gState === "err") { area.append(el("div","gnote",gErr)); return; }
-  if (openPoll && polls[openPoll]) renderPoll(area, openPoll); else { openPoll = null; renderPolls(area); }
+  if (gState === "err") { area.append(el("div","gnote",gErr)); const rb = el("button","xmore",L("↻ Tekrar dene")); rb.type = "button"; rb.onclick = () => location.reload(); area.append(rb); return; }
+  if (window.gidelimName && !window.gidelimName()) { renderNameGate(area); return; }
+  if (openPoll && polls[openPoll]) renderPoll(area, openPoll);
+  else if (openPoll && !polls[openPoll] && gState === "ready" && !pollMissing[openPoll]) { const ld = el("div","xload"); ld.append(el("span","spin"), document.createTextNode(L("Oylama yükleniyor…"))); area.append(ld); setTimeout(() => { pollMissing[openPoll] = true; gRender(); }, 6000); }
+  else { openPoll = null; renderPolls(area); }
+}
+const pollMissing = {};
+function renderNameGate(area){
+  const box = el("div","gpanel"); box.append(el("h3",null,L("👋 Arkadaşların seni nasıl görsün?")));
+  box.append(el("div","hint",L("Oylamalarda adın bu şekilde görünecek. Sonradan değiştirebilirsin.")));
+  const row = el("div","grow"); const inp = el("input","field"); inp.placeholder = L("Adın ya da takma adın"); inp.maxLength = 30; inp.setAttribute("aria-label", L("Adın"));
+  const b = el("button","gbtn",L("Devam")); b.type = "button";
+  const go = async () => { const n = inp.value.trim(); if (!n) { inp.focus(); return; } b.disabled = true;
+    try { await window.gidelimSetName(n); names[myId] = n; gRender(); } catch(e) { b.disabled = false; toast(L("Kaydedilemedi, tekrar dene.")); } };
+  b.onclick = go; inp.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  row.append(inp, b); box.append(row); area.append(box); setTimeout(() => inp.focus(), 50);
 }
 function renderPolls(area){
   const box = el("div","gpanel"); box.append(el("h3",null,"🗳️ Yeni oylama başlat"));
@@ -2045,7 +2122,9 @@ function renderPolls(area){
   if (!all.length) area.append(el("div","empty","Henüz oylama yok. İlkini sen başlat, arkadaşların katılsın! 🎉"));
   if (open.length) { area.append(el("div","gsec","Devam eden oylamalar")); open.forEach(([id, p]) => area.append(pollCard(id, p))); }
   if (closed.length) { area.append(el("div","gsec","Biten oylamalar")); closed.slice(0, 10).forEach(([id, p]) => area.append(pollCard(id, p))); }
-  area.append(el("div","gnote","👥 Arkadaşlarının katılabilmesi için bu uygulamayı sağ üstteki Paylaş menüsünden onlarla paylaş ve en az katkıda bulunabilecek (Contributor) yetki ver. Oylamalar uygulamaya erişimi olan herkese görünür."));
+  area.append(el("div","gnote",L("👥 Arkadaşlarını çağırmak için oylamayı aç ve 📤 Davet et’e dokun. Oylamaları sadece davet bağlantısı olanlar görebilir.")));
+  if (window.gidelimName && window.gidelimName()) { const nm = el("button","helpbtn", (LANG === "en" ? "Your name: " : "Adın: ") + window.gidelimName() + " · " + L("değiştir")); nm.type = "button";
+    nm.onclick = () => { try { localStorage.removeItem("gidelim-name"); } catch(e) {} gRender(); }; area.append(nm); }
 }
 function pollCard(id, p){
   const t = tally(id);
@@ -2307,7 +2386,7 @@ function handleHash(){
   if (h.startsWith("yer=")) { const p = readPlaceLink(h.slice(4)); setHash("");
     if (p && p.ad) { show("explore"); const tryOpen = (n) => { if (sample || n > 20) openPlace(p, p.sehir || ""); else setTimeout(() => tryOpen(n + 1), 150); }; tryOpen(0); }
     return; }
-  if (h.startsWith("oy-")) { openPoll = h.slice(3); show("group"); }
+  if (h.startsWith("oy-")) { openPoll = h.slice(3); if (window.gidelimJoinPoll) window.gidelimJoinPoll(openPoll); show("group"); }
   else if (h === "grup") show("group");
 }
 window.addEventListener("hashchange", handleHash);
