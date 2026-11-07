@@ -43,7 +43,7 @@
   --shadow:none; --emo:.09; color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
-html,body{overflow-x:hidden;max-width:100%}
+body{overflow-x:clip;max-width:100%}
 main{overflow-x:clip}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
@@ -471,17 +471,27 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .sharecard .ar{flex:none;font-weight:800;color:var(--accent)}
 
 /* Açılış ekranı */
-#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#FF4D5E;color:#fff;transition:opacity .35s ease,visibility .35s ease}
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#FF4D5E;color:#fff;transition:opacity .45s ease,visibility .45s ease}
 #splash.hide{opacity:0;visibility:hidden}
 .sp-in{text-align:center;padding-bottom:6vh}
 .sp-logo{width:104px;height:104px;border-radius:30px;background:rgba(255,255,255,.18);display:grid;place-items:center;margin:0 auto 16px}
-.sp-name{font-family:"Baloo 2",system-ui,-apple-system,sans-serif;font-weight:800;font-size:2.2rem;line-height:1;letter-spacing:-.01em}
+.sp-name{font-family:"Baloo 2",system-ui,-apple-system,sans-serif;font-weight:800;font-size:3.2rem;line-height:1;letter-spacing:-.02em}
 .sp-tag{margin-top:8px;opacity:.92;font-weight:700;font-size:.98rem}
-@media (prefers-reduced-motion:no-preference){.sp-logo{animation:sp-pop .55s cubic-bezier(.2,.9,.3,1.3) both}.sp-name,.sp-tag{animation:sp-up .5s .12s ease both}@keyframes sp-pop{from{transform:scale(.75);opacity:0}}@keyframes sp-up{from{transform:translateY(8px);opacity:0}}}
+@media (prefers-reduced-motion:no-preference){.sp-name{animation:sp-pop .7s cubic-bezier(.2,.9,.3,1.25) both}@keyframes sp-pop{from{transform:scale(.85);opacity:0}}}
 /* Başlık satırı dar ekranda sıkışmasın */
 .brandrow{min-width:0}
 .brand{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .locchip{min-width:0;flex-shrink:1}
+
+/* Bildirim düğmesi */
+.pushbtn{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;text-align:left;margin:12px 16px 0;width:calc(100% - 32px);border:1px solid var(--accent-line);background:var(--accent-soft);border-radius:14px;padding:10px 12px;cursor:pointer;color:var(--ink)}
+.pushbtn span{grid-row:span 2;font-size:1.3rem}
+.pushbtn b{font-size:.9rem}
+.pushbtn small{color:var(--muted);font-size:.76rem}
+.pushbtn:disabled{opacity:.6}
+/* Pencereler açıkken içerik kendi içinde kaysın */
+.sheet-bg,.tour-bg{overscroll-behavior:contain;touch-action:none}
+.sheet,.psheet,.hlist,.sugs,.tour{overscroll-behavior:contain;touch-action:pan-y}
 
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
@@ -504,11 +514,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 </style>
 </head>
 <body>
-<div id="splash" aria-hidden="true"><div class="sp-in">
-  <div class="sp-logo"><svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true"><path d="M32 5C21.2 5 12.5 13.6 12.5 24.3 12.5 38.6 32 59 32 59s19.5-20.4 19.5-34.7C51.5 13.6 42.8 5 32 5z" fill="#fff"/><circle cx="32" cy="24.5" r="7.8" fill="#FF4D5E"/></svg></div>
-  <div class="sp-name">Gidelim</div>
-  <div class="sp-tag">Nereye gidiyoruz?</div>
-</div></div>
+<div id="splash" aria-hidden="true"><div class="sp-in"><div class="sp-name" data-notr>Gidelim</div></div></div>
 <main>
   <!-- KEŞFET -->
   <section id="v-explore">
@@ -715,13 +721,36 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
     })();
     return syncing;
   }
+  function describe(op, col, id, data, old){
+    const me = window.gidelimName ? window.gidelimName() : ""; if (!me) return null;
+    const E = typeof LANG !== "undefined" && LANG === "en";
+    const pt = pid => (dcache.polls[pid] || {}).title || "Gidelim";
+    const on = oid => (dcache.options[oid] || {}).ad || "";
+    if (col === "votes" && op === "set") {
+      const o = old || {}, n = data || {};
+      for (const pid of Object.keys(n.v || {})) { const add = (n.v[pid] || []).filter(x => !((o.v || {})[pid] || []).includes(x));
+        if (add.length) return { poll: pid, title: pt(pid), text: E ? `${me} voted for “${on(add[0])}” 👍` : `${me}, “${on(add[0])}” için oy verdi 👍` }; }
+      for (const pid of Object.keys(n.rsvp || {})) { const v = n.rsvp[pid]; if ((o.rsvp || {})[pid] !== v && v)
+        return { poll: pid, title: pt(pid), text: v === "yes" ? (E ? `${me} is coming 🙋` : `${me} geliyor 🙋`) : v === "maybe" ? (E ? `${me} might come 🤔` : `${me} belki gelir 🤔`) : (E ? `${me} can’t make it ❌` : `${me} gelemiyor ❌`) }; }
+      for (const oid of Object.keys(n.rx || {})) { if ((o.rx || {})[oid] !== n.rx[oid]) { const pid = (dcache.options[oid] || {}).poll;
+        if (pid) return { poll: pid, title: pt(pid), text: E ? `${me} reacted ${n.rx[oid]} to “${on(oid)}”` : `${me}, “${on(oid)}” için ${n.rx[oid]} bıraktı` }; } }
+      return null;
+    }
+    if (col === "comments" && op === "set") return { poll: data.poll, title: pt(data.poll), text: (E ? `${me} commented on “${on(data.opt)}”: ` : `${me}, “${on(data.opt)}” hakkında yorum yaptı: `) + "“" + String(data.text || "").slice(0, 80) + "”" };
+    if (col === "options" && op === "set") return { poll: data.poll, title: pt(data.poll), text: E ? `${me} added a place: ${data.ad}` : `${me} yeni mekan ekledi: ${data.ad}` };
+    if (col === "expenses" && op === "set") return { poll: data.poll, title: pt(data.poll), text: E ? `${me} added a payment to the bill 💸` : `${me} hesaba ödeme ekledi 💸` };
+    if (col === "polls" && op === "update" && data.closed === true) return { poll: id, title: pt(id), text: data.winner ? (E ? `🏆 Winner: ${data.winner}` : `🏆 Kazanan belli oldu: ${data.winner}`) : (E ? "🏁 The vote is over" : "🏁 Oylama bitti") };
+    if (col === "polls" && op === "update" && data.when) { const d = new Date(data.when); return { poll: id, title: pt(id), text: (E ? "📅 Date set: " : "📅 Tarih belirlendi: ") + d.toLocaleString(E ? "en-GB" : "tr-TR", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) }; }
+    return null;
+  }
   function write(op, col, id, data){
+    let notify = null; try { notify = describe(op, col, id, data, dcache[col][id]); } catch(e) {}
     if (op === "set") dcache[col][id] = data;
     else if (op === "update") dcache[col][id] = { ...(dcache[col][id] || {}), ...data };
     else delete dcache[col][id];
     if (col === "polls") { if (op === "delete") dropPoll(id); else addPoll(id); }
     emit(col); pending++;
-    const p = queue.then(() => post("/db/write", { op, col, id, data })).finally(() => { pending--; if (!pending) setTimeout(sync, 300); });
+    const p = queue.then(() => post("/db/write", notify ? { op, col, id, data, actor: DEV, notify } : { op, col, id, data })).finally(() => { pending--; if (!pending) setTimeout(sync, 300); });
     queue = p.catch(() => {});
     return p;
   }
@@ -735,6 +764,26 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
     doc: docRef
   };
   const userShim = { id: async () => DEV, profiles: async ids => post("/db/profiles", { ids }) };
+  const VAPID_PUBLIC = "BO6IkWPMApOb5te8hh6SVMcoWgJh38vpM0cCXJnK_9elJhlPyL-8Y0nSD2lsIrRT9z81RQ12YJHAL7jfEzQL4z4";
+  const b64ToU8 = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4)), c => c.charCodeAt(0));
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+  const standalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  window.gidelimPush = {
+    status(){
+      if (!ready) return "none";
+      if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) return isIOS && !standalone() ? "install" : "none";
+      if (Notification.permission === "denied") return "denied";
+      return Notification.permission === "granted" && localStorage.getItem("gidelim-push") === "1" ? "on" : "ready";
+    },
+    async enable(){
+      const perm = await Notification.requestPermission(); if (perm !== "granted") throw { code: "denied" };
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(VAPID_PUBLIC) });
+      await post("/db/push-sub", { uid: DEV, sub: sub.toJSON() });
+      localStorage.setItem("gidelim-push", "1");
+    }
+  };
   window.gidelimJoinPoll = id => { if (/^[A-Za-z0-9_\-]{4,80}$/.test(id)) { addPoll(id); sync(); } };
   window.gidelimSetName = name => { try { localStorage.setItem("gidelim-name", name); } catch(e) {} return post("/db/me", { id: DEV, name }); };
   window.gidelimName = () => { try { return localStorage.getItem("gidelim-name") || ""; } catch(e) { return ""; } };
@@ -817,6 +866,7 @@ const EN = {
   "Nereye gidiyoruz?":"Where are we going?",
   "Grup oylaması için veritabanı henüz bağlı değil. Cloudflare’de Worker’a DB bağlantısını ekle.":"The group vote database isn’t connected yet. Add the DB binding to the Worker in Cloudflare.","Bu site veritabanına yetkili değil. Cloudflare’deki ALLOWED_ORIGINS ayarını kontrol et.":"This site isn’t allowed to use the database. Check ALLOWED_ORIGINS in Cloudflare.","Grup verisine şu an ulaşılamıyor. Biraz sonra tekrar dene.":"Can’t reach group data right now. Try again in a moment.",
   "👋 Arkadaşların seni nasıl görsün?":"👋 How should friends see you?","Oylamalarda adın bu şekilde görünecek. Sonradan değiştirebilirsin.":"This is how your name appears in votes. You can change it later.","Adın ya da takma adın":"Your name or nickname","Adın":"Your name","Devam":"Continue","Oylama yükleniyor…":"Loading the vote…","👥 Arkadaşlarını çağırmak için oylamayı aç ve 📤 Davet et’e dokun. Oylamaları sadece davet bağlantısı olanlar görebilir.":"👥 To invite friends, open a vote and tap 📤 Invite. Only people with the invite link can see a vote.","değiştir":"change",
+  "🔔 Bildirim almak için Gidelim’i ana ekrana ekle (Safari’de Paylaş → Ana Ekrana Ekle) ve oradan aç.":"🔔 To get notifications, add Gidelim to your Home Screen (Safari: Share → Add to Home Screen) and open it from there.","🔕 Bildirimlere izin verilmedi. Telefonun ayarlarından Gidelim için bildirimleri açabilirsin.":"🔕 Notifications are blocked. You can turn them on for Gidelim in your phone settings.","Bildirimleri aç":"Turn on notifications","Biri oy verince, yorum yazınca haberin olsun":"Know when someone votes or comments","🔔 Bildirimler açıldı":"🔔 Notifications on","Bildirim izni verilmedi.":"Notification permission denied.","Bildirimler açılamadı, tekrar dene.":"Couldn’t turn on notifications, try again.",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1923,7 +1973,7 @@ SADECE şu JSON nesnesini döndür, başka hiçbir şey yazma:
 Soru soruyorsan "mekanlar" ve "plan" boş dizi olsun.`;
   ctl?.abort(); ctl = new AbortController();
   try {
-    const r = await sample.json(prompt, { signal: ctl.signal, ...FASTAI, cache: false, onText: ({ text }) => {
+    const r = await sample.json(prompt, { signal: ctl.signal, ...QUICKAI, cache: false, onText: ({ text }) => {
       const msg = partialField(text, "mesaj");
       if (msg) { if (!live) { live = el("div","msg ai"); typing.replaceWith(live); } live.textContent = msg; }
       const mi = text.indexOf('"mekanlar"');
@@ -2093,6 +2143,16 @@ function gRender(){
   else { openPoll = null; renderPolls(area); }
 }
 const pollMissing = {};
+function pushRow(area){
+  const P = window.gidelimPush; if (!P) return; const st = P.status();
+  if (st === "on" || st === "none") return;
+  if (st === "install") { area.append(el("div","gnote",L("🔔 Bildirim almak için Gidelim’i ana ekrana ekle (Safari’de Paylaş → Ana Ekrana Ekle) ve oradan aç."))); return; }
+  if (st === "denied") { area.append(el("div","gnote",L("🔕 Bildirimlere izin verilmedi. Telefonun ayarlarından Gidelim için bildirimleri açabilirsin."))); return; }
+  const b = el("button","pushbtn"); b.type = "button";
+  b.append(el("span",null,"🔔"), el("b",null,L("Bildirimleri aç")), el("small",null,L("Biri oy verince, yorum yazınca haberin olsun")));
+  b.onclick = async () => { b.disabled = true; try { await P.enable(); toast(L("🔔 Bildirimler açıldı")); gRender(); } catch(e) { b.disabled = false; toast(e && e.code === "denied" ? L("Bildirim izni verilmedi.") : L("Bildirimler açılamadı, tekrar dene.")); } };
+  area.append(b);
+}
 function renderNameGate(area){
   const box = el("div","gpanel"); box.append(el("h3",null,L("👋 Arkadaşların seni nasıl görsün?")));
   box.append(el("div","hint",L("Oylamalarda adın bu şekilde görünecek. Sonradan değiştirebilirsin.")));
@@ -2115,7 +2175,7 @@ function renderPolls(area){
   b.onclick = create; inp.addEventListener("keydown", e => { if (e.key === "Enter") create(); });
   row.append(inp, b); box.append(row);
   box.append(el("div","hint","📍 " + locStr() + " için. Konumu üstteki düğmeden değiştirebilirsin."));
-  area.append(box);
+  area.append(box); pushRow(area);
   const all = Object.entries(polls).sort((a, b) => (b[1].at || 0) - (a[1].at || 0));
   const open = all.filter(([,p]) => !p.closed), closed = all.filter(([,p]) => p.closed);
   resolveNames(all.map(([,p]) => p.by));
@@ -2168,7 +2228,7 @@ function renderPoll(area, pid){
   inv.onclick = async () => { const text = `🗳️ ${p.title}\n📍 ${p.loc || ""}${p.when ? "\n📅 " + fmtWhen(p.when) : ""}\n${LANG === "en" ? "Add places and vote on Gidelim" : "Gidelim’de mekan ekle ve oy ver"} 👉 ${APP_URL}#oy-${pid}`;
     try { if (navigator.share) { await navigator.share({ text }); return; } } catch(e){ if (e?.name === "AbortError") return; }
     try { await navigator.clipboard.writeText(text); toast("📋 Davet metni kopyalandı"); } catch(e){ toast("Kopyalanamadı"); } };
-  ph.append(inv); area.append(ph);
+  ph.append(inv); area.append(ph); pushRow(area);
 
   if (p.closed) {
     const w = el("div","winner"); const lead = t.rows[0];
@@ -2606,11 +2666,17 @@ updateSkipInfo();
 
 if (!ls.get("gidelim-tour", 0) && !location.hash.startsWith("#oy-")) setTimeout(openTour, 300);
 else if (!ls.get("nereye-loc", null)) setTimeout(() => openSheet(), 400);
+/* Pencere açıkken arka sayfa kaymasın */
+(() => { let y = 0, locked = false; const ids = ["place","sheet","settings","hist","tour"];
+  const sync = () => { const any = ids.some(i => { const e = document.getElementById(i); return e && !e.hidden; }); const b = document.body;
+    if (any && !locked) { y = window.scrollY || 0; Object.assign(b.style, { position: "fixed", top: -y + "px", left: "0", right: "0", width: "100%" }); locked = true; }
+    else if (!any && locked) { Object.assign(b.style, { position: "", top: "", left: "", right: "", width: "" }); window.scrollTo(0, y); locked = false; } };
+  const mo = new MutationObserver(sync); ids.forEach(i => { const e = document.getElementById(i); if (e) mo.observe(e, { attributes: true, attributeFilter: ["hidden"] }); }); })();
 startI18n();
 /* Açılış ekranını, uygulama hazır olunca (en az ~0.7 sn gösterip) kaldır */
 (() => { const sp = document.getElementById("splash"); if (!sp) return;
   const hide = () => { if (sp.classList.contains("hide")) return; sp.classList.add("hide"); document.documentElement.style.background = ""; setTimeout(() => sp.remove(), 450); };
-  setTimeout(hide, Math.max(0, 700 - performance.now())); setTimeout(hide, 2500); })();
+  setTimeout(hide, 1600); })();
 </script>
 </body>
 </html>
