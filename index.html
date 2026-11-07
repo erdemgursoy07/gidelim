@@ -28,7 +28,7 @@
   --primary:var(--accent); --star:#FFB020; --danger:#E5383B; --ok:#1F9D63;
   --shadow:0 1px 2px rgba(23,23,28,.04),0 4px 14px rgba(23,23,28,.05);
   --emo:.13;
-  color-scheme:light; box-sizing:border-box; --tbh:58px;
+  color-scheme:light; box-sizing:border-box; --tbh:50px; --sab:max(calc(env(safe-area-inset-bottom, 0px) - 14px), 4px);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -64,7 +64,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 [hidden]{display:none!important}
-main{position:fixed;top:0;left:0;right:0;bottom:calc(var(--tbh) + env(safe-area-inset-bottom,0px));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-top:env(safe-area-inset-top,0px);padding-bottom:24px}
+main{position:fixed;top:0;left:0;right:0;bottom:calc(var(--tbh) + var(--sab));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-top:env(safe-area-inset-top,0px);padding-bottom:24px}
 main > section{max-width:720px;margin:0 auto}
 
 /* Başlık */
@@ -207,7 +207,7 @@ main > section{max-width:720px;margin:0 auto}
 .typing{display:flex;gap:4px;padding:12px 14px}
 .typing span{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5}
 @media (prefers-reduced-motion:no-preference){.typing span{animation:bl 1s infinite}.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}@keyframes bl{50%{opacity:1;transform:translateY(-3px)}}}
-.composer{position:fixed;left:0;right:0;width:100%;box-sizing:border-box;bottom:calc(var(--tbh) + env(safe-area-inset-bottom,0px));z-index:5;padding:8px 12px;background:var(--bg)}
+.composer{position:fixed;left:0;right:0;width:100%;box-sizing:border-box;bottom:calc(var(--tbh) + var(--sab));z-index:5;padding:8px 12px;background:var(--bg)}
 .composer-in{max-width:696px;margin:0 auto;display:flex;gap:6px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:4px 4px 4px 12px;box-shadow:var(--shadow)}
 .composer-in:focus-within{border-color:var(--accent-line)}
 .composer textarea{flex:1;border:0;background:none;color:var(--ink);font:inherit;padding:8px 0;resize:none;line-height:1.4;max-height:120px}
@@ -425,7 +425,19 @@ main > section{max-width:720px;margin:0 auto}
 .xinfo{margin:8px 18px 0;font-size:.74rem;color:var(--muted)}
 
 /* Mekan detay penceresi */
-.psheet{max-height:88vh;overflow-y:auto;padding-top:14px}
+.psheet{max-height:62vh;min-height:250px;overflow-y:auto;padding-top:14px}
+@media (prefers-reduced-motion:no-preference){.sheet-bg:not([hidden]){animation:bgin .2s ease both}.sheet-bg:not([hidden]) .sheet{animation:sheetup .3s cubic-bezier(.2,.9,.3,1) both}
+  @keyframes bgin{from{background:rgba(10,10,20,0)}}@keyframes sheetup{from{transform:translateY(60px);opacity:.3}}}
+.psub{color:var(--muted);font-size:.84rem;font-weight:700;margin-top:3px}
+.pinfo2{margin-top:12px;min-height:78px}
+.plead{margin:0;font-size:.98rem;line-height:1.45}
+.plead.muted{color:var(--muted);font-size:.88rem}
+.ptags2{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ptag{font-size:.8rem;font-weight:700;background:var(--soft);border-radius:999px;padding:4px 10px}
+.ptag.sk{width:86px;height:24px}
+.pskel{height:14px;border-radius:7px;background:var(--soft);margin-bottom:8px}
+.pskel.short{width:62%}
+@media (prefers-reduced-motion:no-preference){.pskel,.ptag.sk{animation:pulse 1.2s ease-in-out infinite}@keyframes pulse{50%{opacity:.45}}}
 .phd{display:flex;gap:12px;align-items:flex-start}
 .phd .em{width:48px;height:48px;font-size:24px}
 .phd h2{margin:0;font-size:1.15rem;line-height:1.2}
@@ -522,6 +534,7 @@ html.kb main{bottom:var(--kb,0px)}
 html.kb .composer{bottom:var(--kb,0px)}
 html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
 
+.appver{text-align:center;color:var(--muted);font-size:.74rem;font-weight:700;margin-top:12px}
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -531,7 +544,7 @@ html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
 .segset button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 
 /* Sekme çubuğu */
-.tabbar{position:fixed;left:0;right:0;bottom:0;width:100%;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;width:100%;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-bottom:var(--sab)}
 .tabbar-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;height:var(--tbh);padding:0 6px}
 .tb{border:0;background:none;cursor:pointer;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--muted);font-size:.7rem;font-weight:700;position:relative;border-radius:12px;text-align:center;line-height:1.1}
 .tb .ic{font-size:1.15rem;line-height:1.2;filter:grayscale(1);opacity:.6}
@@ -562,7 +575,7 @@ html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
         </div>
       </div>
       <div class="tgrid" id="typechips" role="group" aria-label="Mekan türü"></div>
-      <div class="fseg" id="filterchips" role="group" aria-label="Filtre"></div>
+      <div class="fseg" id="filterchips" role="group" aria-label="Filtre" hidden></div>
       <div id="ex-list" aria-live="polite"></div>
       <button class="tipbar" id="loc-tip" type="button" hidden style="display:block;width:calc(100% - 32px);text-align:left;border:0;cursor:pointer"></button>
       <div class="tipbar" id="ai-warn" hidden></div>
@@ -666,6 +679,7 @@ html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
     <div class="lbl">Tema</div>
     <div class="segset" id="set-theme" role="group" aria-label="Tema"><button type="button" data-val="auto">🌗 Otomatik</button><button type="button" data-val="light">☀️ Aydınlık</button><button type="button" data-val="dark">🌙 Karanlık</button></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.0.0</div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -892,7 +906,7 @@ const EN = {
   "Popüler":"Popular","Az bilinen":"Lesser-known","Uygun fiyatlı":"Affordable","Sakin":"Quiet","+ Daha fazla göster":"+ Show more","Bir mekana dokun: neyiyle meşhur, ne zaman gidilir, nasıl gidilir.":"Tap a place to see what it’s known for, when to go and how to get there.","Emin olduğum bir yer bulamadım. Yazımı ya da konumu değiştir.":"Couldn’t find a place I’m sure about. Check the spelling or change the location.","Bu filtrede emin olduğum bir yer bulamadım. Başka bir filtre dene.":"No places I’m sure about with this filter. Try another one.","Liste getirilemedi. Tekrar dene.":"Couldn’t load the list. Try again.","Mekan türü":"Place type",
   "↻ Tekrar dene":"↻ Try again",
   "Yapay zeka servisi şu an cevap vermedi. Biraz sonra tekrar dene.":"The AI service didn’t respond. Try again in a moment.","Yapay zeka anahtarı geçersiz görünüyor. Cloudflare’deki GEMINI_API_KEY’i kontrol et.":"The AI key looks invalid. Check GEMINI_API_KEY in Cloudflare.","Bu site yapay zeka bağlantısına yetkili değil. Cloudflare’deki ALLOWED_ORIGINS ayarını kontrol et.":"This site isn’t allowed to use the AI. Check ALLOWED_ORIGINS in Cloudflare.","Yapay zekaya bağlanılamadı. İnternetini kontrol edip tekrar dene.":"Couldn’t reach the AI. Check your connection and try again.",
-  "Üstten bir mekan türü seç (Kafe, Restoran, Bar…), altından filtre seç (Popüler, Az bilinen, Uygun, Sakin). Liste anında gelir. ♡ ile kaydet, mekana dokunup neyiyle meşhur olduğuna ve yol tarifine bak.":"Pick a place type at the top (Café, Restaurant, Bar…) and a filter below (Popular, Lesser-known, Affordable, Quiet). The list appears instantly. Save with ♡, tap a place to see what it’s known for and get directions.",
+  "Bir mekan türü seç (Restoran, Kafe, Bar, Doğa…). Bölgendeki en sevilen yerler listelenir. ♡ ile kaydet, mekana dokunup neyiyle meşhur olduğuna ve yol tarifine bak.":"Pick a place type (Restaurant, Café, Bar, Nature…). The best-loved spots nearby are listed. Save with ♡, tap a place to see what it’s known for and get directions.",
   "Ne istediğini yaz: “bu akşam sakin bir yer”, “arkadaşlarla plan yap” gibi. Mekan önerir, saatleriyle akşam planı çıkarır. Eski sohbetlerin 🕘 Geçmiş’te durur.":"Type what you want, like “a quiet place tonight” or “plan a night out with friends”. It suggests places and builds an evening plan with times. Past chats stay in 🕘 History.",
   "Kaydettiğin yerler burada. Gittiklerini ✅ işaretle, yıldız ver, not al; öneriler zevkine göre iyileşir. 3 yer olunca listeni arkadaşlarınla paylaşabilirsin.":"Your saved places live here. Mark visited ones ✅, rate them and add notes — suggestions get better. With 3+ places you can share your list.",
   "📍 Konumumu bul":"📍 Use my location","📍 Konumun bulunuyor…":"📍 Finding you…","Bu cihaz konum paylaşmıyor.":"This device can’t share its location.","Konum bulunamadı, elle yazabilirsin.":"Couldn’t find your location — you can type it in.","Konum izni verilmedi. Telefon ayarlarından izin verebilirsin.":"Location permission denied. You can allow it in your phone settings.",
@@ -903,6 +917,7 @@ const EN = {
   "🔔 Bildirim almak için Gidelim’i ana ekrana ekle (Safari’de Paylaş → Ana Ekrana Ekle) ve oradan aç.":"🔔 To get notifications, add Gidelim to your Home Screen (Safari: Share → Add to Home Screen) and open it from there.","🔕 Bildirimlere izin verilmedi. Telefonun ayarlarından Gidelim için bildirimleri açabilirsin.":"🔕 Notifications are blocked. You can turn them on for Gidelim in your phone settings.","Bildirimleri aç":"Turn on notifications","Biri oy verince, yorum yazınca haberin olsun":"Know when someone votes or comments","🔔 Bildirimler açıldı":"🔔 Notifications on","Bildirim izni verilmedi.":"Notification permission denied.","Bildirimler açılamadı, tekrar dene.":"Couldn’t turn on notifications, try again.",
   "Fırın":"Bakery","Müze":"Museum","Park":"Park","Çarşı":"Market","Sanat":"Arts","Bar":"Bar","Uygun":"Affordable","Temizle":"Clear","Listen boş. Keşfet’te beğendiğin mekanın ♡’sine dokun, buraya gelsin.":"Your list is empty. Tap ♡ on a place in Explore to save it here.",
   "Temizle":"Clear",
+  "Doğa":"Nature","Park, sahil, orman, göl":"Parks, beaches, forests, lakes","Çarşı & AVM":"Markets & malls","Çarşı, pazar, AVM, butik":"Bazaars, markets, malls, boutiques","Bilgiler yapay zekaya dayanır; gitmeden haritadan kontrol et.":"Info is AI-generated; check the map before you go.","Ek bilgiler şu an getirilemedi; yol tarifi ve haritayla devam edebilirsin.":"Couldn’t load details right now; you can still use directions and the map.",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1020,10 +1035,10 @@ const COLS = [
     q:"Sadece fırınlar, pastaneler, tatlıcılar, baklavacılar, muhallebiciler ve dondurmacılar. Restoran ya da bar KOYMA." },
   { id:"muze",     label:"Müze & tarih", sub:"Müze, saray, tarihi yapı", emoji:"🏛️",
     q:"Sadece müzeler, galeriler, saraylar, camiler, kiliseler, kaleler ve tarihi yapılar. Yeme-içme mekanı KOYMA." },
-  { id:"park",     label:"Park & doğa", sub:"Park, sahil, seyir tepesi", emoji:"🌳",
-    q:"Sadece açık hava mekanları: parklar, korular, sahil yürüyüş yolları, plajlar, seyir tepeleri, botanik bahçeleri. Kapalı mekan ya da yeme-içme yeri KOYMA." },
-  { id:"carsi",    label:"Çarşı & alışveriş", sub:"Çarşı, pazar, butik", emoji:"🛍️",
-    q:"Sadece alışveriş yapılacak yerler: tarihi çarşılar, semt pazarları, bit pazarları, alışveriş caddeleri, butik ve tasarım dükkanları, sahaflar. AVM'leri sadece gerçekten meşhursa koy; yeme-içme mekanı KOYMA." },
+  { id:"park",     label:"Doğa", sub:"Park, sahil, orman, göl", emoji:"🌳",
+    q:"Sadece doğa ve açık hava yerleri: parklar, korular, ormanlar, sahil yürüyüş yolları, plajlar, göller, şelaleler, seyir tepeleri, botanik bahçeleri, mesire alanları. Kapalı mekan, AVM ya da yeme-içme yeri KOYMA." },
+  { id:"carsi",    label:"Çarşı & AVM", sub:"Çarşı, pazar, AVM, butik", emoji:"🛍️",
+    q:"Sadece alışveriş yerleri: bu konumdaki AVM'ler (alışveriş merkezleri), tarihi çarşılar, kapalı çarşılar, semt pazarları, bit pazarları, alışveriş caddeleri, butik ve tasarım dükkanları. Konumdaki bilinen AVM'leri mutlaka dahil et. Yeme-içme mekanı, müze ya da park KOYMA." },
   { id:"sanat",    label:"Sanat & etkinlik", sub:"Sinema, tiyatro, konser", emoji:"🎭",
     q:"Sadece kültür-sanat ve etkinlik mekanları: sinemalar, tiyatrolar, konser salonları, sanat galerileri, kültür merkezleri, canlı performans sahneleri. Yeme-içme mekanı KOYMA." }
 ];
@@ -1271,6 +1286,7 @@ function mapLink(p){
   a.target = "_blank"; a.rel = "noopener"; return a;
 }
 function askAbout(p, where){
+  if (!$("#place").hidden) { $("#place").hidden = true; pdOpen = null; }
   newChat(); curTab = "x";
   show("ask");
   send(`${p.ad} (${[p.semt, fullWhere(p, where)].filter(Boolean).join(", ")}) hakkında ne dersin? Gitmeye değer mi, ne zaman gidilir, yanına başka ne yapılır?`.replace(/ hakkında ne dersin\? Gitmeye değer mi, ne zaman gidilir, yanına başka ne yapılır\?$/, LANG === "en" ? " — what do you think? Is it worth going, when should I go, what else is nearby?" : "$&"));
@@ -1388,7 +1404,7 @@ const FILTERS = [
   { id:"ucuz",    label:"Uygun fiyatlı", q:"Uygun fiyatlı (₺) ama sevilen mekanlar; pahalı (₺₺₺) olanları KOYMA" },
   { id:"sakin",   label:"Sakin", q:"Sakin, kalabalık olmayan, sohbete ya da dinlenmeye uygun mekanlar" }
 ];
-let exType = ls.get("gidelim-type", "restoran"), exFilter = ls.get("gidelim-filter", "populer"), exMode = "browse", exTerm = "";
+let exType = ls.get("gidelim-type", "restoran"), exFilter = "populer", exMode = "browse", exTerm = "";
 if (!COLS.some(c => c.id === exType)) exType = "restoran";
 /* Son 2 saatte elle tür seçilmediyse saate uygun türle aç */
 if (Date.now() - (ls.get("gidelim-type-at", 0) || 0) > 2 * 3600 * 1000) {
@@ -1407,7 +1423,7 @@ function listPrompt(where, c, f, n, exclude){
   return `Konum: ${where}${locHint()}
 Tür: ${c.q}
 Filtre: ${f.q}
-Bu konum, tür ve filtreye uyan ${n} mekanı listele, en iyiler başta. Hızlı ve kısa cevap ver.
+Bu konumdaki bu türün en iyi ${n} mekanını listele, en sevilenler başta. "tur" alanına mekanın gerçek türünü açıkça yaz (ör. Kahveci, Kebapçı, Meyhane, Müze, Park, AVM). Türe uymayan tek bir yer bile koyma. Hızlı ve kısa cevap ver.
 ${exclude && exclude.length ? "Şunları zaten gösterdin, tekrar yazma: " + exclude.slice(-40).join(", ") + "\n" : ""}${skipN.length ? "Bunları önerme: " + skipN.join(", ") + "\n" : ""}${LIST_RULES}
 ${LIST_FORMAT}`;
 }
@@ -1423,11 +1439,13 @@ function fetchList(t, f, where, more, onStream, signal){
   const base = (lists[key] && lists[key].items) || [];
   const items = more ? base.slice() : [];
   const seen = new Set(items.map(p => norm(p.ad)));
-  const take = arr => { let n = 0; (arr || []).forEach(p => { if (okPlace(p) && inLoc(p) && !seen.has(norm(p.ad)) && !isSkipped(p, where)) { seen.add(norm(p.ad)); items.push(p); n++; } }); return n; };
+  const take = arr => { let n = 0; (arr || []).forEach(p => { if (okPlace(p) && inLoc(p) && fitsType(p, t) && !seen.has(norm(p.ad)) && !isSkipped(p, where)) { seen.add(norm(p.ad)); items.push(p); n++; } }); return n; };
   if (onStream) userBusy++;
   const pr = sample.json(listPrompt(where, c, fl, 8, items.map(p => p.ad)), Object.assign({ ...QUICKAI, fast: onStream ? "auto" : false, signal,
       onText: ({ text }) => { if (take(partialObjects(text)) && onStream) onStream(items); } }, more ? { cache: false } : {}))
-    .then(r => { take(Array.isArray(r) ? r : []); lists[key] = { items, at: Date.now(), done: more && items.length === base.length }; persistLists(); return items; })
+    .then(r => { const arr = Array.isArray(r) ? r : []; take(arr);
+      if (!items.length && arr.length) arr.forEach(p => { if (okPlace(p) && inLoc(p) && !seen.has(norm(p.ad))) { seen.add(norm(p.ad)); items.push(p); } });
+      lists[key] = { items, at: Date.now(), done: more && items.length === base.length }; persistLists(); return items; })
     .finally(() => { delete inflight[key]; if (onStream) userBusy = Math.max(0, userBusy - 1); });
   inflight[key] = pr; return pr;
 }
@@ -1449,19 +1467,31 @@ async function pumpPre(){
   preBusy = false;
 }
 function markReady(){}
-const SHORT = { restoran:"Restoran", kafe:"Kafe", bar:"Bar", firin:"Fırın", muze:"Müze", park:"Park", carsi:"Çarşı", sanat:"Sanat" };
+const SHORT = { restoran:"Restoran", kafe:"Kafe", bar:"Bar", firin:"Fırın", muze:"Müze", park:"Doğa", carsi:"Çarşı & AVM", sanat:"Sanat" };
+/* Gelen mekanın türü seçilen kategoriye uyuyor mu? (alakasızları ele) */
+const TYPE_OK = {
+  restoran: t => !/kafe|kahve|cafe|café|coffee|kahvalt|bar\b|pub|kokteyl|şarap evi|müze|museum|park|avm|mall|pastane|fırın|dondurma|tatlıcı|sinema|tiyatro/.test(t),
+  kafe: t => /kafe|kahve|cafe|café|coffee|kahvalt|çay|brunch|espresso|roaster|kavurma/.test(t),
+  bar: t => /bar|meyhane|pub|şarap|wine|kokteyl|cocktail|bira|beer|gece|club|kulüp|caz|jazz|müzik/.test(t),
+  firin: t => /fırın|pastane|tatlı|baklava|muhallebi|dondurma|künefe|börek|simit|çikolata|pasta|bakery|patisserie|dessert|ice cream|gelato|lokum|şekerci/.test(t),
+  muze: t => /müze|museum|saray|palace|cami|mosque|kilise|church|sinagog|kale|castle|tarih|histor|anıt|monument|türbe|köşk|kasır|hamam|bedesten|antik|ören|galeri|gallery|kütüphane/.test(t),
+  park: t => /park|koru|bahçe|garden|sahil|beach|plaj|orman|forest|göl|lake|şelale|tepe|seyir|vadi|doğa|nature|botanik|mesire|ada|kanyon|yayla|yürüyüş|sahil/.test(t),
+  carsi: t => /çarşı|pazar|bazaar|market|avm|alışveriş|shopping|mall|butik|boutique|sahaf|cadde|bedesten|outlet|dükkan|mağaza|store|han\b|arasta/.test(t),
+  sanat: t => /sinema|cinema|tiyatro|theat|konser|concert|sahne|stage|galeri|gallery|sanat|art|kültür|culture|opera|bale|ballet|performans|müzik|music|etkinlik/.test(t)
+};
+const fitsType = (p, t) => { const f = TYPE_OK[t]; if (!f) return true; const s = ((p.tur || "") + " " + (p.ad || "")).toLocaleLowerCase("tr"); return f(s); };
 function renderChips(){
   const tc = $("#typechips"), fc = $("#filterchips"); tc.innerHTML = ""; fc.innerHTML = "";
   COLS.filter(c => !c.guide).forEach(c => { const b = el("button","tcell"); b.type = "button"; b.dataset.t = c.id; b.setAttribute("aria-pressed", exMode === "browse" && exType === c.id);
     b.setAttribute("aria-label", L(c.label)); b.append(el("span",null,c.emoji), document.createTextNode(L(SHORT[c.id] || c.label))); b.onclick = () => selectType(c.id); tc.append(b); });
   FILTERS.forEach(f => { const b = el("button",null, L(f.id === "ucuz" ? "Uygun" : f.label)); b.type = "button"; b.dataset.f = f.id; b.setAttribute("aria-pressed", exFilter === f.id);
     b.onclick = () => { exFilter = f.id; ls.set("gidelim-filter", f.id); exMode = "browse"; syncChips(); loadList(); }; fc.append(b); });
-  fc.hidden = exMode !== "browse";
+  fc.hidden = true;
 }
 function syncChips(){
   document.querySelectorAll(".tcell").forEach(b => b.setAttribute("aria-pressed", exMode === "browse" && b.dataset.t === exType));
   document.querySelectorAll("#filterchips button").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === exFilter));
-  $("#filterchips").hidden = exMode !== "browse";
+  $("#filterchips").hidden = true;
 }
 function centerChip(){
   const row = $("#typechips"), b = row.querySelector('.tchip[aria-pressed="true"]'); if (!b || row.classList.contains("tgrid")) return;
@@ -1846,18 +1876,16 @@ $("#place").addEventListener("click", e => { if (e.target.id === "place") closeP
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#place").hidden) closePlace(); });
 function openPlace(p, where, opts = {}){
   pdLastFocus = document.activeElement;
-  const fw = fullWhere(p, where || ""), k = keyOf(p, where || ""), pk = LK + k;
+  const fw = fullWhere(p, where || ""), k = keyOf(p, where || ""), pk = LK + "p2|" + k;
   pdOpen = pk;
   const box = $("#place-in"); box.innerHTML = "";
   const cat = catOf(p.tur);
   const hd = el("div","phd"); const ht = el("div"); ht.style.cssText = "flex:1;min-width:0";
   const h2 = notr(el("h2",null,p.ad)); h2.id = "place-h";
-  const meta = el("div","meta"); [p.tur, p.semt, p.fiyat].filter(Boolean).forEach(x => meta.append(el("span","pill",x)));
-  ht.append(h2, meta);
+  ht.append(h2, el("div","psub",[p.tur, p.semt || p.ilce, p.fiyat].filter(Boolean).join(" · ")));
   const x = el("button","pclose","✕"); x.type = "button"; x.setAttribute("aria-label", L("Kapat")); x.onclick = closePlace;
   hd.append(el("div","em",cat.emoji), ht, x); box.append(hd);
-  if (p.neden) box.append(el("p","pwhy",p.neden));
-  const info = el("div","pinfo"); box.append(info);
+  const info = el("div","pinfo2"); box.append(info);
   const acts = el("div","pacts2");
   const sb = el("button","savebtn"); sb.type = "button";
   const syncSave = () => { const on = !!saved[k]; sb.setAttribute("aria-pressed", on); sb.textContent = on ? L("♥ Listende") : L("❤️ Kaydet"); };
@@ -1867,21 +1895,20 @@ function openPlace(p, where, opts = {}){
   acts.append(dl, mapLink({ ...p, sehir: fw }), sb, shareBtn(p, where || ""));
   if (!opts.noAsk) acts.append(askBtn(p, where || ""));
   box.append(acts);
-  box.append(el("div","pnote", L("Bilgiler yapay zekaya dayanır; saat ve fiyatlar değişmiş olabilir. Gitmeden haritadan kontrol et.")));
-  $("#place").hidden = false; setTimeout(() => x.focus(), 30);
+  box.append(el("div","pnote", L("Bilgiler yapay zekaya dayanır; gitmeden haritadan kontrol et.")));
+  $("#place").hidden = false; setTimeout(() => x.focus({ preventScroll: true }), 30);
   const render = d => {
     info.innerHTML = "";
-    if (d === "loading") { const ld = el("div","xload"); ld.style.margin = "4px 2px"; ld.append(el("span","spin"), document.createTextNode(L("Bilgiler hazırlanıyor…"))); info.append(ld);
-      for (let i = 0; i < 3; i++) { const sk = el("div","skel"); sk.style.height = "44px"; info.append(sk); } return; }
-    if (!d || d === "error") { info.append(el("div","hint", L("Ek bilgiler getirilemedi."))); return; }
-    const row = (ic, label, val) => { if (!val || (Array.isArray(val) && !val.length)) return; const r = el("div","pi-row"); const t = el("div");
-      t.append(el("b",null,L(label)));
-      if (Array.isArray(val)) { const tg = el("div","ptags"); val.forEach(v => tg.append(el("i",null,v))); t.append(tg); } else t.append(el("span",null,val));
-      r.append(el("span","ic",ic), t); info.append(r); };
-    row("⭐","Neyiyle meşhur", d.ne_yapilir); row("📝","Nasıl bir yer", d.ozet); row("⏰","En iyi zaman", d.en_iyi_zaman);
-    row("👥","Kimlerle gidilir", d.kimlerle); row("📅","Rezervasyon", d.rezervasyon); row("💰","Bütçe", d.butce);
-    row("🕘","Çalışma saatleri (yaklaşık)", d.saatler); row("💡","Bilmen gereken", d.bilmen_gereken);
-    if (!d.bilmen_gereken && !d.saatler && d.guven == null) { const sk = el("div","skel"); sk.style.height = "40px"; info.append(sk); }
+    if (d === "loading" || (d && !d.meshur && !d.ne_yapilir)) {
+      const l1 = el("div","pskel"), l2 = el("div","pskel short"), tg = el("div","ptags2");
+      for (let i = 0; i < 3; i++) tg.append(el("span","ptag sk"));
+      info.append(l1, l2, tg); return; }
+    if (!d || d === "error") { info.append(el("p","plead muted", L("Ek bilgiler şu an getirilemedi; yol tarifi ve haritayla devam edebilirsin."))); return; }
+    info.append(el("p","plead", d.meshur || d.ne_yapilir));
+    const tg = el("div","ptags2");
+    const add = (ic, v) => { if (v && String(v).trim()) tg.append(el("span","ptag", ic + " " + v)); };
+    add("⏰", d.zaman || d.en_iyi_zaman); add("💰", d.butce); add("📅", d.rezervasyon); add("👥", Array.isArray(d.kimlerle) ? d.kimlerle.slice(0, 2).join(", ") : d.kimlerle);
+    if (tg.children.length) info.append(tg);
     if (d.guven != null && Number(d.guven) < 3) info.append(el("div","pwarn", L("⚠️ Bu mekan hakkında bilgim sınırlı, gitmeden mutlaka kontrol et.")));
   };
   if (pdCache[pk]) return render(pdCache[pk]);
@@ -1889,16 +1916,15 @@ function openPlace(p, where, opts = {}){
   render("loading"); userBusy++; yieldBg();
   sample.json(`Mekan: ${p.ad}${p.tur ? " (" + p.tur + ")" : ""}
 Yer: ${[p.semt, fw].filter(Boolean).join(", ")}
-Bu mekan hakkında kısa, gerçekten işe yarar bilgiler ver. SADECE şu JSON nesnesini döndür:
-{"ozet":"1-2 cümle: nasıl bir yer, ortamı nasıl","ne_yapilir":"Bu mekanın neyiyle meşhur olduğu: yeme-içme yeriyse en meşhur yemekleri/içecekleri, değilse ne görülür ya da ne yapılır","en_iyi_zaman":"Ne zaman gitmeli, ne zaman kalabalık olur","kimlerle":["Arkadaşlar","Çift","Aile / çocuk","Tek başına","İş"],"rezervasyon":"Gerekmez / Önerilir / Şart","butce":"Kişi başı yaklaşık tutar, yerel para birimiyle","saatler":"Yaklaşık çalışma saatleri","bilmen_gereken":"Bir ipucu ya da uyarı","guven":5}
-"kimlerle" listesinde sadece uygun olanları bırak. Emin olmadığın alanı boş metin yap, asla uydurma. "guven" (1-5): bu mekan hakkındaki bilginden ne kadar eminsin. Kısa yaz. Türkçe yaz.`, { ...QUICKAI, onText: ({ text }) => {
+Bu mekan için çok kısa bilgi kartı hazırla. SADECE şu JSON nesnesini döndür:
+{"meshur":"Tek cümle, en fazla 18 kelime: bu mekan neyiyle meşhur, nasıl bir yer","zaman":"En fazla 4 kelime, ör. Hafta içi öğlen","butce":"Kişi başı yaklaşık, ör. 300–600 ₺","rezervasyon":"Gerekmez / Önerilir / Şart","kimlerle":["En fazla 2 tane: Arkadaşlarla / Çiftler / Ailece / Tek başına / İş"],"guven":5}
+Emin olmadığın alanı boş metin yap, asla uydurma. "guven" (1-5): bu mekan hakkındaki bilginden ne kadar eminsin. Türkçe yaz.`, { ...QUICKAI, onText: ({ text }) => {
       if (pdOpen !== pk) return;
-      const d = {}; let any = false;
-      ["ne_yapilir","ozet","en_iyi_zaman","rezervasyon","butce","saatler","bilmen_gereken"].forEach(f => { const v = partialField(text, f); if (v) { d[f] = v; any = true; } });
+      const d = {}; ["meshur","zaman","butce","rezervasyon"].forEach(f => { const v = partialField(text, f); if (v) d[f] = v; });
       const km = text.match(/"kimlerle"\s*:\s*\[([^\]]*)\]/); if (km) { try { d.kimlerle = JSON.parse("[" + km[1] + "]"); } catch(e) {} }
-      if (any) render(d);
+      if (d.meshur) render(d);
     } })
-    .then(r => { const d = r && typeof r === "object" && !Array.isArray(r) ? r : "error"; if (d !== "error") { pdCache[pk] = d; const ks = Object.keys(pdCache); if (ks.length > 60) delete pdCache[ks[0]]; ls.set("gidelim-pd", pdCache); } if (pdOpen === pk) render(d); })
+    .then(r => { const d = r && typeof r === "object" && !Array.isArray(r) ? r : "error"; if (d !== "error") { pdCache[pk] = d; const ks = Object.keys(pdCache); if (ks.length > 80) delete pdCache[ks[0]]; ls.set("gidelim-pd", pdCache); } if (pdOpen === pk) render(d); })
     .catch(() => { if (pdOpen === pk) render("error"); })
     .finally(() => { userBusy = Math.max(0, userBusy - 1); });
 }
@@ -1962,7 +1988,6 @@ function renderChat(){
     chatEl.append(el("div","msg " + (m.role === "user" ? "me" : "ai"), m.text));
     if (m.plan && m.plan.length) chatEl.append(planCard(m));
     if (m.places && m.places.length) chatEl.append(placeRows(m.places, m.where || ""));
-    if (i === chat.length - 1 && m.role === "assistant" && m.options && m.options.length) chatEl.append(quick(m.options));
   });
 }
 function scrollEnd(smooth = true){ requestAnimationFrame(() => SC().scrollTo({ top: SC().scrollHeight, behavior: smooth ? "smooth" : "auto" })); }
@@ -2682,7 +2707,7 @@ function calLinks(p, place){
 
 /* ---------- Tanıtım turu ---------- */
 const TOUR = [
-  { e:"🧭", h:"Keşfet", p:"Üstten bir mekan türü seç (Kafe, Restoran, Bar…), altından filtre seç (Popüler, Az bilinen, Uygun, Sakin). Liste anında gelir. ♡ ile kaydet, mekana dokunup neyiyle meşhur olduğuna ve yol tarifine bak." },
+  { e:"🧭", h:"Keşfet", p:"Bir mekan türü seç (Restoran, Kafe, Bar, Doğa…). Bölgendeki en sevilen yerler listelenir. ♡ ile kaydet, mekana dokunup neyiyle meşhur olduğuna ve yol tarifine bak." },
   { e:"💬", h:"Asistan", p:"Ne istediğini yaz: “bu akşam sakin bir yer”, “arkadaşlarla plan yap” gibi. Mekan önerir, saatleriyle akşam planı çıkarır. Eski sohbetlerin 🕘 Geçmiş’te durur." },
   { e:"❤️", h:"Listem", p:"Kaydettiğin yerler burada. Gittiklerini ✅ işaretle, yıldız ver, not al; öneriler zevkine göre iyileşir. 3 yer olunca listeni arkadaşlarınla paylaşabilirsin." }
 ];
