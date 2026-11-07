@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Gidelim">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#FF4D5E" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111114" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📍%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +40,12 @@
 }
 *,*::before,*::after{box-sizing:inherit}
 html,body{overflow-x:hidden;max-width:100%}
+main{overflow-x:clip}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
+body::before{background:var(--accent)!important}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body::before{background:var(--bg)!important}}
+:root[data-theme="dark"] body::before{background:var(--bg)!important}
 main,.tabbar-in,.composer-in{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
 img,svg,video{max-width:100%}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);height:100%}
@@ -49,10 +53,10 @@ body{margin:0;background:var(--bg);color:var(--ink);min-height:100%;
   font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 /* süzülen emoji deseni */
 body{background-image:radial-gradient(900px 340px at 50% -120px,var(--accent-soft),transparent 70%);background-repeat:no-repeat}
-body::after{content:"";position:fixed;top:-260px;left:-260px;width:calc(100vw + 520px);height:calc(100vh + 520px);z-index:-1;pointer-events:none;opacity:var(--emo);contain:strict;
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:var(--emo);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg font-size='26' font-family='Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif'%3E%3Ctext x='18' y='44'%3E%F0%9F%93%8D%3C/text%3E%3Ctext x='150' y='70'%3E%E2%98%95%3C/text%3E%3Ctext x='70' y='130'%3E%F0%9F%8D%BD%EF%B8%8F%3C/text%3E%3Ctext x='200' y='160'%3E%F0%9F%8C%99%3C/text%3E%3Ctext x='30' y='220'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3Ctext x='140' y='240'%3E%F0%9F%8D%B0%3C/text%3E%3C/g%3E%3C/svg%3E");
   background-size:260px 260px}
-@media (prefers-reduced-motion:no-preference){body::after{animation:drift 70s linear infinite}@keyframes drift{from{transform:translate(0,0)}to{transform:translate(260px,-260px)}}}
+@media (prefers-reduced-motion:no-preference){body::after{animation:drift 70s linear infinite}@keyframes drift{from{background-position:0 0}to{background-position:260px -260px}}}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -335,6 +339,8 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .field:focus{outline:none;border-color:var(--accent-line);background:var(--surface)}
 .recent{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .recent button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;cursor:pointer;font-size:.8rem;font-weight:700}
+.geobtn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--ink);border-radius:12px;padding:10px;font-weight:800;font-size:.9rem;cursor:pointer;margin-bottom:4px}
+.geobtn:disabled{opacity:.7;cursor:progress}
 .sugt{font-size:.74rem;font-weight:800;color:var(--muted);margin:10px 2px 0}
 .sugs{display:flex;flex-direction:column;gap:2px;margin-top:6px;max-height:min(240px,34vh);overflow-y:auto}
 .sugs button{display:flex;align-items:baseline;gap:8px;text-align:left;border:0;background:none;border-radius:10px;padding:8px 10px;cursor:pointer}
@@ -408,6 +414,10 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .xhead .q{flex:1;min-width:0;font-weight:800;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .xmore{display:block;margin:10px 16px 0;width:calc(100% - 32px);border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px;font-weight:800;font-size:.85rem;cursor:pointer;color:var(--ink)}
 .xmore:disabled{opacity:.6;cursor:default}
+.xload{display:flex;align-items:center;gap:10px;margin:14px 18px 0;color:var(--muted);font-weight:700;font-size:.86rem}
+.spin{flex:none;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tchip:active,.fchip:active,.xmain:active{transform:scale(.97)}
 .xinfo{margin:8px 18px 0;font-size:.74rem;color:var(--muted)}
 
 /* Mekan detay penceresi */
@@ -566,6 +576,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 <div class="sheet-bg" id="sheet" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h">
     <h2 id="sheet-h">Nerede arayalım?</h2>
+    <button class="geobtn" id="geo-btn" type="button">📍 Konumumu bul</button>
     <label class="lbl" for="country">Ülke</label>
     <select class="field" id="country"></select>
     <label class="lbl" for="cityin">Şehir / ilçe</label>
@@ -641,7 +652,7 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
       try { res = await fetch(AI_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, tier, ground }), signal: o.signal }); }
       catch(e) { throw { code: e && e.name === "AbortError" ? "cancelled" : "network", message: String(e) }; }
       if (!res.ok) { let j = {}; try { j = await res.json(); } catch(e) {}
-        const code = res.status === 429 ? "rate_limited" : res.status === 403 ? "forbidden" : (j.error || "upstream");
+        const code = j.error || (res.status === 429 ? "rate_limited" : res.status === 403 ? "forbidden" : "upstream");
         console.warn("Gidelim AI hata:", res.status, j); throw { code, message: "HTTP " + res.status + " " + (j.detail || "") }; }
       const rd = res.body.getReader(), dec = new TextDecoder(); let text = "";
       try { while (true) { const { done, value } = await rd.read(); if (done) break; const delta = dec.decode(value, { stream: true }); text += delta; if (o.onText) o.onText({ text, delta }); } }
@@ -717,6 +728,8 @@ const EN = {
   "Üstten bir mekan türü seç (Kafe, Restoran, Bar…), altından filtre seç (Popüler, Az bilinen, Uygun, Sakin). Liste anında gelir. ♡ ile kaydet, mekana dokunup neyiyle meşhur olduğuna ve yol tarifine bak.":"Pick a place type at the top (Café, Restaurant, Bar…) and a filter below (Popular, Lesser-known, Affordable, Quiet). The list appears instantly. Save with ♡, tap a place to see what it’s known for and get directions.",
   "Ne istediğini yaz: “bu akşam sakin bir yer”, “arkadaşlarla plan yap” gibi. Mekan önerir, saatleriyle akşam planı çıkarır. Eski sohbetlerin 🕘 Geçmiş’te durur.":"Type what you want, like “a quiet place tonight” or “plan a night out with friends”. It suggests places and builds an evening plan with times. Past chats stay in 🕘 History.",
   "Kaydettiğin yerler burada. Gittiklerini ✅ işaretle, yıldız ver, not al; öneriler zevkine göre iyileşir. 3 yer olunca listeni arkadaşlarınla paylaşabilirsin.":"Your saved places live here. Mark visited ones ✅, rate them and add notes — suggestions get better. With 3+ places you can share your list.",
+  "📍 Konumumu bul":"📍 Use my location","📍 Konumun bulunuyor…":"📍 Finding you…","Bu cihaz konum paylaşmıyor.":"This device can’t share its location.","Konum bulunamadı, elle yazabilirsin.":"Couldn’t find your location — you can type it in.","Konum izni verilmedi. Telefon ayarlarından izin verebilirsin.":"Location permission denied. You can allow it in your phone settings.",
+  "aranıyor…":"— searching…","Daha fazla yer geliyor…":"More places coming…","Bilgiler hazırlanıyor…":"Getting the details…","Çok hızlı istek gönderildi. Birkaç saniye bekleyip tekrar dene.":"Too many requests. Wait a few seconds and try again.",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -802,7 +815,8 @@ const errText = {
   upstream:"Yapay zeka servisi şu an cevap vermedi. Biraz sonra tekrar dene.",
   bad_key:"Yapay zeka anahtarı geçersiz görünüyor. Cloudflare’deki GEMINI_API_KEY’i kontrol et.",
   forbidden:"Bu site yapay zeka bağlantısına yetkili değil. Cloudflare’deki ALLOWED_ORIGINS ayarını kontrol et.",
-  network:"Yapay zekaya bağlanılamadı. İnternetini kontrol edip tekrar dene."
+  network:"Yapay zekaya bağlanılamadı. İnternetini kontrol edip tekrar dene.",
+  slow_down:"Çok hızlı istek gönderildi. Birkaç saniye bekleyip tekrar dene."
 };
 
 /* ---------- Kategoriler ve koleksiyonlar ---------- */
@@ -892,7 +906,7 @@ function closeSheet(ok){
   if (ok) {
     const changed = cSel.value !== loc.code || snorm($("#cityin").value.trim()) !== snorm(loc.city);
     setLoc(cSel.value, $("#cityin").value);
-    if (changed) { toast("📍 " + locStr()); exMode = "browse"; renderChips(); loadList(); prefetchAll(); }
+    if (changed) { toast("📍 " + locStr()); exMode = "browse"; syncChips(); loadList(); prefetchAll(); }
   }
   $("#sheet").hidden = true;
   const f = sheetDone; sheetDone = null; if (ok && f) f();
@@ -984,6 +998,34 @@ $("#sugs").addEventListener("keydown", e => {
   if (e.key === "ArrowDown" && i < bs.length - 1) { e.preventDefault(); bs[i + 1].focus(); }
   if (e.key === "ArrowUp") { e.preventDefault(); (i > 0 ? bs[i - 1] : $("#cityin")).focus(); }
 });
+
+/* ---------- Konumumu bul ---------- */
+$("#geo-btn").onclick = () => {
+  const btn = $("#geo-btn");
+  if (!navigator.geolocation) { toast(L("Bu cihaz konum paylaşmıyor.")); return; }
+  btn.disabled = true; btn.textContent = L("📍 Konumun bulunuyor…");
+  const done = () => { btn.disabled = false; btn.textContent = L("📍 Konumumu bul"); };
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try {
+      const { latitude: la, longitude: lo } = pos.coords;
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${la}&lon=${lo}&zoom=14&addressdetails=1&accept-language=${LANG}`);
+      const a = ((await r.json()) || {}).address || {};
+      const cc = (a.country_code || "").toUpperCase();
+      const code = GEO.codes.includes(cc) ? cc : loc.code;
+      let city = "";
+      if (code === "TR") {
+        const ilRaw = (a.province || a.state || a.city || "").replace(/\s+(ili|province)$/i, "");
+        const il = Object.keys(GEO.tr).find(k => snorm(k) === snorm(ilRaw));
+        const cands = [a.town, a.city_district, a.district, a.county, a.municipality, a.suburb, a.city].filter(Boolean);
+        let ilce = null;
+        if (il) for (const c of cands) { const m = GEO.tr[il].split("|").find(x => snorm(x) === snorm(c)); if (m) { ilce = m; break; } }
+        city = il ? (ilce ? ilce + ", " + il : il) : (cands[0] || "");
+      } else city = a.city || a.town || a.village || a.municipality || a.county || a.state || "";
+      cSel.value = code; $("#cityin").value = city; done(); closeSheet(true);
+    } catch(e) { done(); toast(L("Konum bulunamadı, elle yazabilirsin.")); }
+  }, err => { done(); toast(err && err.code === 1 ? L("Konum izni verilmedi. Telefon ayarlarından izin verebilirsin.") : L("Konum bulunamadı, elle yazabilirsin.")); },
+  { enableHighAccuracy: false, timeout: 12000, maximumAge: 10 * 60 * 1000 });
+};
 function needLoc(then){ return true; }
 updateLoc();
 
@@ -1060,10 +1102,19 @@ function askAbout(p, where){
   show("ask");
   send(`${p.ad} (${[p.semt, fullWhere(p, where)].filter(Boolean).join(", ")}) hakkında ne dersin? Gitmeye değer mi, ne zaman gidilir, yanına başka ne yapılır?`.replace(/ hakkında ne dersin\? Gitmeye değer mi, ne zaman gidilir, yanına başka ne yapılır\?$/, LANG === "en" ? " — what do you think? Is it worth going, when should I go, what else is nearby?" : "$&"));
 }
+function placeLink(p, where){
+  const o = { ad: p.ad, tur: p.tur || "", semt: p.semt || "", ilce: p.ilce || "", sehir: fullWhere(p, where), fiyat: p.fiyat || "" };
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return location.origin + location.pathname + "#yer=" + b64;
+}
+function readPlaceLink(h){
+  try { const b = h.replace(/-/g, "+").replace(/_/g, "/"); return JSON.parse(decodeURIComponent(escape(atob(b + "===".slice((b.length + 3) % 4))))); } catch(e) { return null; }
+}
 function shareBtn(p, where){
   const b = el("button","askbtn","📤 Paylaş"); b.type = "button";
   b.onclick = async () => { const fw = fullWhere(p, where);
-    const text = `📍 ${p.ad}\n${[p.tur, p.semt, fw].filter(Boolean).join(", ")}${p.neden ? "\n" + p.neden : ""}\nhttps://www.google.com/maps/search/?api=1&query=` + encodeURIComponent(`${p.ad} ${p.semt || ""} ${fw}`);
+    const text = `📍 ${p.ad}\n${[p.tur, p.semt, fw].filter(Boolean).join(", ")}${p.neden ? "\n" + p.neden : ""}\n\n${LANG === "en" ? "Open in Gidelim" : "Gidelim’de aç"} 👉 ${placeLink(p, where)}\n${LANG === "en" ? "Map" : "Harita"} 👉 https://www.google.com/maps/search/?api=1&query=` + encodeURIComponent(`${p.ad} ${p.semt || ""} ${fw}`);
+
     try { if (navigator.share) { await navigator.share({ text }); return; } } catch(e){ if (e?.name === "AbortError") return; }
     try { await navigator.clipboard.writeText(text); toast("📋 Kopyalandı, istediğin yere yapıştır"); } catch(e){ toast("Kopyalanamadı"); } };
   return b;
@@ -1166,6 +1217,11 @@ const FILTERS = [
 ];
 let exType = ls.get("gidelim-type", "restoran"), exFilter = ls.get("gidelim-filter", "populer"), exMode = "browse", exTerm = "";
 if (!COLS.some(c => c.id === exType)) exType = "restoran";
+/* Son 2 saatte elle tür seçilmediyse saate uygun türle aç */
+if (Date.now() - (ls.get("gidelim-type-at", 0) || 0) > 2 * 3600 * 1000) {
+  const h = new Date().getHours();
+  exType = h >= 6 && h < 11 ? "kafe" : h >= 11 && h < 15 ? "restoran" : h >= 15 && h < 18 ? "firin" : h >= 18 && h < 21 ? "restoran" : "bar";
+}
 const LIST_FORMAT = `SADECE şu biçimde JSON dizi döndür, başka hiçbir şey yazma:
 [{"ad":"Mekan adı","tur":"Kısa tür","ilce":"İlçe","semt":"Semt","sehir":"Şehir","fiyat":"₺ / ₺₺ / ₺₺₺","guven":5}]
 "guven" (1-5): mekanın var olduğundan, hâlâ açık olduğundan ve konuma ve türe uyduğundan ne kadar eminsin; 4'ün altındakileri hiç yazma. Kısa tut, açıklama yazma.`;
@@ -1222,14 +1278,23 @@ async function pumpPre(){
 function markReady(){}
 function renderChips(){
   const tc = $("#typechips"), fc = $("#filterchips"); tc.innerHTML = ""; fc.innerHTML = "";
-  COLS.filter(c => !c.guide).forEach(c => { const b = el("button","tchip"); b.type = "button"; b.setAttribute("aria-pressed", exMode === "browse" && exType === c.id);
+  COLS.filter(c => !c.guide).forEach(c => { const b = el("button","tchip"); b.type = "button"; b.dataset.t = c.id; b.setAttribute("aria-pressed", exMode === "browse" && exType === c.id);
     b.append(el("span",null,c.emoji), document.createTextNode(L(c.label))); b.onclick = () => selectType(c.id); tc.append(b); });
-  FILTERS.forEach(f => { const b = el("button","fchip", L(f.label)); b.type = "button"; b.setAttribute("aria-pressed", exFilter === f.id);
-    b.onclick = () => { exFilter = f.id; ls.set("gidelim-filter", f.id); exMode = "browse"; renderChips(); loadList(); }; fc.append(b); });
+  FILTERS.forEach(f => { const b = el("button","fchip", L(f.label)); b.type = "button"; b.dataset.f = f.id; b.setAttribute("aria-pressed", exFilter === f.id);
+    b.onclick = () => { exFilter = f.id; ls.set("gidelim-filter", f.id); exMode = "browse"; syncChips(); loadList(); }; fc.append(b); });
   fc.hidden = exMode !== "browse";
 }
-function selectType(id){ exType = id; ls.set("gidelim-type", id); exMode = "browse"; renderChips(); loadList();
-  const b = [...document.querySelectorAll(".tchip")].find(x => x.getAttribute("aria-pressed") === "true"); if (b && b.scrollIntoView) b.scrollIntoView({ inline: "center", block: "nearest" }); }
+function syncChips(){
+  document.querySelectorAll(".tchip").forEach(b => b.setAttribute("aria-pressed", exMode === "browse" && b.dataset.t === exType));
+  document.querySelectorAll(".fchip").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === exFilter));
+  $("#filterchips").hidden = exMode !== "browse";
+}
+function centerChip(){
+  const row = $("#typechips"), b = row.querySelector('.tchip[aria-pressed="true"]'); if (!b) return;
+  const left = b.offsetLeft - (row.clientWidth - b.offsetWidth) / 2;
+  try { row.scrollTo({ left: Math.max(0, left), behavior: "smooth" }); } catch(e) { row.scrollLeft = Math.max(0, left); }
+}
+function selectType(id){ exType = id; ls.set("gidelim-type", id); ls.set("gidelim-type-at", Date.now()); exMode = "browse"; syncChips(); centerChip(); loadList(); }
 function openCol(c){ if (c && !c.guide) selectType(c.id); }
 function xrow(p, where){
   const cat = catOf(p.tur), k = keyOf(p, where);
@@ -1245,8 +1310,11 @@ function xrow(p, where){
 let listTok = 0;
 function drawList(items, where, loading, opts = {}){
   const box = $("#ex-list"); box.innerHTML = "";
+  if (loading) { const c = COLS.find(x => x.id === exType) || {}; const ld = el("div","xload"); ld.append(el("span","spin"));
+    ld.append(document.createTextNode(exMode === "search" ? (LANG === "en" ? `Searching “${exTerm}”…` : `“${exTerm}” aranıyor…`) : (items.length ? L("Daha fazla yer geliyor…") : `${c.emoji || ""} ${L(c.label || "")} ${L("aranıyor…")}`)));
+    box.append(ld); }
   if (exMode === "search") { const hd = el("div","xhead"); hd.append(el("span","q","🔎 “" + exTerm + "”"));
-    const x = el("button","pill-btn",L("✕ Kapat")); x.type = "button"; x.onclick = () => { exMode = "browse"; exQi.value = ""; renderChips(); loadList(); }; hd.append(x); box.append(hd); }
+    const x = el("button","pill-btn",L("✕ Kapat")); x.type = "button"; x.onclick = () => { exMode = "browse"; exQi.value = ""; syncChips(); loadList(); }; hd.append(x); box.append(hd); }
   const list = el("div","xlist");
   items.forEach(p => list.append(xrow(p, where)));
   if (loading) for (let i = 0; i < (items.length ? 2 : 6); i++) list.append(el("div","xskel"));
@@ -1273,7 +1341,7 @@ async function loadList(more){
     if (more && c2.done) toast(L("Emin olduğum başka yer kalmadı"));
   } catch(e) { if (tok === listTok) drawList(base, where, false, { err: errText[e?.code] || L("Liste getirilemedi. Tekrar dene.") }); }
 }
-renderChips();
+renderChips(); setTimeout(centerChip, 50);
 /* (eski deste hazırlama devre dışı) */
 const pre = {}; const deckKey = (c, where) => LK + c.id + "|" + norm(where);
 function prefetchCol(){}
@@ -1516,7 +1584,7 @@ async function placeSearch(){
   const term = exQi.value.trim() || (exMode === "search" ? exTerm : "");
   if (!term) { toast(L("Aradığın mekanı ya da yemeği yaz.")); exQi.focus(); return; }
   exQi.blur(); addSearch(term); exSug.hidden = true;
-  exMode = "search"; exTerm = term; renderChips();
+  exMode = "search"; exTerm = term; syncChips();
   const where = locStr(), tok = ++listTok;
   if (!sample) { drawList([], where, false, { err: L("Yapay zeka bu görünümde çalışmıyor.") }); return; }
   drawList([], where, true); userBusy++; yieldBg();
@@ -1622,7 +1690,8 @@ function openPlace(p, where, opts = {}){
   $("#place").hidden = false; setTimeout(() => x.focus(), 30);
   const render = d => {
     info.innerHTML = "";
-    if (d === "loading") { for (let i = 0; i < 3; i++) { const sk = el("div","skel"); sk.style.height = "44px"; info.append(sk); } return; }
+    if (d === "loading") { const ld = el("div","xload"); ld.style.margin = "4px 2px"; ld.append(el("span","spin"), document.createTextNode(L("Bilgiler hazırlanıyor…"))); info.append(ld);
+      for (let i = 0; i < 3; i++) { const sk = el("div","skel"); sk.style.height = "44px"; info.append(sk); } return; }
     if (!d || d === "error") { info.append(el("div","hint", L("Ek bilgiler getirilemedi."))); return; }
     const row = (ic, label, val) => { if (!val || (Array.isArray(val) && !val.length)) return; const r = el("div","pi-row"); const t = el("div");
       t.append(el("b",null,L(label)));
@@ -2205,6 +2274,9 @@ async function addOption(pid, x, btn){
 }
 function handleHash(){
   const h = location.hash.replace(/^#/, "");
+  if (h.startsWith("yer=")) { const p = readPlaceLink(h.slice(4)); setHash("");
+    if (p && p.ad) { show("explore"); const tryOpen = (n) => { if (sample || n > 20) openPlace(p, p.sehir || ""); else setTimeout(() => tryOpen(n + 1), 150); }; tryOpen(0); }
+    return; }
   if (h.startsWith("oy-")) { openPoll = h.slice(3); show("group"); }
   else if (h === "grup") show("group");
 }
