@@ -13,11 +13,14 @@
 <meta name="apple-mobile-web-app-title" content="Gidelim">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FF4D5E" media="(prefers-color-scheme: light)">
+<style>html{background:#FF4D5E}</style>
 <meta name="theme-color" content="#111114" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📍%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
   --bg:#FFFFFF; --surface:#FFFFFF; --soft:#F5F5F7; --soft2:#EFEFF2; --ink:#17171C; --muted:#6E6E78; --line:#EAEAEE;
@@ -54,9 +57,6 @@ body{margin:0;background:var(--bg);color:var(--ink);min-height:100%;
   font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 /* süzülen emoji deseni */
 body{background-image:radial-gradient(900px 340px at 50% -120px,var(--accent-soft),transparent 70%);background-repeat:no-repeat}
-.bgfx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;contain:strict}
-.bgfx i{position:absolute;top:-260px;left:-260px;right:-260px;bottom:-260px;opacity:var(--emo);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg font-size='26' font-family='Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif'%3E%3Ctext x='18' y='44'%3E%F0%9F%93%8D%3C/text%3E%3Ctext x='150' y='70'%3E%E2%98%95%3C/text%3E%3Ctext x='70' y='130'%3E%F0%9F%8D%BD%EF%B8%8F%3C/text%3E%3Ctext x='200' y='160'%3E%F0%9F%8C%99%3C/text%3E%3Ctext x='30' y='220'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3Ctext x='140' y='240'%3E%F0%9F%8D%B0%3C/text%3E%3C/g%3E%3C/svg%3E");background-size:260px 260px;will-change:transform;transform:translate3d(0,0,0)}
-@media (prefers-reduced-motion:no-preference){.bgfx i{animation:drift 70s linear infinite}@keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(260px,-260px,0)}}}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -97,7 +97,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .helpbtn{display:block;margin:18px auto 0;border:0;background:none;color:var(--muted);font-weight:700;font-size:.82rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
 /* Deste */
-.deckbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.deckbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
 .back{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:34px;height:34px;font-size:1.1rem;font-weight:800;cursor:pointer;flex:none}
 .deckbar .t{flex:1;min-width:0}
 .deckbar b{display:block;font-weight:800;font-size:1rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -203,7 +203,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .typing{display:flex;gap:4px;padding:12px 14px}
 .typing span{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5}
 @media (prefers-reduced-motion:no-preference){.typing span{animation:bl 1s infinite}.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}@keyframes bl{50%{opacity:1;transform:translateY(-3px)}}}
-.composer{position:fixed;left:0;right:0;width:100%;box-sizing:border-box;bottom:calc(60px + env(safe-area-inset-bottom,0px));z-index:5;padding:8px 12px;background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.composer{position:fixed;left:0;right:0;width:100%;box-sizing:border-box;bottom:calc(60px + env(safe-area-inset-bottom,0px));z-index:5;padding:8px 12px;background:var(--bg)}
 .composer-in{max-width:696px;margin:0 auto;display:flex;gap:6px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:4px 4px 4px 12px;box-shadow:var(--shadow)}
 .composer-in:focus-within{border-color:var(--accent-line)}
 .composer textarea{flex:1;border:0;background:none;color:var(--ink);font:inherit;padding:8px 0;resize:none;line-height:1.4;max-height:120px}
@@ -470,6 +470,19 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .sharecard small{color:var(--muted);font-size:.78rem}
 .sharecard .ar{flex:none;font-weight:800;color:var(--accent)}
 
+/* Açılış ekranı */
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#FF4D5E;color:#fff;transition:opacity .35s ease,visibility .35s ease}
+#splash.hide{opacity:0;visibility:hidden}
+.sp-in{text-align:center;padding-bottom:6vh}
+.sp-logo{width:104px;height:104px;border-radius:30px;background:rgba(255,255,255,.18);display:grid;place-items:center;margin:0 auto 16px}
+.sp-name{font-family:"Baloo 2",system-ui,-apple-system,sans-serif;font-weight:800;font-size:2.2rem;line-height:1;letter-spacing:-.01em}
+.sp-tag{margin-top:8px;opacity:.92;font-weight:700;font-size:.98rem}
+@media (prefers-reduced-motion:no-preference){.sp-logo{animation:sp-pop .55s cubic-bezier(.2,.9,.3,1.3) both}.sp-name,.sp-tag{animation:sp-up .5s .12s ease both}@keyframes sp-pop{from{transform:scale(.75);opacity:0}}@keyframes sp-up{from{transform:translateY(8px);opacity:0}}}
+/* Başlık satırı dar ekranda sıkışmasın */
+.brandrow{min-width:0}
+.brand{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.locchip{min-width:0;flex-shrink:1}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -479,7 +492,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .segset button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 
 /* Sekme çubuğu */
-.tabbar{position:fixed;left:0;right:0;bottom:0;width:100%;z-index:6;background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;width:100%;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabbar-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:4px 6px}
 .tb{border:0;background:none;cursor:pointer;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--muted);font-size:.7rem;font-weight:700;position:relative;border-radius:12px;text-align:center;line-height:1.1}
 .tb .ic{font-size:1.15rem;line-height:1.2;filter:grayscale(1);opacity:.6}
@@ -491,7 +504,11 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 </style>
 </head>
 <body>
-<div class="bgfx" aria-hidden="true"><i></i></div>
+<div id="splash" aria-hidden="true"><div class="sp-in">
+  <div class="sp-logo"><svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true"><path d="M32 5C21.2 5 12.5 13.6 12.5 24.3 12.5 38.6 32 59 32 59s19.5-20.4 19.5-34.7C51.5 13.6 42.8 5 32 5z" fill="#fff"/><circle cx="32" cy="24.5" r="7.8" fill="#FF4D5E"/></svg></div>
+  <div class="sp-name">Gidelim</div>
+  <div class="sp-tag">Nereye gidiyoruz?</div>
+</div></div>
 <main>
   <!-- KEŞFET -->
   <section id="v-explore">
@@ -736,6 +753,7 @@ const EN = {
   "Kaydettiğin yerler burada. Gittiklerini ✅ işaretle, yıldız ver, not al; öneriler zevkine göre iyileşir. 3 yer olunca listeni arkadaşlarınla paylaşabilirsin.":"Your saved places live here. Mark visited ones ✅, rate them and add notes — suggestions get better. With 3+ places you can share your list.",
   "📍 Konumumu bul":"📍 Use my location","📍 Konumun bulunuyor…":"📍 Finding you…","Bu cihaz konum paylaşmıyor.":"This device can’t share its location.","Konum bulunamadı, elle yazabilirsin.":"Couldn’t find your location — you can type it in.","Konum izni verilmedi. Telefon ayarlarından izin verebilirsin.":"Location permission denied. You can allow it in your phone settings.",
   "aranıyor…":"— searching…","Daha fazla yer geliyor…":"More places coming…","Bilgiler hazırlanıyor…":"Getting the details…","Çok hızlı istek gönderildi. Birkaç saniye bekleyip tekrar dene.":"Too many requests. Wait a few seconds and try again.",
+  "Nereye gidiyoruz?":"Where are we going?",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1314,7 +1332,13 @@ function xrow(p, where){
   sync(); r.append(m, h); return r;
 }
 let listTok = 0;
+let drawRaf = 0, drawArgs = null;
 function drawList(items, where, loading, opts = {}){
+  if (loading && items.length) { drawArgs = [items, where, loading, opts]; if (!drawRaf) drawRaf = requestAnimationFrame(() => { drawRaf = 0; const a = drawArgs; drawArgs = null; if (a) drawListNow(...a); }); return; }
+  if (drawRaf) { cancelAnimationFrame(drawRaf); drawRaf = 0; drawArgs = null; }
+  drawListNow(items, where, loading, opts);
+}
+function drawListNow(items, where, loading, opts = {}){
   const box = $("#ex-list"); box.innerHTML = "";
   if (loading) { const c = COLS.find(x => x.id === exType) || {}; const ld = el("div","xload"); ld.append(el("span","spin"));
     ld.append(document.createTextNode(exMode === "search" ? (LANG === "en" ? `Searching “${exTerm}”…` : `“${exTerm}” aranıyor…`) : (items.length ? L("Daha fazla yer geliyor…") : `${c.emoji || ""} ${L(c.label || "")} ${L("aranıyor…")}`)));
@@ -2504,6 +2528,10 @@ updateSkipInfo();
 if (!ls.get("gidelim-tour", 0) && !location.hash.startsWith("#oy-")) setTimeout(openTour, 300);
 else if (!ls.get("nereye-loc", null)) setTimeout(() => openSheet(), 400);
 startI18n();
+/* Açılış ekranını, uygulama hazır olunca (en az ~0.7 sn gösterip) kaldır */
+(() => { const sp = document.getElementById("splash"); if (!sp) return;
+  const hide = () => { if (sp.classList.contains("hide")) return; sp.classList.add("hide"); document.documentElement.style.background = ""; setTimeout(() => sp.remove(), 450); };
+  setTimeout(hide, Math.max(0, 700 - performance.now())); setTimeout(hide, 2500); })();
 </script>
 </body>
 </html>
