@@ -713,8 +713,10 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
         await queue;
         const out = await post("/db/sync", { ids: myPolls() });
         if (pending) return;
-        Object.keys(dcache).forEach(col => { dcache[col] = {}; (out[col] || []).forEach(x => dcache[col][x.id] = x.data); });
-        synced = true; Object.keys(dcache).forEach(emit);
+        const first = !synced;
+        Object.keys(dcache).forEach(col => { const next = {}; (out[col] || []).forEach(x => next[x.id] = x.data);
+          const changed = JSON.stringify(next) !== JSON.stringify(dcache[col]); dcache[col] = next; if (changed || first) emit(col); });
+        synced = true;
       } catch(e) {
         if (!synced) Object.values(subs).forEach(list => list.forEach(s => s.err && s.err(e)));
       } finally { syncing = null; }
@@ -2103,7 +2105,7 @@ async function resolveNames(ids){
   need.forEach(i => names[i] = "…");
   try { const ps = await guser.profiles(need); need.forEach(i => names[i] = (ps && ps[i] && ps[i].name) || "Biri"); }
   catch(e) { need.forEach(i => names[i] = "Biri"); }
-  gRender();
+  gRenderSoft();
 }
 async function initGroup(){
   try {
@@ -2113,11 +2115,11 @@ async function initGroup(){
     if (!myId) { gState = "off"; gRender(); return; }
     gdb = db; guser = user;
     const onErr = e => { gState = "err"; gErr = e?.code === "no_db" ? L("Grup oylaması için veritabanı henüz bağlı değil. Cloudflare’de Worker’a DB bağlantısını ekle.") : e?.code === "forbidden" ? L("Bu site veritabanına yetkili değil. Cloudflare’deki ALLOWED_ORIGINS ayarını kontrol et.") : L("Grup verisine şu an ulaşılamıyor. Biraz sonra tekrar dene."); gRender(); };
-    db.collection("polls").onSnapshot(sn => { polls = {}; sn.docs.forEach(d => { if (d.exists) polls[d.id] = d.data(); }); gState = "ready"; gRender(); }, onErr);
-    db.collection("options").onSnapshot(sn => { options = {}; sn.docs.forEach(d => { if (d.exists) options[d.id] = d.data(); }); gRender(); }, onErr);
-    db.collection("votes").onSnapshot(sn => { votes = {}; sn.docs.forEach(d => { if (d.exists) votes[d.id] = d.data(); }); gRender(); }, onErr);
-    db.collection("comments").onSnapshot(sn => { comments = {}; sn.docs.forEach(d => { if (d.exists) comments[d.id] = d.data(); }); gRender(); }, onErr);
-    db.collection("expenses").onSnapshot(sn => { expenses = {}; sn.docs.forEach(d => { if (d.exists) expenses[d.id] = d.data(); }); gRender(); }, onErr);
+    db.collection("polls").onSnapshot(sn => { polls = {}; sn.docs.forEach(d => { if (d.exists) polls[d.id] = d.data(); }); gState = "ready"; gRenderSoft(); }, onErr);
+    db.collection("options").onSnapshot(sn => { options = {}; sn.docs.forEach(d => { if (d.exists) options[d.id] = d.data(); }); gRenderSoft(); }, onErr);
+    db.collection("votes").onSnapshot(sn => { votes = {}; sn.docs.forEach(d => { if (d.exists) votes[d.id] = d.data(); }); gRenderSoft(); }, onErr);
+    db.collection("comments").onSnapshot(sn => { comments = {}; sn.docs.forEach(d => { if (d.exists) comments[d.id] = d.data(); }); gRenderSoft(); }, onErr);
+    db.collection("expenses").onSnapshot(sn => { expenses = {}; sn.docs.forEach(d => { if (d.exists) expenses[d.id] = d.data(); }); gRenderSoft(); }, onErr);
     setTimeout(() => { if (gState === "loading") { gState = "err"; gErr = "Grup verisi yüklenemedi. Sayfayı yenilemeyi dene."; gRender(); } }, 10000);
   } catch(e) { gState = "off"; gRender(); }
 }
@@ -2131,7 +2133,14 @@ function tally(pid){
   const voterSet = new Set(); rows.forEach(r => r.voters.forEach(u => voterSet.add(u)));
   return { rows, voters: voterSet.size };
 }
+/* Kullanıcı bir kutuya yazarken arka plan güncellemeleri ekranı yeniden çizmesin (klavye kapanmasın) */
+let gPending = false;
+function typingInGroup(){ const a = document.activeElement; return !!(a && /^(INPUT|TEXTAREA)$/.test(a.tagName) && $("#g-area").contains(a)); }
+function gRenderSoft(){ if (typingInGroup()) { gPending = true; return; } gRender(); }
+document.addEventListener("focusout", e => { if (!gPending || !$("#g-area").contains(e.target)) return;
+  setTimeout(() => { if (gPending && !typingInGroup()) { gPending = false; gRender(); } }, 250); });
 function gRender(){
+  gPending = false;
   if ($("#v-group").hidden) return;
   const area = $("#g-area"); area.innerHTML = "";
   if (gState === "loading") { const g = el("div","grid"); g.style.marginTop = "16px"; g.append(el("div","skel"), el("div","skel")); area.append(g); return; }
@@ -2139,7 +2148,7 @@ function gRender(){
   if (gState === "err") { area.append(el("div","gnote",gErr)); const rb = el("button","xmore",L("↻ Tekrar dene")); rb.type = "button"; rb.onclick = () => location.reload(); area.append(rb); return; }
   if (window.gidelimName && !window.gidelimName()) { renderNameGate(area); return; }
   if (openPoll && polls[openPoll]) renderPoll(area, openPoll);
-  else if (openPoll && !polls[openPoll] && gState === "ready" && !pollMissing[openPoll]) { const ld = el("div","xload"); ld.append(el("span","spin"), document.createTextNode(L("Oylama yükleniyor…"))); area.append(ld); setTimeout(() => { pollMissing[openPoll] = true; gRender(); }, 6000); }
+  else if (openPoll && !polls[openPoll] && gState === "ready" && !pollMissing[openPoll]) { const ld = el("div","xload"); ld.append(el("span","spin"), document.createTextNode(L("Oylama yükleniyor…"))); area.append(ld); setTimeout(() => { pollMissing[openPoll] = true; gRenderSoft(); }, 6000); }
   else { openPoll = null; renderPolls(area); }
 }
 const pollMissing = {};

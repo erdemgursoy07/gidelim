@@ -1,7 +1,7 @@
 // Gidelim – uygulamayı telefonda saklayan katman (servis çalışanı)
 // Sayfa: önce internetten en güncel hali (1.5 sn bekler), olmazsa saklanan hali → hızlı ve internetsiz açılış
 // Simgeler ve yazı tipleri: saklanandan anında
-const V = "gidelim-v4";
+const V = "gidelim-v5";
 const API = "https://gidelim-ai.erdemgursoy07.workers.dev";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
@@ -58,10 +58,8 @@ self.addEventListener("push", e => {
         items = ((await r.json()) || {}).items || [];
       }
     } catch {}
-    if (!items.length) items = [{ title: "Gidelim", text: "Grup oylamasında yeni bir gelişme var 🗳️" }];
-    for (const n of items.slice(0, 3).reverse()) {
-      await self.registration.showNotification(n.title || "Gidelim", { body: n.text, icon: "icon-192.png", badge: "icon-192.png", tag: "g" + (n.id || Date.now()), data: { poll: n.poll || "" } });
-    }
+    const n = items[0] || { title: "Grup oylaması", text: "Oylamanda yeni bir şey var" };
+    await self.registration.showNotification("🗳️ " + (n.title || "Grup oylaması"), { body: n.text, icon: "icon-192.png", badge: "icon-192.png", tag: "g" + (n.id || Date.now()), data: { poll: n.poll || "" } });
   })());
 });
 self.addEventListener("notificationclick", e => {
