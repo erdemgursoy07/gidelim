@@ -1086,7 +1086,7 @@ let sample = null;
       catch(e) { if (e && e.code === "invalid_json") { const got = salvage((e.text || "").length > last.length ? e.text : last); if (got) return got; } throw e; } }; }
   if (sample && LANG === "en") { const raw = sample.json.bind(sample);
     sample.json = (input, o) => raw(typeof input === "string" ? input.replace(/Tüm metinler Türkçe olsun\./g, "").replace(/açıklamaları Türkçe yaz/g, "write descriptions in English").replace(/Türkçe yaz[.;]?/g, "") + "\n\nIMPORTANT: The user's app language is English. Write ALL text values in natural English (keep place names in their original local form). Prices: use relative $ / $$ / $$$ instead of ₺." : input, o); }
-  if (sample) { loadList(); setTimeout(prefetchAll, 2500); } else loadList();
+  if (sample) { loadList(); setTimeout(prefetchAll, 6000); } else loadList();
   if (!sample) { const w = $("#ai-warn"); w.hidden = false; w.textContent = "⚠️ Yapay zeka bağlantısı kurulamadı. index.html içindeki AI_URL ayarını kontrol et."; $("#send").disabled = true; }
 })();
 const FORMAT = `SADECE şu biçimde JSON dizi döndür, başka hiçbir şey yazma:
@@ -1189,7 +1189,7 @@ function fetchList(t, f, where, more, onStream, signal){
 const preQ = []; let preBusy = false;
 function prefetchAll(){
   const where = locStr(); if (!where || !sample) return;
-  COLS.filter(c => !c.guide).forEach(c => { const k = lkey(c.id, "populer", where); if (!lists[k] && !preQ.some(x => x.k === k)) preQ.push({ k, t: c.id, where }); });
+  COLS.filter(c => !c.guide && ["restoran","kafe"].includes(c.id)).forEach(c => { const k = lkey(c.id, "populer", where); if (!lists[k] && !preQ.some(x => x.k === k)) preQ.push({ k, t: c.id, where }); });
   pumpPre();
 }
 function prefetchSome(){ prefetchAll(); }
@@ -1614,6 +1614,7 @@ function openPlace(p, where, opts = {}){
     row("⭐","Neyiyle meşhur", d.ne_yapilir); row("📝","Nasıl bir yer", d.ozet); row("⏰","En iyi zaman", d.en_iyi_zaman);
     row("👥","Kimlerle gidilir", d.kimlerle); row("📅","Rezervasyon", d.rezervasyon); row("💰","Bütçe", d.butce);
     row("🕘","Çalışma saatleri (yaklaşık)", d.saatler); row("💡","Bilmen gereken", d.bilmen_gereken);
+    if (!d.bilmen_gereken && !d.saatler && d.guven == null) { const sk = el("div","skel"); sk.style.height = "40px"; info.append(sk); }
     if (d.guven != null && Number(d.guven) < 3) info.append(el("div","pwarn", L("⚠️ Bu mekan hakkında bilgim sınırlı, gitmeden mutlaka kontrol et.")));
   };
   if (pdCache[pk]) return render(pdCache[pk]);
@@ -1623,7 +1624,13 @@ function openPlace(p, where, opts = {}){
 Yer: ${[p.semt, fw].filter(Boolean).join(", ")}
 Bu mekan hakkında kısa, gerçekten işe yarar bilgiler ver. SADECE şu JSON nesnesini döndür:
 {"ozet":"1-2 cümle: nasıl bir yer, ortamı nasıl","ne_yapilir":"Bu mekanın neyiyle meşhur olduğu: yeme-içme yeriyse en meşhur yemekleri/içecekleri, değilse ne görülür ya da ne yapılır","en_iyi_zaman":"Ne zaman gitmeli, ne zaman kalabalık olur","kimlerle":["Arkadaşlar","Çift","Aile / çocuk","Tek başına","İş"],"rezervasyon":"Gerekmez / Önerilir / Şart","butce":"Kişi başı yaklaşık tutar, yerel para birimiyle","saatler":"Yaklaşık çalışma saatleri","bilmen_gereken":"Bir ipucu ya da uyarı","guven":5}
-"kimlerle" listesinde sadece uygun olanları bırak. Emin olmadığın alanı boş metin yap, asla uydurma. "guven" (1-5): bu mekan hakkındaki bilginden ne kadar eminsin. Türkçe yaz.`, FASTAI)
+"kimlerle" listesinde sadece uygun olanları bırak. Emin olmadığın alanı boş metin yap, asla uydurma. "guven" (1-5): bu mekan hakkındaki bilginden ne kadar eminsin. Kısa yaz. Türkçe yaz.`, { ...QUICKAI, onText: ({ text }) => {
+      if (pdOpen !== pk) return;
+      const d = {}; let any = false;
+      ["ne_yapilir","ozet","en_iyi_zaman","rezervasyon","butce","saatler","bilmen_gereken"].forEach(f => { const v = partialField(text, f); if (v) { d[f] = v; any = true; } });
+      const km = text.match(/"kimlerle"\s*:\s*\[([^\]]*)\]/); if (km) { try { d.kimlerle = JSON.parse("[" + km[1] + "]"); } catch(e) {} }
+      if (any) render(d);
+    } })
     .then(r => { const d = r && typeof r === "object" && !Array.isArray(r) ? r : "error"; if (d !== "error") { pdCache[pk] = d; const ks = Object.keys(pdCache); if (ks.length > 60) delete pdCache[ks[0]]; ls.set("gidelim-pd", pdCache); } if (pdOpen === pk) render(d); })
     .catch(() => { if (pdOpen === pk) render("error"); })
     .finally(() => { userBusy = Math.max(0, userBusy - 1); });
