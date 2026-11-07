@@ -28,7 +28,7 @@
   --primary:var(--accent); --star:#FFB020; --danger:#E5383B; --ok:#1F9D63;
   --shadow:0 1px 2px rgba(23,23,28,.04),0 4px 14px rgba(23,23,28,.05);
   --emo:.13;
-  color-scheme:light; box-sizing:border-box; padding-top:env(safe-area-inset-top,0px);
+  color-scheme:light; box-sizing:border-box; --tbh:58px;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -55,7 +55,7 @@ body::before{background:var(--accent)!important}
 :root[data-theme="dark"] body::before{background:var(--bg)!important}
 main,.tabbar-in,.composer-in{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
 img,svg,video{max-width:100%}
-html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);height:100%}
+html,body{height:100%;overflow:hidden}
 body{margin:0;background:var(--bg);color:var(--ink);min-height:100%;
   font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 /* süzülen emoji deseni */
@@ -64,7 +64,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 [hidden]{display:none!important}
-main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-bottom,0px))}
+main{position:fixed;top:0;left:0;right:0;bottom:calc(var(--tbh) + env(safe-area-inset-bottom,0px));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-top:env(safe-area-inset-top,0px);padding-bottom:24px}
+main > section{max-width:720px;margin:0 auto}
 
 /* Başlık */
 .head{padding:14px 16px 8px}
@@ -100,7 +101,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .helpbtn{display:block;margin:18px auto 0;border:0;background:none;color:var(--muted);font-weight:700;font-size:.82rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
 /* Deste */
-.deckbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.deckbar{position:sticky;top:0;z-index:4;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
 .back{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:34px;height:34px;font-size:1.1rem;font-weight:800;cursor:pointer;flex:none}
 .deckbar .t{flex:1;min-width:0}
 .deckbar b{display:block;font-weight:800;font-size:1rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -206,7 +207,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .typing{display:flex;gap:4px;padding:12px 14px}
 .typing span{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5}
 @media (prefers-reduced-motion:no-preference){.typing span{animation:bl 1s infinite}.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}@keyframes bl{50%{opacity:1;transform:translateY(-3px)}}}
-.composer{position:fixed;left:0;right:0;width:100%;box-sizing:border-box;bottom:calc(60px + env(safe-area-inset-bottom,0px));z-index:5;padding:8px 12px;background:var(--bg)}
+.composer{position:fixed;left:0;right:0;width:100%;box-sizing:border-box;bottom:calc(var(--tbh) + env(safe-area-inset-bottom,0px));z-index:5;padding:8px 12px;background:var(--bg)}
 .composer-in{max-width:696px;margin:0 auto;display:flex;gap:6px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:4px 4px 4px 12px;box-shadow:var(--shadow)}
 .composer-in:focus-within{border-color:var(--accent-line)}
 .composer textarea{flex:1;border:0;background:none;color:var(--ink);font:inherit;padding:8px 0;resize:none;line-height:1.4;max-height:120px}
@@ -497,6 +498,30 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 .sheet-bg,.tour-bg{overscroll-behavior:contain;touch-action:none}
 .sheet,.psheet,.hlist,.sugs,.tour{overscroll-behavior:contain;touch-action:pan-y}
 
+/* Yazı yazarken alt çubuk gizlensin, yazma kutusu klavyenin hemen üstünde dursun */
+/* Arama kutularında temizle (×) düğmesi */
+.clr{flex:none;width:24px;height:24px;border-radius:50%;border:0;background:var(--soft2);color:var(--muted);font-size:.8rem;font-weight:800;display:grid;place-items:center;cursor:pointer;margin-right:4px;padding:0}
+.clr[hidden]{display:none}
+.clrwrap{position:relative}
+.clrwrap .field{padding-right:40px}
+.clrwrap .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);margin:0}
+/* Keşfet: sade tür ızgarası ve tek parça filtre */
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:12px 16px 0}
+.tcell{display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:9px 2px 7px;cursor:pointer;font-weight:800;font-size:.76rem;color:var(--ink)}
+.tcell span{font-size:1.25rem;line-height:1.1}
+.tcell[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.fseg{display:flex;gap:3px;margin:10px 16px 0;background:var(--soft);border-radius:12px;padding:3px}
+.fseg button{flex:1;border:0;background:none;border-radius:9px;padding:7px 2px;font-weight:700;font-size:.78rem;color:var(--muted);cursor:pointer;white-space:nowrap}
+.fseg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.xmain{padding:11px 4px 11px 14px}
+.xprice{flex:none;color:var(--muted);font-size:.78rem;font-weight:700}
+
+/* Klavye açıkken */
+html.kb .tabbar{display:none}
+html.kb main{bottom:var(--kb,0px)}
+html.kb .composer{bottom:var(--kb,0px)}
+html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -507,7 +532,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
 
 /* Sekme çubuğu */
 .tabbar{position:fixed;left:0;right:0;bottom:0;width:100%;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabbar-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:4px 6px}
+.tabbar-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;height:var(--tbh);padding:0 6px}
 .tb{border:0;background:none;cursor:pointer;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--muted);font-size:.7rem;font-weight:700;position:relative;border-radius:12px;text-align:center;line-height:1.1}
 .tb .ic{font-size:1.15rem;line-height:1.2;filter:grayscale(1);opacity:.6}
 .tb[aria-selected="true"]{color:var(--accent)}
@@ -528,8 +553,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
     <div id="ex-home">
       <div class="head">
         <div class="brandrow"><div class="brand-dot" aria-hidden="true">📍</div><div class="brand">Gidelim</div><button class="locchip" type="button"></button><button class="setbtn" type="button" aria-label="Ayarları aç">⚙️</button></div>
-        <h1 class="h-sm">Bugün ne keşfediyoruz?</h1>
-        <div class="swrap">
+                <div class="swrap">
           <div class="search">
             <span class="ico" aria-hidden="true">🔎</span>
             <input id="ex-q" type="text" placeholder="Mekan ya da semt ara" aria-label="Mekan ara" enterkeyhint="search" autocomplete="off" role="combobox" aria-controls="ex-sug" aria-expanded="false">
@@ -537,8 +561,8 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
           <div class="sbox" id="ex-sug" role="listbox" hidden></div>
         </div>
       </div>
-      <div class="chiprow" id="typechips" role="group" aria-label="Mekan türü"></div>
-      <div class="chiprow sm" id="filterchips" role="group" aria-label="Filtre"></div>
+      <div class="tgrid" id="typechips" role="group" aria-label="Mekan türü"></div>
+      <div class="fseg" id="filterchips" role="group" aria-label="Filtre"></div>
       <div id="ex-list" aria-live="polite"></div>
       <button class="tipbar" id="loc-tip" type="button" hidden style="display:block;width:calc(100% - 32px);text-align:left;border:0;cursor:pointer"></button>
       <div class="tipbar" id="ai-warn" hidden></div>
@@ -590,7 +614,7 @@ main{max-width:720px;margin:0 auto;padding:0 0 calc(92px + env(safe-area-inset-b
         <button type="button" data-f="want" aria-pressed="false">📌 Gidilecek</button>
         <button type="button" data-f="been" class="been" aria-pressed="false">✅ Gittim</button>
       </div>
-      <div class="filter"><span aria-hidden="true">🔍</span><input id="l-q" type="search" placeholder="Listende ara" aria-label="Listende ara"></div>
+      <div class="filter"><span aria-hidden="true">🔍</span><input id="l-q" type="text" placeholder="Listende ara" aria-label="Listende ara"></div>
       <div class="sortrow" role="group" aria-label="Sıralama"><span>Sırala:</span>
         <button type="button" data-s="new" aria-pressed="true">🕒 Yeni</button>
         <button type="button" data-s="star" aria-pressed="false">⭐ Puan</button>
@@ -809,6 +833,7 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
 </script>
 <script>
 const $ = s => document.querySelector(s);
+const SC = () => document.querySelector("main");
 function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 const norm = s => (s||"").toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const ls = { get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
@@ -843,7 +868,7 @@ const EN = {
   "📤 Planı paylaş":"📤 Share plan","Senin planın":"Your plan","Planım":"My plan","📋 Plan kopyalandı":"📋 Plan copied","Asistan bu görünümde çalışmıyor.":"The assistant doesn’t work in this view.","Bunu tam anlayamadım, biraz daha anlatır mısın?":"I didn’t quite get that — can you tell me a bit more?","Bir sorun oldu, tekrar dener misin?":"Something went wrong, could you try again?",
   // listem
   "kayıtlı ·":"saved ·","gidilecek ·":"to go ·","gidildi":"visited","Hepsi":"All","📌 Gidilecek":"📌 To go","✅ Gittim":"✅ Been there","Filtre":"Filter","Listende ara":"Search your list","Sırala:":"Sort:","Sıralama":"Sort","🕒 Yeni":"🕒 Newest","⭐ Puan":"⭐ Rating","🔤 A-Z":"🔤 A-Z","Bu akşam nereye?":"Where tonight?","Listeyi paylaş":"Share list","Paylaşılacak liste":"List to share",
-  "Detay ▾":"Details ▾","Kapat ▴":"Close ▴","🗑️ Çıkar":"🗑️ Remove","Puan":"Rating","Not":"Note","Nasıldı? Ne yedin, tekrar gider misin?":"How was it? What did you have, would you go again?","Not ekle (kiminle gidilir, ne zaman…)":"Add a note (who to go with, when…)","📝 Not kaydedildi":"📝 Note saved","✅ Nasıldı? Yıldız ver, öneriler sana göre iyileşsin":"✅ How was it? Rate it so suggestions get better","Bu filtrede ya da aramada mekan yok.":"No places match this filter or search.","Listen boş. Keşfet’te kartları sağa kaydır, buraya gelsin.":"Your list is empty. Save places in Explore and they’ll show up here.","Listen hesabına bağlı, başka cihazdan açınca da görünür.":"Your list is tied to your account and syncs across devices.","Listen bu cihazda tutuluyor.":"Your list is stored on this device.","Listene şu an ulaşılamıyor; sayfayı yenileyip tekrar dene.":"Can’t reach your list right now; reload and try again.","Paylaşılacak mekan yok.":"Nothing to share.","📋 Liste kopyalandı":"📋 List copied","Metni seçip kopyala.":"Select and copy the text.","Diğer":"Other","Gidilecek":"To go","Gittim":"Been there",
+  "Detay ▾":"Details ▾","Kapat ▴":"Close ▴","🗑️ Çıkar":"🗑️ Remove","Puan":"Rating","Not":"Note","Nasıldı? Ne yedin, tekrar gider misin?":"How was it? What did you have, would you go again?","Not ekle (kiminle gidilir, ne zaman…)":"Add a note (who to go with, when…)","📝 Not kaydedildi":"📝 Note saved","✅ Nasıldı? Yıldız ver, öneriler sana göre iyileşsin":"✅ How was it? Rate it so suggestions get better","Bu filtrede ya da aramada mekan yok.":"No places match this filter or search.","Listen boş. Keşfet’te beğendiğin mekanın ♡’sine dokun, buraya gelsin.":"Your list is empty. Tap ♡ on a place in Explore to save it here.","Listen hesabına bağlı, başka cihazdan açınca da görünür.":"Your list is tied to your account and syncs across devices.","Listen bu cihazda tutuluyor.":"Your list is stored on this device.","Listene şu an ulaşılamıyor; sayfayı yenileyip tekrar dene.":"Can’t reach your list right now; reload and try again.","Paylaşılacak mekan yok.":"Nothing to share.","📋 Liste kopyalandı":"📋 List copied","Metni seçip kopyala.":"Select and copy the text.","Diğer":"Other","Gidilecek":"To go","Gittim":"Been there",
   // grup
   "Nereye gidelim?":"Where should we go?","Herkes mekan eklesin, oylayın, kazanan belli olsun.":"Everyone adds places, you vote, the winner is decided.","🗳️ Yeni oylama başlat":"🗳️ Start a new vote","Ör: Cuma akşamı nereye gidelim?":"E.g. Where should we go Friday night?","Oylama başlığı":"Vote title","Başlat":"Start","Devam eden oylamalar":"Ongoing votes","Biten oylamalar":"Finished votes","Henüz oylama yok. İlkini sen başlat, arkadaşların katılsın! 🎉":"No votes yet. Start the first one and invite your friends! 🎉",
   "👥 Arkadaşlarının katılabilmesi için bu uygulamayı sağ üstteki Paylaş menüsünden onlarla paylaş ve en az katkıda bulunabilecek (Contributor) yetki ver. Oylamalar uygulamaya erişimi olan herkese görünür.":"👥 For friends to join, share this app with them from the Share menu (top right) with at least Contributor access. Votes are visible to everyone with access.",
@@ -876,6 +901,8 @@ const EN = {
   "Grup oylaması için veritabanı henüz bağlı değil. Cloudflare’de Worker’a DB bağlantısını ekle.":"The group vote database isn’t connected yet. Add the DB binding to the Worker in Cloudflare.","Bu site veritabanına yetkili değil. Cloudflare’deki ALLOWED_ORIGINS ayarını kontrol et.":"This site isn’t allowed to use the database. Check ALLOWED_ORIGINS in Cloudflare.","Grup verisine şu an ulaşılamıyor. Biraz sonra tekrar dene.":"Can’t reach group data right now. Try again in a moment.",
   "👋 Arkadaşların seni nasıl görsün?":"👋 How should friends see you?","Oylamalarda adın bu şekilde görünecek. Sonradan değiştirebilirsin.":"This is how your name appears in votes. You can change it later.","Adın ya da takma adın":"Your name or nickname","Adın":"Your name","Devam":"Continue","Oylama yükleniyor…":"Loading the vote…","👥 Arkadaşlarını çağırmak için oylamayı aç ve 📤 Davet et’e dokun. Oylamaları sadece davet bağlantısı olanlar görebilir.":"👥 To invite friends, open a vote and tap 📤 Invite. Only people with the invite link can see a vote.","değiştir":"change",
   "🔔 Bildirim almak için Gidelim’i ana ekrana ekle (Safari’de Paylaş → Ana Ekrana Ekle) ve oradan aç.":"🔔 To get notifications, add Gidelim to your Home Screen (Safari: Share → Add to Home Screen) and open it from there.","🔕 Bildirimlere izin verilmedi. Telefonun ayarlarından Gidelim için bildirimleri açabilirsin.":"🔕 Notifications are blocked. You can turn them on for Gidelim in your phone settings.","Bildirimleri aç":"Turn on notifications","Biri oy verince, yorum yazınca haberin olsun":"Know when someone votes or comments","🔔 Bildirimler açıldı":"🔔 Notifications on","Bildirim izni verilmedi.":"Notification permission denied.","Bildirimler açılamadı, tekrar dene.":"Couldn’t turn on notifications, try again.",
+  "Fırın":"Bakery","Müze":"Museum","Park":"Park","Çarşı":"Market","Sanat":"Arts","Bar":"Bar","Uygun":"Affordable","Temizle":"Clear","Listen boş. Keşfet’te beğendiğin mekanın ♡’sine dokun, buraya gelsin.":"Your list is empty. Tap ♡ on a place in Explore to save it here.",
+  "Temizle":"Clear",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1045,7 +1072,7 @@ function openSheet(then){
   const rb = $("#recent"); rb.innerHTML = "";
   ls.get("nereye-recent4", []).forEach(x => { const b = el("button",null,"🕘 " + [x.city, cname(x.code)].filter(Boolean).join(", ")); b.type = "button";
     b.onclick = () => { cSel.value = x.code; $("#cityin").value = x.city; closeSheet(true); }; rb.append(b); });
-  renderSugs();
+  renderSugs(); if (typeof syncClears === "function") syncClears();
   $("#sheet").hidden = false; setTimeout(() => $("#cityin").focus(), 50);
 }
 function closeSheet(ok){
@@ -1184,7 +1211,7 @@ function show(v){
   ["explore","ask","group","list"].forEach(x => $("#v-" + x).hidden = x !== v);
   if (v === "list") renderSaved();
   if (v === "group") { gRender(); if (!location.hash.startsWith("#oy-")) setHash("grup"); } else if (location.hash) setHash("");
-  if (v === "ask") { renderChat(); scrollEnd(false); } else window.scrollTo(0, 0);
+  if (v === "ask") { renderChat(); scrollEnd(false); } else SC().scrollTo(0, 0);
 }
 document.querySelectorAll(".tb").forEach(b => b.onclick = () => show(b.dataset.v));
 
@@ -1422,21 +1449,22 @@ async function pumpPre(){
   preBusy = false;
 }
 function markReady(){}
+const SHORT = { restoran:"Restoran", kafe:"Kafe", bar:"Bar", firin:"Fırın", muze:"Müze", park:"Park", carsi:"Çarşı", sanat:"Sanat" };
 function renderChips(){
   const tc = $("#typechips"), fc = $("#filterchips"); tc.innerHTML = ""; fc.innerHTML = "";
-  COLS.filter(c => !c.guide).forEach(c => { const b = el("button","tchip"); b.type = "button"; b.dataset.t = c.id; b.setAttribute("aria-pressed", exMode === "browse" && exType === c.id);
-    b.append(el("span",null,c.emoji), document.createTextNode(L(c.label))); b.onclick = () => selectType(c.id); tc.append(b); });
-  FILTERS.forEach(f => { const b = el("button","fchip", L(f.label)); b.type = "button"; b.dataset.f = f.id; b.setAttribute("aria-pressed", exFilter === f.id);
+  COLS.filter(c => !c.guide).forEach(c => { const b = el("button","tcell"); b.type = "button"; b.dataset.t = c.id; b.setAttribute("aria-pressed", exMode === "browse" && exType === c.id);
+    b.setAttribute("aria-label", L(c.label)); b.append(el("span",null,c.emoji), document.createTextNode(L(SHORT[c.id] || c.label))); b.onclick = () => selectType(c.id); tc.append(b); });
+  FILTERS.forEach(f => { const b = el("button",null, L(f.id === "ucuz" ? "Uygun" : f.label)); b.type = "button"; b.dataset.f = f.id; b.setAttribute("aria-pressed", exFilter === f.id);
     b.onclick = () => { exFilter = f.id; ls.set("gidelim-filter", f.id); exMode = "browse"; syncChips(); loadList(); }; fc.append(b); });
   fc.hidden = exMode !== "browse";
 }
 function syncChips(){
-  document.querySelectorAll(".tchip").forEach(b => b.setAttribute("aria-pressed", exMode === "browse" && b.dataset.t === exType));
-  document.querySelectorAll(".fchip").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === exFilter));
+  document.querySelectorAll(".tcell").forEach(b => b.setAttribute("aria-pressed", exMode === "browse" && b.dataset.t === exType));
+  document.querySelectorAll("#filterchips button").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === exFilter));
   $("#filterchips").hidden = exMode !== "browse";
 }
 function centerChip(){
-  const row = $("#typechips"), b = row.querySelector('.tchip[aria-pressed="true"]'); if (!b) return;
+  const row = $("#typechips"), b = row.querySelector('.tchip[aria-pressed="true"]'); if (!b || row.classList.contains("tgrid")) return;
   const left = b.offsetLeft - (row.clientWidth - b.offsetWidth) / 2;
   try { row.scrollTo({ left: Math.max(0, left), behavior: "smooth" }); } catch(e) { row.scrollLeft = Math.max(0, left); }
 }
@@ -1446,8 +1474,9 @@ function xrow(p, where){
   const cat = catOf(p.tur), k = keyOf(p, where);
   const r = el("div","xrow");
   const m = el("button","xmain"); m.type = "button";
-  const t = el("div","pt"); t.append(notr(el("b",null,p.ad)), el("small",null,[p.semt, p.ilce && snorm(p.ilce) !== snorm(p.semt || "") ? p.ilce : "", p.tur, p.fiyat].filter(Boolean).join(" · ")));
-  m.append(el("div","em",cat.emoji), t); m.onclick = () => openPlace(p, where);
+  const t = el("div","pt"); t.append(notr(el("b",null,p.ad)), el("small",null,[p.semt || p.ilce, p.tur].filter(Boolean).join(" · ")));
+  if (exMode === "search") m.append(el("div","em",cat.emoji));
+  m.append(t); if (p.fiyat) m.append(el("span","xprice",p.fiyat)); m.onclick = () => openPlace(p, where);
   const h = el("button","xheart"); h.type = "button"; h.dataset.k = k;
   const sync = () => { const on = !!saved[k]; h.setAttribute("aria-pressed", on); h.textContent = on ? "♥" : "♡"; h.setAttribute("aria-label", L(on ? "Listeden çıkar" : "Listeye ekle")); };
   h.onclick = () => { if (saved[k]) removeWithUndo(k); else { savePlace(p, where); buzz(15); toast(L("❤️ Listene eklendi")); } sync(); };
@@ -1475,7 +1504,7 @@ function drawListNow(items, where, loading, opts = {}){
     const rb = el("button","xmore", L("↻ Tekrar dene")); rb.type = "button"; rb.onclick = () => exMode === "search" ? placeSearch() : loadList(); box.append(rb); }
   else if (!loading && !items.length) box.append(el("div","empty", exMode === "search" ? L("Emin olduğum bir yer bulamadım. Yazımı ya da konumu değiştir.") : L("Bu filtrede emin olduğum bir yer bulamadım. Başka bir filtre dene.")));
   if (!loading && items.length && exMode === "browse" && !opts.done) { const mb = el("button","xmore", L("+ Daha fazla göster")); mb.type = "button"; mb.onclick = () => loadList(true); box.append(mb); }
-  if (items.length) box.append(el("div","xinfo", L("Bir mekana dokun: neyiyle meşhur, ne zaman gidilir, nasıl gidilir.")));
+
 }
 async function loadList(more){
   if (exMode !== "browse") return;
@@ -1500,7 +1529,7 @@ function prefetchCol(){}
 let decks = ls.get("nereye-decks", {}) || {};
 let cur = null, view = "deck";
 function persistDecks(){ const keys = Object.keys(decks); if (keys.length > 14) keys.slice(0, keys.length - 14).forEach(k => delete decks[k]); ls.set("nereye-decks", decks); }
-function showDeck(on){ $("#ex-home").hidden = on; $("#ex-deck").hidden = !on; window.scrollTo(0, 0); }
+function showDeck(on){ $("#ex-home").hidden = on; $("#ex-deck").hidden = !on; SC().scrollTo(0, 0); }
 $("#deck-back").onclick = () => { cur?.ctl?.abort(); cur = null; showDeck(false); };
 
 function openDeckOld(c){
@@ -1735,7 +1764,7 @@ function renderGuide(gd){
 async function placeSearch(){
   const term = exQi.value.trim() || (exMode === "search" ? exTerm : "");
   if (!term) { toast(L("Aradığın mekanı ya da yemeği yaz.")); exQi.focus(); return; }
-  exQi.blur(); addSearch(term); exSug.hidden = true;
+  exQi.blur(); addSearch(term); exSug.hidden = true; if (typeof syncClears === "function") syncClears();
   exMode = "search"; exTerm = term; syncChips();
   const where = locStr(), tok = ++listTok;
   if (!sample) { drawList([], where, false, { err: L("Yapay zeka bu görünümde çalışmıyor.") }); return; }
@@ -1936,7 +1965,7 @@ function renderChat(){
     if (i === chat.length - 1 && m.role === "assistant" && m.options && m.options.length) chatEl.append(quick(m.options));
   });
 }
-function scrollEnd(smooth = true){ requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: smooth ? "smooth" : "auto" })); }
+function scrollEnd(smooth = true){ requestAnimationFrame(() => SC().scrollTo({ top: SC().scrollHeight, behavior: smooth ? "smooth" : "auto" })); }
 let ctl = null, busy = false;
 async function send(text){
   text = (text || "").trim();
@@ -1988,7 +2017,7 @@ Soru soruyorsan "mekanlar" ve "plan" boş dizi olsun.`;
       const mi = text.indexOf('"mekanlar"');
       if (mi >= 0) { const got = partialObjects(text, mi).filter(okPlace);
         if (got.length > liveN) { liveN = got.length; const nr = placeRows(got, where); if (liveCards) liveCards.replaceWith(nr); else (live || typing).after(nr); liveCards = nr; } }
-      const near = window.innerHeight + window.scrollY > document.documentElement.scrollHeight - 160; if (near) window.scrollTo(0, document.documentElement.scrollHeight);
+      const m = SC(); const near = m.clientHeight + m.scrollTop > m.scrollHeight - 160; if (near) m.scrollTo(0, m.scrollHeight);
     } });
     const m = r && typeof r === "object" && !Array.isArray(r) ? r : {};
     chat.push({ role:"assistant", where,
@@ -2025,7 +2054,7 @@ function renderSaved(){
   const cmp = sortMode === "star" ? (a,b) => (b[1].puan||0) - (a[1].puan||0) || (b[1].eklendi||0) - (a[1].eklendi||0)
     : sortMode === "az" ? (a,b) => a[1].ad.localeCompare(b[1].ad, "tr") : (a,b) => (b[1].eklendi||0) - (a[1].eklendi||0);
   items.sort(cmp);
-  if (!items.length){ const e = el("div","empty"); e.append(el("b",null,"🗺️"), document.createTextNode(Object.keys(saved).length ? "Bu filtrede ya da aramada mekan yok." : "Listen boş. Keşfet’te kartları sağa kaydır, buraya gelsin.")); list.append(e); return; }
+  if (!items.length){ const e = el("div","empty"); e.append(el("b",null,"🗺️"), document.createTextNode(Object.keys(saved).length ? "Bu filtrede ya da aramada mekan yok." : "Listen boş. Keşfet’te beğendiğin mekanın ♡’sine dokun, buraya gelsin.")); list.append(e); return; }
   const groups = new Map();
   items.forEach(it => { const c = cityOf(it[1]); if (!groups.has(c)) groups.set(c, []); groups.get(c).push(it); });
   groups.forEach((arr, city) => {
@@ -2211,7 +2240,7 @@ function pollCard(id, p){
   b.onclick = () => openPollView(id);
   return b;
 }
-function openPollView(id){ billOpen = false; pollTab = "opts"; pmenu = false; openPoll = id; addMode = null; whenOpen = false; manQ = ""; delArm = false; setHash("oy-" + id); gRender(); window.scrollTo(0, 0); }
+function openPollView(id){ billOpen = false; pollTab = "opts"; pmenu = false; openPoll = id; addMode = null; whenOpen = false; manQ = ""; delArm = false; setHash("oy-" + id); gRender(); SC().scrollTo(0, 0); }
 function renderPoll(area, pid){
   const p = polls[pid], t = tally(pid), mine = myVotes(pid), isOwner = p.by === myId;
   resolveNames([p.by, ...t.rows.map(r => r.o.by), ...t.rows.flatMap(r => r.voters)]);
@@ -2682,12 +2711,35 @@ updateSkipInfo();
 
 if (!ls.get("gidelim-tour", 0) && !location.hash.startsWith("#oy-")) setTimeout(openTour, 300);
 else if (!ls.get("nereye-loc", null)) setTimeout(() => openSheet(), 400);
+
 /* Pencere açıkken arka sayfa kaymasın */
 (() => { let y = 0, locked = false; const ids = ["place","sheet","settings","hist","tour"];
   const sync = () => { const any = ids.some(i => { const e = document.getElementById(i); return e && !e.hidden; }); const b = document.body;
-    if (any && !locked) { y = window.scrollY || 0; Object.assign(b.style, { position: "fixed", top: -y + "px", left: "0", right: "0", width: "100%" }); locked = true; }
-    else if (!any && locked) { Object.assign(b.style, { position: "", top: "", left: "", right: "", width: "" }); window.scrollTo(0, y); locked = false; } };
+    if (any && !locked) { SC().style.overflowY = "hidden"; locked = true; }
+    else if (!any && locked) { SC().style.overflowY = ""; locked = false; } };
   const mo = new MutationObserver(sync); ids.forEach(i => { const e = document.getElementById(i); if (e) mo.observe(e, { attributes: true, attributeFilter: ["hidden"] }); }); })();
+/* Klavye: yazarken alt çubuğu gizle, kutuları klavyenin üstünde tut */
+(() => { const root = document.documentElement, vv = window.visualViewport;
+  const isField = e => e && (e.tagName === "TEXTAREA" || (e.tagName === "INPUT" && !/^(checkbox|radio|button|submit|range|color)$/i.test(e.type || "")));
+  const upd = () => { const kb = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : 0; root.style.setProperty("--kb", kb + "px"); };
+  document.addEventListener("focusin", e => { if (isField(e.target)) { root.classList.add("kb"); upd(); } });
+  document.addEventListener("focusout", () => setTimeout(() => { if (!isField(document.activeElement)) { root.classList.remove("kb"); root.style.setProperty("--kb", "0px"); } }, 60));
+  if (vv) { vv.addEventListener("resize", upd); vv.addEventListener("scroll", upd); } })();
+/* Arama kutularına ✕ */
+const clears = [];
+function syncClears(){ clears.forEach(c => c.b.hidden = !c.inp.value); }
+function addClear(inp, wrap, after){
+  if (!inp) return; const b = el("button","clr","✕"); b.type = "button"; b.setAttribute("aria-label", L("Temizle")); b.hidden = !inp.value;
+  b.addEventListener("mousedown", e => e.preventDefault()); b.addEventListener("touchstart", e => e.preventDefault(), { passive: false });
+  b.addEventListener("touchend", e => { e.preventDefault(); b.click(); });
+  b.onclick = () => { inp.value = ""; inp.dispatchEvent(new Event("input", { bubbles: true })); b.hidden = true; inp.focus(); if (after) after(); };
+  inp.addEventListener("input", () => b.hidden = !inp.value);
+  if (wrap) { const w = el("div","clrwrap"); inp.parentNode.insertBefore(w, inp); w.append(inp, b); } else inp.after(b);
+  clears.push({ inp, b });
+}
+addClear($("#ex-q"), false, () => { if (exMode === "search") { exMode = "browse"; syncChips(); loadList(); } });
+addClear($("#l-q"), false);
+addClear($("#cityin"), true);
 /* İki parmakla yakınlaştırmayı engelle (iPhone) */
 ["gesturestart","gesturechange"].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 startI18n();
