@@ -753,7 +753,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="segset" id="set-map" role="group" aria-label="Harita uygulaması"><button type="button" data-val="apple">🍎 Apple</button><button type="button" data-val="google">🗺️ Google</button><button type="button" data-val="yandex">🟡 Yandex</button></div>
     <div class="hint">Yol tarifi ve harita bağlantıları bu uygulamada açılır.</div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.3.0<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.3.1<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -1378,7 +1378,7 @@ function mapUrl(app, kind, p){
   const e = encodeURIComponent;
   if (app === "apple") return kind === "dir"
     ? "https://maps.apple.com/?daddr=" + (ll ? ll[0] + "," + ll[1] : e(q)) + "&dirflg=d" + (ll ? "&q=" + e(p.ad) : "")
-    : "https://maps.apple.com/?q=" + e(ll ? p.ad : q) + (ll ? "&ll=" + ll[0] + "," + ll[1] : "");
+    : "https://maps.apple.com/?q=" + e(ll ? p.ad : q) + (ll ? "&sll=" + ll[0] + "," + ll[1] + "&z=17" : "");   // sll: "bu civarda ara" → Apple mekanın kendi sayfasını açar
   if (app === "yandex") return kind === "dir" && ll
     ? "https://yandex.com.tr/harita/?rtext=~" + ll[0] + "," + ll[1] + "&rtt=auto"
     : "https://yandex.com.tr/harita/?text=" + e(q) + (ll ? "&ll=" + ll[1] + "," + ll[0] + "&z=16" : "");
