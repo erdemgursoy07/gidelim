@@ -734,7 +734,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="lbl">Tema</div>
     <div class="segset" id="set-theme" role="group" aria-label="Tema"><button type="button" data-val="auto">🌗 Otomatik</button><button type="button" data-val="light">☀️ Aydınlık</button><button type="button" data-val="dark">🌙 Karanlık</button></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.2.0<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.2.1<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2099,7 +2099,7 @@ function setView(v){
   if (v === "map") showMap();
 }
 /* Harita sağlayıcısı: önce Apple Haritalar, olmazsa OpenStreetMap */
-let mapKind = null, mkMap = null, mkAnns = [], mkMe = null, mkP = null, mkFailed = false;
+let mapKind = null, mkMap = null, mkAnns = [], mkMe = null, mkP = null, mkFailed = false, mkWhy = "";
 function loadMapKit(){
   if (mkFailed) return Promise.reject(new Error("failed"));
   if (mkP) return mkP;
@@ -2109,14 +2109,14 @@ function loadMapKit(){
     const to = setTimeout(() => fin(false, new Error("timeout")), 9000);
     const go = () => { try {
         mapkit.addEventListener("configuration-change", ev => { if (ev.status === "Initialized" || ev.status === "Refreshed") fin(true); });
-        mapkit.addEventListener("error", ev => fin(false, new Error(ev.status || "mapkit")));
+        mapkit.addEventListener("error", ev => fin(false, new Error("apple " + (ev.status || "hata"))));
         mapkit.init({ language: LANG, authorizationCallback: cb => {
           fetch(tokenUrl).then(r => r.ok ? r.text() : Promise.reject(new Error("token " + r.status))).then(t => cb(t)).catch(e => fin(false, e)); } });
       } catch(e) { fin(false, e); } };
     if (window.mapkit && window.mapkit.init) { go(); return; }
     const sc = document.createElement("script"); sc.src = "https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"; sc.crossOrigin = "anonymous";
     sc.onload = go; sc.onerror = () => fin(false, new Error("load")); document.head.append(sc);
-  }).catch(e => { mkP = null; mkFailed = true; throw e; });
+  }).catch(e => { mkP = null; mkFailed = true; mkWhy = String((e && e.message) || e || "?"); throw e; });
   return mkP;
 }
 async function showMap(){
@@ -2177,7 +2177,7 @@ function drawMarkers(fit){
     if (fit && pts.length) lmap.fitBounds(pts, { padding: [40, 40], maxZoom: 16.5 });
   }
   pumpGeo();
-  const note = $("#mapnote"); note.textContent = missing ? (LANG === "en" ? `${missing} place(s) still being located…` : `${missing} mekanın yeri bulunuyor…`) : "";
+  const note = $("#mapnote"); note.textContent = (missing ? (LANG === "en" ? `${missing} place(s) still being located… ` : `${missing} mekanın yeri bulunuyor… `) : "") + (mapKind === "osm" && mkWhy ? `(Apple Haritalar: ${mkWhy})` : "");
   if (!mapSel) mapCard();
 }
 function mapCard(){
