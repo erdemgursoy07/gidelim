@@ -578,6 +578,14 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 
 #mapbox .mk-map-view{border-radius:0}
 
+.mapapp-list{display:flex;flex-direction:column;gap:8px;margin:12px 0 8px}
+.mapapp-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;cursor:pointer;color:var(--ink);font-size:1rem}
+.mapapp-btn span{font-size:1.4rem}
+.mapapp-btn b{flex:1;font-weight:800}
+.mapapp-btn small{font-size:.74rem;font-weight:800;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 9px}
+.mapapp-btn:active{transform:scale(.99)}
+#mapapp{z-index:45}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -725,6 +733,14 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="hlist" id="hlist" style="margin-top:12px"></div>
   </div>
 </div>
+<div class="sheet-bg" id="mapapp" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mapapp-h">
+    <h2 id="mapapp-h">Hangi harita uygulamasında açalım?</h2>
+    <div class="mapapp-list" id="mapapp-list"></div>
+    <div class="hint">Seçimin hatırlanır. Ayarlar’dan istediğin zaman değiştirebilirsin.</div>
+    <button class="pill-btn" id="mapapp-x" type="button" style="margin-top:10px">Vazgeç</button>
+  </div>
+</div>
 <div class="sheet-bg" id="settings" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="set-h">
     <h2 id="set-h">Ayarlar</h2>
@@ -733,8 +749,11 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="hint">Dil değişince sayfa yenilenir.</div>
     <div class="lbl">Tema</div>
     <div class="segset" id="set-theme" role="group" aria-label="Tema"><button type="button" data-val="auto">🌗 Otomatik</button><button type="button" data-val="light">☀️ Aydınlık</button><button type="button" data-val="dark">🌙 Karanlık</button></div>
+    <div class="lbl">Harita uygulaması</div>
+    <div class="segset" id="set-map" role="group" aria-label="Harita uygulaması"><button type="button" data-val="apple">🍎 Apple</button><button type="button" data-val="google">🗺️ Google</button><button type="button" data-val="yandex">🟡 Yandex</button></div>
+    <div class="hint">Yol tarifi ve harita bağlantıları bu uygulamada açılır.</div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.2.1<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.3.0<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -987,6 +1006,7 @@ const EN = {
   "Karlı":"Snowy","Yağmurlu":"Rainy","Çok sıcak":"Very hot","Soğuk":"Cold","Güneşli":"Sunny","Açık":"Clear","Bulutlu":"Cloudy",
   "sıcak ve kapalı yerler öne çıktı":"cosy indoor spots first","kapalı mekanlar öne çıktı":"indoor spots first","serin yerler öne çıktı":"cool spots first","sıcak mekanlar öne çıktı":"warm spots first","teras ve açık hava yerleri öne çıktı":"terraces & outdoor spots first",
   "Sen buradasın":"You are here",
+  "Hangi harita uygulamasında açalım?":"Which map app should we use?","Seçimin hatırlanır. Ayarlar’dan istediğin zaman değiştirebilirsin.":"We’ll remember your choice. You can change it anytime in Settings.","Vazgeç":"Cancel","Önerilen":"Recommended","Harita uygulaması":"Map app","Yol tarifi ve harita bağlantıları bu uygulamada açılır.":"Directions and map links open in this app.","Apple Haritalar":"Apple Maps","Google Haritalar":"Google Maps","Yandex Haritalar":"Yandex Maps",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1344,16 +1364,56 @@ function refresh(){
 function setHeart(b, on){ b.setAttribute("aria-pressed", on); b.textContent = on ? "♥" : "♡"; b.setAttribute("aria-label", on ? "Listeden çıkar" : "Listeye ekle"); }
 
 /* ---------- Kart bileşenleri ---------- */
+/* ---------- Harita uygulaması tercihi (Apple / Google / Yandex) ---------- */
+const MAP_APPS = {
+  apple:  { ad: "Apple Haritalar",  ic: "🍎" },
+  google: { ad: "Google Haritalar", ic: "🗺️" },
+  yandex: { ad: "Yandex Haritalar", ic: "🟡" }
+};
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const mapPref = () => { const v = ls.get("gidelim-mapapp", null); return MAP_APPS[v] ? v : null; };
+function mapUrl(app, kind, p){
+  const q = [p.ad, p.semt, p.sehir].filter(Boolean).join(", ");
+  let ll = null; try { ll = typeof coordOf === "function" ? coordOf(p, p.sehir || "") : null; } catch(e) {}
+  const e = encodeURIComponent;
+  if (app === "apple") return kind === "dir"
+    ? "https://maps.apple.com/?daddr=" + (ll ? ll[0] + "," + ll[1] : e(q)) + "&dirflg=d" + (ll ? "&q=" + e(p.ad) : "")
+    : "https://maps.apple.com/?q=" + e(ll ? p.ad : q) + (ll ? "&ll=" + ll[0] + "," + ll[1] : "");
+  if (app === "yandex") return kind === "dir" && ll
+    ? "https://yandex.com.tr/harita/?rtext=~" + ll[0] + "," + ll[1] + "&rtt=auto"
+    : "https://yandex.com.tr/harita/?text=" + e(q) + (ll ? "&ll=" + ll[1] + "," + ll[0] + "&z=16" : "");
+  return kind === "dir"
+    ? "https://www.google.com/maps/dir/?api=1&destination=" + (ll ? ll[0] + "," + ll[1] : e(q))
+    : "https://www.google.com/maps/search/?api=1&query=" + e(q);
+}
+function openExternal(url){ const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener"; document.body.append(a); a.click(); a.remove(); }
+let mapAppCb = null;
+function chooseMapApp(cb){
+  mapAppCb = cb;
+  const box = $("#mapapp-list"); box.innerHTML = "";
+  const order = IS_IOS ? ["apple", "google", "yandex"] : ["google", "yandex", "apple"];
+  order.forEach((k, i) => { const b = el("button","mapapp-btn"); b.type = "button";
+    b.append(el("span",null,MAP_APPS[k].ic), el("b",null,L(MAP_APPS[k].ad)));
+    if (i === 0) b.append(el("small",null,L("Önerilen")));
+    b.onclick = () => { ls.set("gidelim-mapapp", k); $("#mapapp").hidden = true; syncSettings(); const f = mapAppCb; mapAppCb = null; if (f) f(k); };
+    box.append(b); });
+  $("#mapapp").hidden = false; setTimeout(() => box.firstChild && box.firstChild.focus({ preventScroll: true }), 30);
+}
+function extLink(cls, label, kind, p){
+  const a = el("a", cls, label); a.target = "_blank"; a.rel = "noopener";
+  const app = mapPref(); a.href = app ? mapUrl(app, kind, p) : "#";
+  a.addEventListener("click", ev => {
+    const app = mapPref();
+    if (!app) { ev.preventDefault(); chooseMapApp(k => openExternal(mapUrl(k, kind, p))); return; }
+    a.href = mapUrl(app, kind, p);
+  });
+  return a;
+}
 function dirLink(p, short){
-  const a = el("a","maplink dir", short ? "🧭 Yol" : "🧭 Yol tarifi");
-  a.href = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent([p.ad, p.semt, p.sehir].filter(Boolean).join(", "));
-  a.target = "_blank"; a.rel = "noopener"; a.setAttribute("aria-label", p.ad + " için yol tarifi"); return a;
+  const a = extLink("maplink dir", short ? "🧭 Yol" : "🧭 Yol tarifi", "dir", p);
+  a.setAttribute("aria-label", p.ad + " için yol tarifi"); return a;
 }
-function mapLink(p){
-  const a = el("a","maplink","🗺️ Harita");
-  a.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(`${p.ad} ${p.semt || ""} ${p.sehir || ""}`);
-  a.target = "_blank"; a.rel = "noopener"; return a;
-}
+function mapLink(p){ return extLink("maplink", "🗺️ Harita", "map", p); }
 function askAbout(p, where){
   if (!$("#place").hidden) { $("#place").hidden = true; pdOpen = null; }
   newChat(); curTab = "x";
@@ -2806,9 +2866,13 @@ window.addEventListener("hashchange", handleHash);
 function syncSettings(){
   document.querySelectorAll("#set-lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.val === LANG));
   document.querySelectorAll("#set-theme button").forEach(b => b.setAttribute("aria-pressed", b.dataset.val === THEME));
+  document.querySelectorAll("#set-map button").forEach(b => b.setAttribute("aria-pressed", b.dataset.val === mapPref()));
 }
 document.querySelectorAll(".setbtn").forEach(b => b.onclick = () => { syncSettings(); $("#settings").hidden = false; });
 document.querySelectorAll("#set-theme button").forEach(b => b.onclick = () => { THEME = b.dataset.val; ls.set("gidelim-theme", THEME); applyTheme(); syncSettings(); });
+document.querySelectorAll("#set-map button").forEach(b => b.onclick = () => { ls.set("gidelim-mapapp", b.dataset.val); syncSettings(); toast(MAP_APPS[b.dataset.val].ic + " " + L(MAP_APPS[b.dataset.val].ad)); });
+$("#mapapp-x").onclick = () => { $("#mapapp").hidden = true; mapAppCb = null; };
+$("#mapapp").addEventListener("click", e => { if (e.target.id === "mapapp") { $("#mapapp").hidden = true; mapAppCb = null; } });
 document.querySelectorAll("#set-lang button").forEach(b => b.onclick = () => { if (b.dataset.val === LANG) return; ls.set("gidelim-lang", b.dataset.val); location.reload(); });
 $("#set-ok").onclick = () => $("#settings").hidden = true;
 $("#settings").addEventListener("click", e => { if (e.target.id === "settings") $("#settings").hidden = true; });
@@ -3018,7 +3082,7 @@ if (!ls.get("gidelim-tour", 0) && !location.hash.startsWith("#oy-")) setTimeout(
 else if (!ls.get("nereye-loc", null)) setTimeout(() => openSheet(), 400);
 
 /* Pencere açıkken arka sayfa kaymasın */
-(() => { let y = 0, locked = false; const ids = ["place","sheet","settings","hist","tour"];
+(() => { let y = 0, locked = false; const ids = ["place","sheet","settings","hist","tour","mapapp"];
   const sync = () => { const any = ids.some(i => { const e = document.getElementById(i); return e && !e.hidden; }); const b = document.body;
     if (any && !locked) { SC().style.overflowY = "hidden"; locked = true; }
     else if (!any && locked) { SC().style.overflowY = ""; locked = false; } };
