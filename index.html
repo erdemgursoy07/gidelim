@@ -801,7 +801,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="setrow2"><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.7.0<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.7.1<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2213,15 +2213,15 @@ let cityCard = null;
 async function loadCityCard(){
   const box = $("#citycard"); if (!box) return;
   const where = locStr(); if (!where || !sample) { box.hidden = true; renderWx(); return; }
-  const key = "gidelim-city|" + LANG + "|" + snorm(where);
+  const key = "gidelim-city2|" + LANG + "|" + snorm(where);
   let c = ls.get(key, null);
-  if (!c || Date.now() - (c.at || 0) > 30 * 86400000) {
+  if (!c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000)) {
     try {
       const r = await sample.json(`Konum: ${where}
 Bu konumun (semt ya da ilçe verildiyse o semtin/ilçenin, yoksa şehrin ya da ülkenin) en tanınan, simge olmuş TEK yerini seç (ör. Üsküdar → Kız Kulesi, İstanbul → Ayasofya, Ankara → Anıtkabir, Roma → Kolezyum). Doğal güzellik de olabilir.
 Bu yerin Wikipedia'da kendi sayfası olmalı. SADECE şu JSON'u döndür: {"yer":"Yerin adı","tur":"Kısa tür, ör. Tarihi kule","wiki_tr":"Türkçe Wikipedia sayfa başlığı ya da boş","wiki_en":"English Wikipedia page title"}`, { ...QUICKAI, share: 30 * 86400, fast: false });
-      const img = await wikiImage(r && r.wiki_tr, "tr") || await wikiImage(r && r.wiki_en, "en") || await wikiImage(r && r.yer, LANG === "en" ? "en" : "tr");
-      c = img && r && r.yer ? { yer: r.yer, tur: r.tur || "", img: img.src, page: img.page, at: Date.now() } : { none: 1, at: Date.now() };
+      const img = await wikiImage(r && r.wiki_tr, "tr") || await wikiImage(r && r.wiki_en, "en") || await wikiImage(r && r.yer, "tr") || await wikiImage(r && r.yer, "en");
+      c = img && r && r.yer ? { yer: r.yer, tur: r.tur || "", img: img.src, alt: img.alt, page: img.page, at: Date.now() } : { none: 1, at: Date.now() };
       ls.set(key, c);
     } catch(e) { c = null; }
   }
@@ -2239,7 +2239,9 @@ Bu yerin Wikipedia'da kendi sayfası olmalı. SADECE şu JSON'u döndür: {"yer"
     box.setAttribute("aria-label", c.yer); box.onclick = () => openPlace({ ad: c.yer, tur: c.tur || "" }, locStr());
     renderWx();
   };
-  im.onerror = () => { box.hidden = true; cityCard = null; renderWx(); };
+  im.onerror = () => {
+    if (c.alt && im.src !== c.alt) { c.img = c.alt; im.src = c.alt; return; }                 // standart boyut olmadıysa varsayılan fotoğraf
+    ls.set(key, { none: 1, at: Date.now() }); box.hidden = true; cityCard = null; renderWx(); };
   im.src = c.img;
 }
 async function wikiImage(title, lang){
@@ -2247,9 +2249,9 @@ async function wikiImage(title, lang){
   try {
     const j = await (await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(String(title).replace(/ /g, "_"))}`)).json();
     const t = j && j.thumbnail && j.thumbnail.source; if (!t) return null;
-    // küçük ama ekran için net: 640 piksel genişlik
-    const src = /\/\d+px-/.test(t) ? t.replace(/\/\d+px-/, "/640px-") : t;
-    return { src, page: (j.content_urls && j.content_urls.mobile && j.content_urls.mobile.page) || `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}` };
+    // Wikipedia sadece standart genişlikleri veriyor; 960 telefonda net ve yeterince küçük
+    const src = /\/\d+px-/.test(t) ? t.replace(/\/\d+px-/, "/960px-") : t;
+    return { src, alt: t, page: (j.content_urls && j.content_urls.mobile && j.content_urls.mobile.page) || `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}` };
   } catch(e) { return null; }
 }
 
