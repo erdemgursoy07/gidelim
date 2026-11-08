@@ -576,6 +576,8 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .leaflet-container .leaflet-control-attribution a{color:var(--muted)}
 .leaflet-bar a{background:var(--surface);color:var(--ink);border-color:var(--line)}
 
+#mapbox .mk-map-view{border-radius:0}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -732,7 +734,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="lbl">Tema</div>
     <div class="segset" id="set-theme" role="group" aria-label="Tema"><button type="button" data-val="auto">🌗 Otomatik</button><button type="button" data-val="light">☀️ Aydınlık</button><button type="button" data-val="dark">🌙 Karanlık</button></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.1.2<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.2.0<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -984,6 +986,7 @@ const EN = {
   "🗺️ Harita":"🗺️ Map","☰ Liste":"☰ List","Harita":"Map","Konumumu göster":"Show my location","Aç":"Open","📍 Sana en yakın":"📍 Closest to you","Bir iğneye dokun, mekanı gör. 📍 ile kendi konumunu göster.":"Tap a pin to see the place. Use 📍 to show where you are.","Harita yüklenemedi. İnternetini kontrol edip tekrar dene.":"Couldn’t load the map. Check your connection and try again.",
   "Karlı":"Snowy","Yağmurlu":"Rainy","Çok sıcak":"Very hot","Soğuk":"Cold","Güneşli":"Sunny","Açık":"Clear","Bulutlu":"Cloudy",
   "sıcak ve kapalı yerler öne çıktı":"cosy indoor spots first","kapalı mekanlar öne çıktı":"indoor spots first","serin yerler öne çıktı":"cool spots first","sıcak mekanlar öne çıktı":"warm spots first","teras ve açık hava yerleri öne çıktı":"terraces & outdoor spots first",
+  "Sen buradasın":"You are here",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1160,7 +1163,7 @@ function closeSheet(ok){
   if (ok) {
     const changed = cSel.value !== loc.code || snorm($("#cityin").value.trim()) !== snorm(loc.city);
     setLoc(cSel.value, $("#cityin").value);
-    if (changed) { wx = null; renderWx(); loadWeather(); if (lmap) { meLL = null; locCoords().then(c => { if (c) lmap.setView([c.lat, c.lng], 13); }).catch(() => {}); } toast("📍 " + locStr()); if (!$("#ex-lv").hidden) { if (exMode !== "browse") { exMode = "browse"; syncChips(); } updLV(); loadList(); } prefetchAll(); }
+    if (changed) { wx = null; renderWx(); loadWeather(); meLL = null; if (lmap || mkMap) { locCoords().then(c => { if (!c) return; if (lmap) lmap.setView([c.lat, c.lng], 13); if (mkMap) mkMap.region = new mapkit.CoordinateRegion(new mapkit.Coordinate(c.lat, c.lng), new mapkit.CoordinateSpan(0.045, 0.045)); }).catch(() => {}); } toast("📍 " + locStr()); if (!$("#ex-lv").hidden) { if (exMode !== "browse") { exMode = "browse"; syncChips(); } updLV(); loadList(); } prefetchAll(); }
   }
   $("#sheet").hidden = true;
   const f = sheetDone; sheetDone = null; if (ok && f) f();
@@ -2095,7 +2098,47 @@ function setView(v){
   $("#ex-list").hidden = v === "map"; $("#ex-map").hidden = v !== "map";
   if (v === "map") showMap();
 }
+/* Harita sağlayıcısı: önce Apple Haritalar, olmazsa OpenStreetMap */
+let mapKind = null, mkMap = null, mkAnns = [], mkMe = null, mkP = null, mkFailed = false;
+function loadMapKit(){
+  if (mkFailed) return Promise.reject(new Error("failed"));
+  if (mkP) return mkP;
+  const tokenUrl = (typeof AI_URL === "string" ? AI_URL : "").replace(/\/ai$/, "/mapkit-token");
+  mkP = new Promise((res, rej) => {
+    let done = false; const fin = (ok, e) => { if (done) return; done = true; clearTimeout(to); ok ? res() : rej(e || new Error("mapkit")); };
+    const to = setTimeout(() => fin(false, new Error("timeout")), 9000);
+    const go = () => { try {
+        mapkit.addEventListener("configuration-change", ev => { if (ev.status === "Initialized" || ev.status === "Refreshed") fin(true); });
+        mapkit.addEventListener("error", ev => fin(false, new Error(ev.status || "mapkit")));
+        mapkit.init({ language: LANG, authorizationCallback: cb => {
+          fetch(tokenUrl).then(r => r.ok ? r.text() : Promise.reject(new Error("token " + r.status))).then(t => cb(t)).catch(e => fin(false, e)); } });
+      } catch(e) { fin(false, e); } };
+    if (window.mapkit && window.mapkit.init) { go(); return; }
+    const sc = document.createElement("script"); sc.src = "https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"; sc.crossOrigin = "anonymous";
+    sc.onload = go; sc.onerror = () => fin(false, new Error("load")); document.head.append(sc);
+  }).catch(e => { mkP = null; mkFailed = true; throw e; });
+  return mkP;
+}
 async function showMap(){
+  if (!mapKind) { try { await loadMapKit(); mapKind = "apple"; } catch(e) { mapKind = "osm"; } }
+  return mapKind === "apple" ? showAppleMap() : showOsmMap();
+}
+async function showAppleMap(){
+  const box = $("#mapbox");
+  if (!mkMap) {
+    box.innerHTML = "";
+    mkMap = new mapkit.Map(box, {
+      colorScheme: isDark() ? mapkit.Map.ColorSchemes.Dark : mapkit.Map.ColorSchemes.Light,
+      showsMapTypeControl: false, showsCompass: mapkit.FeatureVisibility.Hidden, showsScale: mapkit.FeatureVisibility.Hidden,
+      showsZoomControl: true, isRotationEnabled: false, showsPointsOfInterest: true
+    });
+    mkMap.addEventListener("select", e => { const a = e.annotation; if (a && a.data && a.data.p) { mapSel = a.data.p; mapCard(); } });
+    const c = await locCoords().catch(() => null);
+    if (c && !mkAnns.length) mkMap.region = new mapkit.CoordinateRegion(new mapkit.Coordinate(c.lat, c.lng), new mapkit.CoordinateSpan(0.045, 0.045));
+  }
+  drawMarkers(true);
+}
+async function showOsmMap(){
   const box = $("#mapbox");
   try { await loadLeaflet(); } catch(e) { box.innerHTML = ""; box.append(el("div","status err", L("Harita yüklenemedi. İnternetini kontrol edip tekrar dene."))); return; }
   if (!lmap) {
@@ -2107,18 +2150,32 @@ async function showMap(){
   }
   setTimeout(() => { lmap.invalidateSize(); drawMarkers(true); }, 30);
 }
+function accentColor(){ return (getComputedStyle(document.documentElement).getPropertyValue("--accent") || "").trim() || "#1F5FBF"; }
 function drawMarkers(fit){
-  if (!lmap || exView !== "map") return;
-  mLayer.clearLayers(); const pts = []; let missing = 0;
+  if (exView !== "map" || (mapKind === "apple" ? !mkMap : !lmap)) return;
+  let missing = 0; const pts = [];
+  if (mapKind === "apple") { if (mkAnns.length) mkMap.removeAnnotations(mkAnns); mkAnns = []; } else mLayer.clearLayers();
   mapItems.forEach((p, i) => {
     const ll = coordOf(p, mapWhere);
     if (!ll) { missing++; if (!geoCache[gkey(p, mapWhere)]) { if (!geoQ.some(x => x.p === p)) geoQ.push({ p, where: mapWhere }); } return; }
     pts.push(ll);
-    const ic = LF.divIcon({ className: "mpin" + (mapSel === p ? " on" : ""), html: `<span><i>${i + 1}</i></span>`, iconSize: [30, 30], iconAnchor: [15, 30] });
-    LF.marker(ll, { icon: ic, title: p.ad, keyboard: true }).addTo(mLayer).on("click", () => { mapSel = p; drawMarkers(false); mapCard(); });
+    if (mapKind === "apple") {
+      mkAnns.push(new mapkit.MarkerAnnotation(new mapkit.Coordinate(ll[0], ll[1]), {
+        color: accentColor(), glyphText: String(i + 1), title: p.ad,
+        subtitle: [p.semt || p.ilce, p.fiyat].filter(Boolean).join(" · "), selected: mapSel === p, data: { p } }));
+    } else {
+      const ic = LF.divIcon({ className: "mpin" + (mapSel === p ? " on" : ""), html: `<span><i>${i + 1}</i></span>`, iconSize: [30, 30], iconAnchor: [15, 30] });
+      LF.marker(ll, { icon: ic, title: p.ad, keyboard: true }).addTo(mLayer).on("click", () => { mapSel = p; drawMarkers(false); mapCard(); });
+    }
   });
-  if (meLL) pts.push(meLL);
-  if (fit && pts.length) lmap.fitBounds(pts, { padding: [40, 40], maxZoom: 16.5 });
+  if (mapKind === "apple") {
+    if (mkAnns.length) mkMap.addAnnotations(mkAnns);
+    const all = mkMe ? mkAnns.concat([mkMe]) : mkAnns;
+    if (fit && all.length) mkMap.showItems(all, { animate: true, padding: new mapkit.Padding(60, 40, 40, 40) });
+  } else {
+    if (meLL) pts.push(meLL);
+    if (fit && pts.length) lmap.fitBounds(pts, { padding: [40, 40], maxZoom: 16.5 });
+  }
   pumpGeo();
   const note = $("#mapnote"); note.textContent = missing ? (LANG === "en" ? `${missing} place(s) still being located…` : `${missing} mekanın yeri bulunuyor…`) : "";
   if (!mapSel) mapCard();
@@ -2142,7 +2199,11 @@ function locateMe(){
   b.disabled = true;
   navigator.geolocation.getCurrentPosition(pos => {
     b.disabled = false; meLL = [pos.coords.latitude, pos.coords.longitude];
-    if (meMk) meMk.remove(); meMk = LF.circleMarker(meLL, { radius: 8, color: "#fff", weight: 3, fillColor: "#1F5FBF", fillOpacity: 1 }).addTo(lmap);
+    if (mapKind === "apple" && mkMap) {
+      if (mkMe) mkMap.removeAnnotation(mkMe);
+      mkMe = new mapkit.MarkerAnnotation(new mapkit.Coordinate(meLL[0], meLL[1]), { color: "#34C759", glyphText: "●", title: L("Sen buradasın") });
+      mkMap.addAnnotation(mkMe);
+    } else if (lmap) { if (meMk) meMk.remove(); meMk = LF.circleMarker(meLL, { radius: 8, color: "#fff", weight: 3, fillColor: "#1F5FBF", fillOpacity: 1 }).addTo(lmap); }
     mapSel = null; drawMarkers(true); mapCard();
   }, err => { b.disabled = false; toast(err && err.code === 1 ? L("Konum izni verilmedi. Telefon ayarlarından izin verebilirsin.") : L("Konum bulunamadı, elle yazabilirsin.")); },
   { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
