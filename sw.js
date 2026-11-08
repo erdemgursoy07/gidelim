@@ -1,7 +1,7 @@
 // Gidelim – uygulamayı telefonda saklayan katman (servis çalışanı)
 // Sayfa: telefondaki hali anında açılır, güncel hali arkada indirilir (yeni sürüm bir sonraki açılışta) → hızlı ve internetsiz açılış
 // Simgeler ve yazı tipleri: saklanandan anında
-const V = "gidelim-v6";
+const V = "gidelim-v8";
 const API = "https://gidelim-ai.erdemgursoy07.workers.dev";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
@@ -31,7 +31,19 @@ self.addEventListener("fetch", e => {
     e.respondWith((async () => {
       const c = await caches.open(V);
       const cached = await c.match(req, { ignoreSearch: true }) || await c.match("./index.html") || await c.match("./");
-      const net = fetch(req, { cache: "no-store" }).then(r => { if (r.ok) { c.put(req, r.clone()); c.put("./index.html", r.clone()); } return r; });
+      const oldText = cached ? await cached.clone().text() : null;
+      const net = fetch(req, { cache: "no-store" }).then(async r => {
+        if (r.ok) {
+          const txt = await r.clone().text();
+          await c.put(req, r.clone()); await c.put("./index.html", r.clone());
+          // Yeni sürüm geldiyse açık sayfaya haber ver, kendini yenilesin
+          if (oldText !== null && txt !== oldText) {
+            const cs = await clients.matchAll({ type: "window", includeUncontrolled: true });
+            cs.forEach(cl => cl.postMessage({ type: "gidelim-update" }));
+          }
+        }
+        return r;
+      });
       if (cached) { e.waitUntil(net.catch(() => {})); return cached; }
       return net;
     })());

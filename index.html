@@ -11,35 +11,35 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Gidelim">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#FF4D5E" media="(prefers-color-scheme: light)">
-<style>html{background:#FF4D5E}</style>
-<meta name="theme-color" content="#111114" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F2F5F9" media="(prefers-color-scheme: light)">
+<style>html{background:#0F2740}</style>
+<meta name="theme-color" content="#0D1520" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📍%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600;700;800&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
-  --bg:#FFFFFF; --surface:#FFFFFF; --soft:#F5F5F7; --soft2:#EFEFF2; --ink:#17171C; --muted:#6E6E78; --line:#EAEAEE;
-  --accent:#FF4D5E; --accent-ink:#FFFFFF; --accent-soft:#FFF0F2; --accent-line:#FFD3D8;
-  --primary:var(--accent); --star:#FFB020; --danger:#E5383B; --ok:#1F9D63;
-  --shadow:0 1px 2px rgba(23,23,28,.04),0 4px 14px rgba(23,23,28,.05);
+  --bg:#F2F5F9; --surface:#FFFFFF; --soft:#E9EEF5; --soft2:#DFE6EF; --ink:#0F2740; --muted:#5B6B7E; --line:#D8E1EC;
+  --accent:#1F5FBF; --accent-ink:#FFFFFF; --accent-soft:#E3EDFB; --accent-line:#BFD3F2;
+  --primary:var(--accent); --star:#F2A900; --danger:#D64545; --ok:#1E8C5A;
+  --shadow:0 1px 2px rgba(15,39,64,.05),0 6px 16px rgba(15,39,64,.06);
   --emo:.13;
   color-scheme:light; box-sizing:border-box; --tbh:50px; --sab:max(calc(env(safe-area-inset-bottom, 0px) - 20px), 2px);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#111114; --surface:#1A1A1F; --soft:#222228; --soft2:#2A2A31; --ink:#F2F2F5; --muted:#9A9AA5; --line:#2C2C33;
-    --accent:#FF6B78; --accent-ink:#1A0B0D; --accent-soft:#3A1E22; --accent-line:#5A2A30; --danger:#FF7B7B; --ok:#4CD39A;
+    --bg:#0D1520; --surface:#142030; --soft:#1B2A3D; --soft2:#22344A; --ink:#EAF1FA; --muted:#93A4B8; --line:#243449;
+    --accent:#6AA5FF; --accent-ink:#0A1830; --accent-soft:#15294A; --accent-line:#2A4A7C; --danger:#FF7B7B; --ok:#4CD39A;
     --shadow:none; --emo:.09; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#111114; --surface:#1A1A1F; --soft:#222228; --soft2:#2A2A31; --ink:#F2F2F5; --muted:#9A9AA5; --line:#2C2C33;
-  --accent:#FF6B78; --accent-ink:#1A0B0D; --accent-soft:#3A1E22; --accent-line:#5A2A30; --danger:#FF7B7B; --ok:#4CD39A;
+  --bg:#0D1520; --surface:#142030; --soft:#1B2A3D; --soft2:#22344A; --ink:#EAF1FA; --muted:#93A4B8; --line:#243449;
+  --accent:#6AA5FF; --accent-ink:#0A1830; --accent-soft:#15294A; --accent-line:#2A4A7C; --danger:#FF7B7B; --ok:#4CD39A;
   --shadow:none; --emo:.09; color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
@@ -50,16 +50,15 @@ html{touch-action:manipulation}
 main{overflow-x:clip}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
-body::before{background:var(--accent)!important}
+body::before{background:var(--bg)!important}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body::before{background:var(--bg)!important}}
 :root[data-theme="dark"] body::before{background:var(--bg)!important}
 main,.tabbar-in,.composer-in{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
 img,svg,video{max-width:100%}
 html,body{height:100%;overflow:hidden}
 body{margin:0;background:var(--bg);color:var(--ink);min-height:100%;
-  font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 /* süzülen emoji deseni */
-body{background-image:radial-gradient(900px 340px at 50% -120px,var(--accent-soft),transparent 70%);background-repeat:no-repeat}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -70,11 +69,11 @@ main > section{max-width:720px;margin:0 auto}
 /* Başlık */
 .head{padding:14px 16px 8px}
 .brandrow{display:flex;align-items:center;gap:8px}
-.brand{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:1.3rem;line-height:1;letter-spacing:-.01em}
+.brand{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:1.3rem;line-height:1;letter-spacing:-.025em}
 .brand-dot{width:28px;height:28px;border-radius:9px;background:var(--accent);display:grid;place-items:center;font-size:14px}
 .locchip{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;font-weight:700;font-size:.8rem;cursor:pointer;max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.locchip:hover{border-color:var(--accent-line)}
-.head h1{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:clamp(1.5rem,5.5vw,1.9rem);line-height:1.1;margin:16px 0 4px;letter-spacing:-.01em}
+@media (hover:hover){.locchip:hover{border-color:var(--accent-line)}}
+.head h1{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:clamp(1.5rem,5.5vw,1.9rem);line-height:1.1;margin:16px 0 4px;letter-spacing:-.01em}
 .head p.sub{margin:0 0 4px;color:var(--muted);font-size:.9rem}
 .search{display:flex;gap:6px;align-items:center;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:4px 4px 4px 10px;margin-top:12px}
 .search:focus-within{border-color:var(--accent-line);background:var(--surface)}
@@ -92,7 +91,7 @@ main > section{max-width:720px;margin:0 auto}
 .sec-s{color:var(--muted);font-size:.85rem;margin:0 16px 10px}
 .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px}
 .col{position:relative;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:12px 10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
-.col:hover{border-color:var(--accent-line)}
+@media (hover:hover){.col:hover{border-color:var(--accent-line)}}
 .col b{font-size:1.5rem;line-height:1}
 .col span{font-weight:800;font-size:.86rem;line-height:1.15}
 .col small{display:block;font-weight:600;font-size:.72rem;color:var(--muted);margin-top:2px}
@@ -161,7 +160,7 @@ main > section{max-width:720px;margin:0 auto}
 .tip{margin-top:8px;font-size:.84rem;background:var(--soft);border-radius:10px;padding:7px 10px}
 .card-foot{display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:10px;flex-wrap:wrap}
 .maplink,.askbtn,.ib{display:inline-flex;align-items:center;gap:4px;color:var(--ink);font-weight:700;font-size:.8rem;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer}
-.maplink:hover,.askbtn:hover,.ib:hover{border-color:var(--accent-line)}
+@media (hover:hover){.maplink:hover,.askbtn:hover,.ib:hover{border-color:var(--accent-line)}}
 .maplink.dir{background:var(--accent-soft);border-color:var(--accent-line);color:var(--ink)}
 .ib.trash{color:var(--danger)}
 .more{display:block;margin:12px 16px 0;width:calc(100% - 32px);border:1px dashed var(--line);background:none;color:var(--accent);border-radius:12px;padding:10px;font-weight:800;font-size:.88rem;cursor:pointer}
@@ -178,7 +177,7 @@ main > section{max-width:720px;margin:0 auto}
 .guide .g-sub{font-weight:800;font-size:.82rem;margin-top:14px;color:var(--muted)}
 .g-chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
 .g-chips button{text-align:left;border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:8px 10px;cursor:pointer}
-.g-chips button:hover{border-color:var(--accent-line)}
+@media (hover:hover){.g-chips button:hover{border-color:var(--accent-line)}}
 .g-chips button b{display:block;font-size:.88rem}
 .g-chips button span{display:block;font-size:.74rem;color:var(--muted);line-height:1.3}
 .guide ul{margin:12px 0 0;padding:0;list-style:none;font-size:.88rem}
@@ -203,7 +202,7 @@ main > section{max-width:720px;margin:0 auto}
 .step span{color:var(--muted);font-size:.84rem}
 .quick{display:flex;flex-wrap:wrap;gap:6px}
 .quick button{border:1px solid var(--accent-line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;font-weight:700;font-size:.82rem;cursor:pointer}
-.quick button:hover{background:var(--accent-soft)}
+@media (hover:hover){.quick button:hover{background:var(--accent-soft)}}
 .typing{display:flex;gap:4px;padding:12px 14px}
 .typing span{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5}
 @media (prefers-reduced-motion:no-preference){.typing span{animation:bl 1s infinite}.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}@keyframes bl{50%{opacity:1;transform:translateY(-3px)}}}
@@ -253,7 +252,7 @@ main > section{max-width:720px;margin:0 auto}
 .grow .field{flex:1;min-width:0}
 .gsec{font-weight:800;color:var(--muted);font-size:.78rem;margin:18px 18px 8px;text-transform:uppercase;letter-spacing:.04em}
 .pcard{display:flex;align-items:center;gap:10px;margin:0 16px 8px;width:calc(100% - 32px);text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);cursor:pointer}
-.pcard:hover{border-color:var(--accent-line)}
+@media (hover:hover){.pcard:hover{border-color:var(--accent-line)}}
 .pcard .pi{width:36px;height:36px;border-radius:10px;background:var(--accent-soft);display:grid;place-items:center;font-size:17px;flex:none}
 .pcard.closed .pi{background:var(--soft)}
 .pcard b{display:block;font-size:.92rem}
@@ -263,7 +262,7 @@ main > section{max-width:720px;margin:0 auto}
 .menubtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:10px;width:34px;height:34px;font-weight:800;cursor:pointer}
 .pmenu{position:absolute;right:16px;top:52px;z-index:6;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.12);padding:6px;min-width:200px}
 .pmenu button{display:block;width:100%;text-align:left;border:0;background:none;border-radius:9px;padding:9px 10px;font-weight:700;font-size:.88rem;cursor:pointer}
-.pmenu button:hover{background:var(--soft)}
+@media (hover:hover){.pmenu button:hover{background:var(--soft)}}
 .pmenu button.danger{color:var(--danger)}
 .phead{display:flex;align-items:center;gap:8px;margin:12px 16px 0;flex-wrap:wrap}
 .phead .pm{color:var(--muted);font-weight:700;font-size:.82rem;flex:1;min-width:0}
@@ -348,7 +347,7 @@ main > section{max-width:720px;margin:0 auto}
 .sugt{font-size:.74rem;font-weight:800;color:var(--muted);margin:10px 2px 0}
 .sugs{display:flex;flex-direction:column;gap:2px;margin-top:6px;max-height:min(240px,34vh);overflow-y:auto}
 .sugs button{display:flex;align-items:baseline;gap:8px;text-align:left;border:0;background:none;border-radius:10px;padding:8px 10px;cursor:pointer}
-.sugs button:hover,.sugs button:focus-visible{background:var(--soft)}
+@media (hover:hover){.sugs button:hover,.sugs button:focus-visible{background:var(--soft)}}
 .sugs button:disabled{opacity:.5;cursor:default}
 .sugs b{font-weight:800;font-size:.9rem}
 .sugs span{color:var(--muted);font-size:.8rem}
@@ -372,7 +371,7 @@ main > section{max-width:720px;margin:0 auto}
 .sbox{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:8;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 34px rgba(23,23,28,.14);padding:6px;max-height:min(380px,56vh);overflow-y:auto}
 .sgrp{font-size:.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:8px 8px 2px}
 .srow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;border-radius:11px;padding:8px;cursor:pointer}
-.srow:hover,.srow:focus-visible{background:var(--soft)}
+@media (hover:hover){.srow:hover,.srow:focus-visible{background:var(--soft)}}
 .srow .si{flex:none;width:30px;height:30px;border-radius:9px;background:var(--soft);display:grid;place-items:center;font-size:15px}
 .srow .st{flex:1;min-width:0}
 .srow b{display:block;font-size:.88rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -387,9 +386,9 @@ main > section{max-width:720px;margin:0 auto}
 .col small{font-size:.68rem}
 .dcard{cursor:default}
 .dbody h3{cursor:pointer}
-.dbody h3:hover{color:var(--accent)}
+@media (hover:hover){.dbody h3:hover{color:var(--accent)}}
 .card h3{cursor:pointer}
-.card h3:hover{color:var(--accent)}
+@media (hover:hover){.card h3:hover{color:var(--accent)}}
 
 /* Keşfet liste */
 .chiprow{display:flex;gap:6px;overflow-x:auto;padding:12px 16px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -403,14 +402,14 @@ main > section{max-width:720px;margin:0 auto}
 .xrow{display:flex;align-items:center;gap:4px;border-top:1px solid var(--line)}
 .xrow:first-child{border-top:0}
 .xmain{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:none;text-align:left;padding:10px 4px 10px 12px;cursor:pointer}
-.xmain:hover{background:var(--soft)}
+@media (hover:hover){.xmain:hover{background:var(--soft)}}
 .xmain .em{width:36px;height:36px;font-size:17px;border-radius:10px}
 .xmain .pt{flex:1;min-width:0}
 .xmain b{display:block;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .xmain small{display:block;font-size:.76rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .xheart{flex:none;border:0;background:none;width:40px;height:40px;margin-right:6px;border-radius:10px;cursor:pointer;font-size:1.05rem;color:var(--muted)}
 .xheart[aria-pressed="true"]{color:var(--accent)}
-.xheart:hover{background:var(--soft)}
+@media (hover:hover){.xheart:hover{background:var(--soft)}}
 .xskel{height:56px;border-top:1px solid var(--line);background:linear-gradient(90deg,var(--surface),var(--soft),var(--surface));background-size:200% 100%}
 .xskel:first-child{border-top:0}
 @media (prefers-reduced-motion:no-preference){.xskel{animation:sh 1.2s linear infinite}}
@@ -460,7 +459,7 @@ main > section{max-width:720px;margin:0 auto}
 .prows{align-self:stretch;max-width:92%;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:4px;box-shadow:var(--shadow)}
 .prow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;border-radius:12px;padding:7px 8px;cursor:pointer}
 .prow + .prow{border-top:1px solid var(--line);border-radius:0}
-.prow:hover{background:var(--soft)}
+@media (hover:hover){.prow:hover{background:var(--soft)}}
 .prow .em{width:32px;height:32px;font-size:16px;border-radius:9px}
 .prow .pt{flex:1;min-width:0}
 .prow b{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -471,13 +470,13 @@ main > section{max-width:720px;margin:0 auto}
 .hlist{display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow-y:auto}
 .hrow{display:flex;align-items:center;gap:8px}
 .hrow button.h{flex:1;min-width:0;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 11px;cursor:pointer}
-.hrow button.h:hover{border-color:var(--accent-line)}
+@media (hover:hover){.hrow button.h:hover{border-color:var(--accent-line)}}
 .hrow b{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hrow small{color:var(--muted);font-size:.74rem}
 
 /* Liste paylaş kartı */
 .sharecard{display:flex;align-items:center;gap:12px;margin:16px 16px 0;width:calc(100% - 32px);text-align:left;border:1px solid var(--accent-line);background:var(--accent-soft);border-radius:18px;padding:12px 14px;cursor:pointer}
-.sharecard:hover{border-color:var(--accent)}
+@media (hover:hover){.sharecard:hover{border-color:var(--accent)}}
 .stack-em{display:flex;flex:none}
 .stack-em span{width:32px;height:32px;border-radius:50%;background:var(--surface);border:2px solid var(--accent-soft);display:grid;place-items:center;font-size:15px;margin-left:-9px;box-shadow:var(--shadow)}
 .stack-em span:first-child{margin-left:0}
@@ -487,12 +486,13 @@ main > section{max-width:720px;margin:0 auto}
 .sharecard .ar{flex:none;font-weight:800;color:var(--accent)}
 
 /* Açılış ekranı */
-#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#FF4D5E;color:#fff;transition:opacity .45s ease,visibility .45s ease}
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:linear-gradient(180deg,#0F2740 0%,#143A66 62%,#1F5FBF 100%);color:#fff;transition:opacity .45s ease,visibility .45s ease}
 #splash.hide{opacity:0;visibility:hidden}
 .sp-in{text-align:center;padding-bottom:6vh}
 .sp-logo{width:104px;height:104px;border-radius:30px;background:rgba(255,255,255,.18);display:grid;place-items:center;margin:0 auto 16px}
-.sp-logo{width:116px;height:116px;border-radius:32px;background:rgba(255,255,255,.18);display:grid;place-items:center;margin:0 auto 18px;box-shadow:0 10px 30px rgba(120,0,20,.18)}
-.sp-name{font-family:"Baloo 2",system-ui,-apple-system,sans-serif;font-weight:800;font-size:3rem;line-height:1;letter-spacing:-.02em}
+.sp-logo{width:116px;height:116px;border-radius:32px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);display:grid;place-items:center;margin:0 auto 18px;box-shadow:0 14px 34px rgba(0,10,30,.35)}
+.sp-wave{position:absolute;left:0;right:0;bottom:0;width:100%;height:18vh}
+.sp-name{font-family:"Bricolage Grotesque",system-ui,-apple-system,sans-serif;font-weight:800;font-size:3.1rem;line-height:1;letter-spacing:-.035em}
 .sp-tag{margin-top:8px;opacity:.92;font-weight:700;font-size:.98rem}
 @media (prefers-reduced-motion:no-preference){.sp-logo{animation:sp-pop .6s cubic-bezier(.2,.9,.3,1.3) both}.sp-name{animation:sp-up .6s .15s ease both}@keyframes sp-pop{from{transform:scale(.7);opacity:0}}@keyframes sp-up{from{transform:translateY(10px);opacity:0}}}
 /* Başlık satırı dar ekranda sıkışmasın */
@@ -539,10 +539,41 @@ html.kb .composer{bottom:var(--kb,0px)}
 html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
 
 .appver{text-align:center;color:var(--muted);font-size:.74rem;font-weight:700;margin-top:12px}
+.brand{flex:none!important;overflow:visible!important}
+.brandrow .locchip{flex:1 1 auto;max-width:none;min-width:0}
+/* Alt çubuk: ana ekran uygulamasında iPhone alt şeridi sayfaya vermezse kendini aşağı taşı */
+.tabbar{bottom:calc(-1 * var(--gap, 0px))}
+main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
+.composer{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
+#sa-probe{position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+
+/* Hava satırı */
+.wxline{margin-top:10px;font-size:.84rem;font-weight:700;color:var(--muted)}
+/* Harita */
+.viewbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 11px;font-weight:800;font-size:.8rem;cursor:pointer;color:var(--ink)}
+.viewbtn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-line)}
+.mapwrap{position:relative;margin:12px 16px 0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
+#mapbox{height:min(58vh,520px);min-height:300px;background:var(--soft)}
+.mapme{position:absolute;top:10px;right:10px;z-index:500;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:1.05rem;cursor:pointer;box-shadow:var(--shadow)}
+.mapme:disabled{opacity:.6}
+.mapnote{margin:8px 18px 0;font-size:.78rem;color:var(--muted);min-height:1em}
+#mapcard{margin:8px 16px 0}
+.mcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.mcr{display:flex;align-items:center;gap:10px}
+.mct{flex:1;min-width:0}
+.mct b{display:block;font-size:.95rem}
+.mct small{color:var(--muted);font-size:.78rem}
+.mnear{font-size:.78rem;font-weight:800;color:var(--accent);margin:0 2px 6px}
+.mpin{display:grid;place-items:center}
+.mpin span{display:grid;place-items:center;width:28px;height:28px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--accent);color:var(--accent-ink);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);font:800 12px/1 "Figtree",system-ui,sans-serif}
+.mpin span i{font-style:normal;transform:rotate(45deg)}
+.mpin.on span{background:var(--ink);color:var(--bg);transform:rotate(-45deg) scale(1.15)}
+.leaflet-container{font-family:"Figtree",system-ui,sans-serif}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
-.setbtn:hover{border-color:var(--accent-line)}
+@media (hover:hover){.setbtn:hover{border-color:var(--accent-line)}}
 .segset{display:flex;gap:4px;background:var(--soft);border-radius:12px;padding:3px}
 .segset button{flex:1;border:0;background:none;border-radius:9px;padding:8px 4px;font-weight:700;font-size:.85rem;cursor:pointer;color:var(--muted)}
 .segset button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
@@ -560,10 +591,13 @@ html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
 </style>
 </head>
 <body>
+<div id="sa-probe" aria-hidden="true"></div>
 <div id="splash" aria-hidden="true"><div class="sp-in">
-  <div class="sp-logo"><svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><path d="M32 4C20.7 4 11.6 13 11.6 24.2 11.6 39.2 32 60 32 60s20.4-20.8 20.4-35.8C52.4 13 43.3 4 32 4z" fill="#fff"/><circle cx="32" cy="24.4" r="8.4" fill="#FF4D5E"/></svg></div>
+  <div class="sp-logo"><svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><path d="M32 4C20.7 4 11.6 13 11.6 24.2 11.6 39.2 32 60 32 60s20.4-20.8 20.4-35.8C52.4 13 43.3 4 32 4z" fill="#fff"/><circle cx="32" cy="24.4" r="8.4" fill="#1F5FBF"/></svg></div>
   <div class="sp-name" data-notr>Gidelim</div>
-</div></div>
+</div>
+<svg class="sp-wave" viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 34 C 50 14, 100 14, 150 34 S 250 54, 300 34 S 370 14, 400 30 L400 60 L0 60 Z" fill="rgba(255,255,255,.10)"/><path d="M0 44 C 60 26, 120 26, 180 44 S 300 60, 400 40 L400 60 L0 60 Z" fill="rgba(255,255,255,.08)"/></svg>
+</div>
 <main>
   <!-- KEŞFET -->
   <section id="v-explore">
@@ -577,6 +611,7 @@ html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
           </div>
           <div class="sbox" id="ex-sug" role="listbox" hidden></div>
         </div>
+        <div class="wxline" id="wxline" hidden></div>
       </div>
       <div class="tgrid" id="typechips" role="group" aria-label="Mekan türü"></div>
       <div class="fseg" id="filterchips" role="group" aria-label="Filtre" hidden></div>
@@ -586,8 +621,13 @@ html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
     </div>
 
     <div id="ex-lv" hidden>
-      <div class="deckbar"><button class="back" id="lv-back" type="button" aria-label="Türlere dön">‹</button><div class="t"><b id="lv-title"></b><small id="lv-sub"></small></div></div>
+      <div class="deckbar"><button class="back" id="lv-back" type="button" aria-label="Türlere dön">‹</button><div class="t"><b id="lv-title"></b><small id="lv-sub"></small></div><button class="viewbtn" id="lv-view" type="button" aria-pressed="false">🗺️ Harita</button></div>
       <div id="ex-list" aria-live="polite"></div>
+      <div id="ex-map" hidden>
+        <div class="mapwrap"><div id="mapbox" role="application" aria-label="Harita"></div><button class="mapme" id="map-me" type="button" aria-label="Konumumu göster">📍</button></div>
+        <div class="mapnote" id="mapnote" aria-live="polite"></div>
+        <div id="mapcard"></div>
+      </div>
     </div>
     <div id="ex-deck" hidden>
       <div class="deckbar">
@@ -686,7 +726,7 @@ html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
     <div class="lbl">Tema</div>
     <div class="segset" id="set-theme" role="group" aria-label="Tema"><button type="button" data-val="auto">🌗 Otomatik</button><button type="button" data-val="light">☀️ Aydınlık</button><button type="button" data-val="dark">🌙 Karanlık</button></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.0.1</div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.1.0<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -849,7 +889,15 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
   // Açılışta yapay zeka sunucusunu uyandır (Gemini'ye istek atmaz, ücretsiz)
   if (ready) setTimeout(() => { fetch(AI_URL.replace(/\/ai$/, "/"), { mode: "cors" }).catch(() => {}); }, 0);
   // Uygulamayı telefonda sakla: hızlı açılış ve internetsiz kullanım
-  if ("serviceWorker" in navigator && location.protocol === "https:") addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    if (navigator.serviceWorker.addEventListener) navigator.serviceWorker.addEventListener("message", e => {
+      if (!e.data || e.data.type !== "gidelim-update") return;
+      const busy = document.activeElement && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName);
+      if (performance.now() < 10000 && !busy) location.reload();
+      else if (typeof toast === "function") toast(typeof L === "function" ? L("✨ Yeni sürüm hazır") : "✨ Yeni sürüm hazır", typeof L === "function" ? L("Yenile") : "Yenile", () => location.reload());
+    });
+  }
 })();
 </script>
 <script>
@@ -875,7 +923,7 @@ const EN = {
   "⚙️":"⚙️","Ayarlar":"Settings","Dil":"Language","Tema":"Theme","🌗 Otomatik":"🌗 Auto","☀️ Aydınlık":"☀️ Light","🌙 Karanlık":"🌙 Dark","Ayarları aç":"Open settings","Dil değişince sayfa yenilenir.":"The page reloads when you change the language.",
   // keşfet
   "Bugün ne keşfediyoruz?":"What are we exploring today?","Mekan ya da yemek ara (ör. Çiya, lahmacun)":"Search a place or a dish (e.g. ramen, Café de Flore)","Mekan ara":"Search places","Ara":"Search","Koleksiyonlar":"Collections","Birine dokun, kartları kaydır: beğendiğini sağa, geçmek istediğini sola.":"Tap one and go through the cards: save what you like, skip the rest.","❔ Nasıl kullanılır?":"❔ How does it work?","Koleksiyonlara dön":"Back to collections",
-  "Mutlaka gör":"Must-see","İkonik yerler":"The icons","Gizli kalmış":"Hidden gems","Yerellerin sırrı":"Locals’ secret","Şehir rehberi":"City guide","Semtler ve ipuçları":"Areas & tips","Yemek":"Food","Lezzet durakları":"Tasty stops","Kafe":"Café","Kahve ve kahvaltı":"Coffee & breakfast","Akşam":"Evening","Bar ve gece":"Bars & nightlife","Manzaralı":"With a view","Teras ve sahil":"Terraces & seaside","Bütçe dostu":"Budget-friendly","Ucuz ama süper":"Cheap but great","Gezi":"Sightseeing","Müze, park, tarih":"Museums, parks, history",
+  "Mutlaka gör":"Must-see","İkonik yerler":"The icons","Gizli kalmış":"Hidden gems","Yerellerin sırrı":"Locals’ secret","Şehir rehberi":"City guide","Semtler ve ipuçları":"Areas & tips","Yemek":"Food","Lezzet durakları":"Tasty stops","Kafe":"Cafés","Kahve ve kahvaltı":"Coffee & breakfast","Akşam":"Evening","Bar ve gece":"Bars & nightlife","Manzaralı":"With a view","Teras ve sahil":"Terraces & seaside","Bütçe dostu":"Budget-friendly","Ucuz ama süper":"Cheap but great","Gezi":"Sightseeing","Müze, park, tarih":"Museums, parks, history",
   "Bilgiler yapay zekaya dayanıyor, canlı değil. Fotoğraflar ve güncel durum için Haritada aç’a dokun.":"Info is based on Claude’s knowledge, not live data. Tap Map for photos and current status.",
   "KAYDET":"SAVE","GEÇ":"SKIP","Geç":"Skip","Listeme ekle":"Save to my list","Asistana sor":"Ask the assistant","Sağa kaydır: kaydet · Sola kaydır: geç · Klavyede ← →":"Swipe right: save · Swipe left: skip · Keyboard ← →","Desteyi bitirdin!":"You’ve seen them all!","Bu sefer hiçbirini kaydetmedin.":"You didn’t save any this time.","+ Yeni kartlar getir":"+ Get new cards","❤️ Listeme git":"❤️ Go to my list","+ Daha fazla yer getir":"+ Load more places","Yeni yerler aranıyor…":"Looking for new places…","Kartlar getirilemedi. Tekrar dene.":"Couldn’t load cards. Try again.","Bir sorun oldu":"Something went wrong","Emin olduğum başka yer kalmadı":"No more places I’m sure about","⚡ hazır":"⚡ ready",
   "📖 Rehber hazırlanıyor…":"📖 Preparing the guide…","Rehber hazırlanamadı.":"Couldn’t prepare the guide.","Keşfetmeye değer bölgeler · dokun, konumu oraya alayım":"Areas worth exploring · tap to move there","Mutlaka dene":"Must try","💬 Bu şehir hakkında asistana soru sor":"💬 Ask the assistant about this city",
@@ -908,7 +956,7 @@ const EN = {
   "♥ Listende":"♥ Saved","❤️ Kaydet":"❤️ Save","Bilgiler yapay zekaya dayanır; saat ve fiyatlar değişmiş olabilir. Gitmeden haritadan kontrol et.":"Info is AI-generated; hours and prices may have changed. Check the map before you go.","Ek bilgiler getirilemedi.":"Couldn’t load more details.","Nasıl bir yer":"What it’s like","Ne yenir, ne yapılır":"What to get or do","En iyi zaman":"Best time to go","Kimlerle gidilir":"Good for","Rezervasyon":"Reservation","Bütçe":"Budget","Çalışma saatleri (yaklaşık)":"Opening hours (approx.)","Bilmen gereken":"Good to know","⚠️ Bu mekan hakkında bilgim sınırlı, gitmeden mutlaka kontrol et.":"⚠️ I have limited info on this place — double-check before going.",
   "🕘 Geçmiş":"🕘 History","🕘 Sohbet geçmişi":"🕘 Chat history","Henüz geçmiş sohbet yok.":"No past chats yet.","mesaj":"messages","Sohbeti sil":"Delete chat","Listeni arkadaşlarınla paylaş":"Share your list with friends",
   "Mekan türleri":"Place types","Bir tür seç, beğendiğin mekanları ❤️ ile listene ekle.":"Pick a type and save the places you like with ❤️.","Mekan ya da semt ara":"Search a place or neighborhood","Neyiyle meşhur":"Known for",
-  "Restoran":"Restaurants","Lokanta, kebap, balık":"Local, grill, seafood","Kahve, kahvaltı, sohbet":"Coffee, breakfast, chats","Bar & meyhane":"Bars & taverns","Akşam ve gece":"Evenings & nights","Fırın & pastane":"Bakeries & sweets","Tatlıcı, pastane, fırın":"Desserts, pastries, bread","Müze & tarih":"Museums & history","Müze, saray, tarihi yapı":"Museums, palaces, landmarks","Park & doğa":"Parks & nature","Park, sahil, seyir tepesi":"Parks, seaside, viewpoints","Çarşı & alışveriş":"Markets & shopping","Çarşı, pazar, butik":"Bazaars, markets, boutiques","Sanat & etkinlik":"Arts & events","Sinema, tiyatro, konser":"Cinema, theatre, concerts",
+  "Restoran":"Restaurants","Lokanta, kebap, balık":"Local eateries, grills & seafood","Kahve, kahvaltı, sohbet":"Coffee, breakfast & catch-ups","Bar & meyhane":"Bars & taverns","Akşam ve gece":"Evenings & nightlife","Fırın & pastane":"Bakeries & sweets","Tatlıcı, pastane, fırın":"Desserts, pastries & bread","Müze & tarih":"Museums & history","Müze, saray, tarihi yapı":"Museums, palaces & landmarks","Park & doğa":"Parks & nature","Park, sahil, seyir tepesi":"Parks, seaside, viewpoints","Çarşı & alışveriş":"Markets & shopping","Çarşı, pazar, butik":"Bazaars, markets, boutiques","Sanat & etkinlik":"Arts & events","Sinema, tiyatro, konser":"Cinemas, theatres & concerts",
   "📍 Sadece ülke seçili. Şehir ya da ilçe seçersen sonuçlar sana yakın olur — dokun, seç.":"📍 Only a country is selected. Pick a city or district for results near you — tap to choose.",
   "Popüler":"Popular","Az bilinen":"Lesser-known","Uygun fiyatlı":"Affordable","Sakin":"Quiet","+ Daha fazla göster":"+ Show more","Bir mekana dokun: neyiyle meşhur, ne zaman gidilir, nasıl gidilir.":"Tap a place to see what it’s known for, when to go and how to get there.","Emin olduğum bir yer bulamadım. Yazımı ya da konumu değiştir.":"Couldn’t find a place I’m sure about. Check the spelling or change the location.","Bu filtrede emin olduğum bir yer bulamadım. Başka bir filtre dene.":"No places I’m sure about with this filter. Try another one.","Liste getirilemedi. Tekrar dene.":"Couldn’t load the list. Try again.","Mekan türü":"Place type",
   "↻ Tekrar dene":"↻ Try again",
@@ -917,15 +965,19 @@ const EN = {
   "Ne istediğini yaz: “bu akşam sakin bir yer”, “arkadaşlarla plan yap” gibi. Mekan önerir, saatleriyle akşam planı çıkarır. Eski sohbetlerin 🕘 Geçmiş’te durur.":"Type what you want, like “a quiet place tonight” or “plan a night out with friends”. It suggests places and builds an evening plan with times. Past chats stay in 🕘 History.",
   "Kaydettiğin yerler burada. Gittiklerini ✅ işaretle, yıldız ver, not al; öneriler zevkine göre iyileşir. 3 yer olunca listeni arkadaşlarınla paylaşabilirsin.":"Your saved places live here. Mark visited ones ✅, rate them and add notes — suggestions get better. With 3+ places you can share your list.",
   "📍 Konumumu bul":"📍 Use my location","📍 Konumun bulunuyor…":"📍 Finding you…","Bu cihaz konum paylaşmıyor.":"This device can’t share its location.","Konum bulunamadı, elle yazabilirsin.":"Couldn’t find your location — you can type it in.","Konum izni verilmedi. Telefon ayarlarından izin verebilirsin.":"Location permission denied. You can allow it in your phone settings.",
-  "aranıyor…":"— searching…","Daha fazla yer geliyor…":"More places coming…","Bilgiler hazırlanıyor…":"Getting the details…","Çok hızlı istek gönderildi. Birkaç saniye bekleyip tekrar dene.":"Too many requests. Wait a few seconds and try again.",
+  "aranıyor…":"· searching…","Daha fazla yer geliyor…":"More places coming…","Bilgiler hazırlanıyor…":"Getting the details…","Çok hızlı istek gönderildi. Birkaç saniye bekleyip tekrar dene.":"Too many requests. Wait a few seconds and try again.",
   "Nereye gidiyoruz?":"Where are we going?",
   "Grup oylaması için veritabanı henüz bağlı değil. Cloudflare’de Worker’a DB bağlantısını ekle.":"The group vote database isn’t connected yet. Add the DB binding to the Worker in Cloudflare.","Bu site veritabanına yetkili değil. Cloudflare’deki ALLOWED_ORIGINS ayarını kontrol et.":"This site isn’t allowed to use the database. Check ALLOWED_ORIGINS in Cloudflare.","Grup verisine şu an ulaşılamıyor. Biraz sonra tekrar dene.":"Can’t reach group data right now. Try again in a moment.",
   "👋 Arkadaşların seni nasıl görsün?":"👋 How should friends see you?","Oylamalarda adın bu şekilde görünecek. Sonradan değiştirebilirsin.":"This is how your name appears in votes. You can change it later.","Adın ya da takma adın":"Your name or nickname","Adın":"Your name","Devam":"Continue","Oylama yükleniyor…":"Loading the vote…","👥 Arkadaşlarını çağırmak için oylamayı aç ve 📤 Davet et’e dokun. Oylamaları sadece davet bağlantısı olanlar görebilir.":"👥 To invite friends, open a vote and tap 📤 Invite. Only people with the invite link can see a vote.","değiştir":"change",
   "🔔 Bildirim almak için Gidelim’i ana ekrana ekle (Safari’de Paylaş → Ana Ekrana Ekle) ve oradan aç.":"🔔 To get notifications, add Gidelim to your Home Screen (Safari: Share → Add to Home Screen) and open it from there.","🔕 Bildirimlere izin verilmedi. Telefonun ayarlarından Gidelim için bildirimleri açabilirsin.":"🔕 Notifications are blocked. You can turn them on for Gidelim in your phone settings.","Bildirimleri aç":"Turn on notifications","Biri oy verince, yorum yazınca haberin olsun":"Know when someone votes or comments","🔔 Bildirimler açıldı":"🔔 Notifications on","Bildirim izni verilmedi.":"Notification permission denied.","Bildirimler açılamadı, tekrar dene.":"Couldn’t turn on notifications, try again.",
   "Fırın":"Bakery","Müze":"Museum","Park":"Park","Çarşı":"Market","Sanat":"Arts","Bar":"Bar","Uygun":"Affordable","Temizle":"Clear","Listen boş. Keşfet’te beğendiğin mekanın ♡’sine dokun, buraya gelsin.":"Your list is empty. Tap ♡ on a place in Explore to save it here.",
   "Temizle":"Clear",
-  "Doğa":"Nature","Park, sahil, orman, göl":"Parks, beaches, forests, lakes","Çarşı & AVM":"Markets & malls","Çarşı, pazar, AVM, butik":"Bazaars, markets, malls, boutiques","Bilgiler yapay zekaya dayanır; gitmeden haritadan kontrol et.":"Info is AI-generated; check the map before you go.","Ek bilgiler şu an getirilemedi; yol tarifi ve haritayla devam edebilirsin.":"Couldn’t load details right now; you can still use directions and the map.",
+  "Doğa":"Nature","Park, sahil, orman, göl":"Parks, beaches, forests & lakes","Çarşı & AVM":"Markets & malls","Çarşı, pazar, AVM, butik":"Bazaars, markets, malls & boutiques","Bilgiler yapay zekaya dayanır; gitmeden haritadan kontrol et.":"Info is AI-generated; check the map before you go.","Ek bilgiler şu an getirilemedi; yol tarifi ve haritayla devam edebilirsin.":"Couldn’t load details right now; you can still use directions and the map.",
   "Türlere dön":"Back to types",
+  "✨ Yeni sürüm hazır":"✨ New version ready","Yenile":"Reload",
+  "🗺️ Harita":"🗺️ Map","☰ Liste":"☰ List","Harita":"Map","Konumumu göster":"Show my location","Aç":"Open","📍 Sana en yakın":"📍 Closest to you","Bir iğneye dokun, mekanı gör. 📍 ile kendi konumunu göster.":"Tap a pin to see the place. Use 📍 to show where you are.","Harita yüklenemedi. İnternetini kontrol edip tekrar dene.":"Couldn’t load the map. Check your connection and try again.",
+  "Karlı":"Snowy","Yağmurlu":"Rainy","Çok sıcak":"Very hot","Soğuk":"Cold","Güneşli":"Sunny","Açık":"Clear","Bulutlu":"Cloudy",
+  "sıcak ve kapalı yerler öne çıktı":"cosy indoor spots first","kapalı mekanlar öne çıktı":"indoor spots first","serin yerler öne çıktı":"cool spots first","sıcak mekanlar öne çıktı":"warm spots first","teras ve açık hava yerleri öne çıktı":"terraces & outdoor spots first",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1102,7 +1154,7 @@ function closeSheet(ok){
   if (ok) {
     const changed = cSel.value !== loc.code || snorm($("#cityin").value.trim()) !== snorm(loc.city);
     setLoc(cSel.value, $("#cityin").value);
-    if (changed) { toast("📍 " + locStr()); if (!$("#ex-lv").hidden) { if (exMode !== "browse") { exMode = "browse"; syncChips(); } updLV(); loadList(); } prefetchAll(); }
+    if (changed) { wx = null; renderWx(); loadWeather(); if (lmap) { meLL = null; locCoords().then(c => { if (c) lmap.setView([c.lat, c.lng], 13); }).catch(() => {}); } toast("📍 " + locStr()); if (!$("#ex-lv").hidden) { if (exMode !== "browse") { exMode = "browse"; syncChips(); } updLV(); loadList(); } prefetchAll(); }
   }
   $("#sheet").hidden = true;
   const f = sheetDone; sheetDone = null; if (ok && f) f();
@@ -1352,6 +1404,7 @@ let sample = null;
   if (sample && LANG === "en") { const raw = sample.json.bind(sample);
     sample.json = (input, o) => raw(typeof input === "string" ? input.replace(/Tüm metinler Türkçe olsun\./g, "").replace(/açıklamaları Türkçe yaz/g, "write descriptions in English").replace(/Türkçe yaz[.;]?/g, "") + "\n\nIMPORTANT: The user's app language is English. Write ALL text values in natural English (keep place names in their original local form). Prices: use relative $ / $$ / $$$ instead of ₺." : input, o); }
   if (sample) setTimeout(prefetchAll, 4000);
+  loadWeather();
   if (!sample) { const w = $("#ai-warn"); w.hidden = false; w.textContent = "⚠️ Yapay zeka bağlantısı kurulamadı. index.html içindeki AI_URL ayarını kontrol et."; $("#send").disabled = true; }
 })();
 const FORMAT = `SADECE şu biçimde JSON dizi döndür, başka hiçbir şey yazma:
@@ -1421,7 +1474,8 @@ if (Date.now() - (ls.get("gidelim-type-at", 0) || 0) > 2 * 3600 * 1000) {
   exType = h >= 6 && h < 11 ? "kafe" : h >= 11 && h < 15 ? "restoran" : h >= 15 && h < 18 ? "firin" : h >= 18 && h < 21 ? "restoran" : "bar";
 }
 const LIST_FORMAT = `SADECE şu biçimde JSON dizi döndür, başka hiçbir şey yazma:
-[{"ad":"Mekan adı","tur":"Kısa tür","ilce":"İlçe","semt":"Semt","sehir":"Şehir","fiyat":"₺ / ₺₺ / ₺₺₺","guven":5}]
+[{"ad":"Mekan adı","tur":"Kısa tür","ilce":"İlçe","semt":"Semt","sehir":"Şehir","fiyat":"₺ / ₺₺ / ₺₺₺","lat":41.0,"lng":29.0,"guven":5}]
+"lat"/"lng": mekanın yaklaşık enlem ve boylamı (4 ondalık); bilmiyorsan 0 yaz.
 "guven" (1-5): mekanın var olduğundan, hâlâ açık olduğundan ve konuma ve türe uyduğundan ne kadar eminsin; 4'ün altındakileri hiç yazma. Kısa tut, açıklama yazma.`;
 const LIST_RULES = `Mekan adlarını resmi ve doğru yazımıyla, Türkçe karakterleri (ç, ğ, ı, İ, ö, ş, ü) eksiksiz kullanarak yaz; semt adlarını da doğru yaz.
 Gerçekten var olduğundan emin olmadığın hiçbir yeri yazma. Sadece yıllardır açık, kalıcı mekanlar.
@@ -1431,13 +1485,13 @@ Yurt dışında mekan adını yerel adıyla yaz.`;
 function listPrompt(where, c, f, n, exclude){
   const skipN = skippedNames(where);
   return `Konum: ${where}${locHint()}
-Tür: ${c.q}
+${wxInfo() && wxInfo().hint ? "Bugünkü hava: " + wxInfo().hint + "\n" : ""}Tür: ${c.q}
 Filtre: ${f.q}
 Bu konumdaki bu türün en iyi ${n} mekanını listele, en sevilenler başta. "tur" alanına mekanın gerçek türünü açıkça yaz (ör. Kahveci, Kebapçı, Meyhane, Müze, Park, AVM). Türe uymayan tek bir yer bile koyma. Hızlı ve kısa cevap ver.
 ${exclude && exclude.length ? "Şunları zaten gösterdin, tekrar yazma: " + exclude.slice(-40).join(", ") + "\n" : ""}${skipN.length ? "Bunları önerme: " + skipN.join(", ") + "\n" : ""}${LIST_RULES}
 ${LIST_FORMAT}`;
 }
-const lkey = (t, f, where) => LK + "L|" + t + "|" + f + "|" + norm(where);
+const lkey = (t, f, where) => LK + "L|" + t + "|" + f + "|" + norm(where) + "|" + ((typeof wxInfo === "function" && wxInfo() && wxInfo().hint) ? wxInfo().k : "n");
 let lists = ls.get("gidelim-lists", {}) || {};
 function persistLists(){ const ks = Object.keys(lists); if (ks.length > 40) ks.slice(0, ks.length - 40).forEach(k => delete lists[k]); ls.set("gidelim-lists", lists); }
 const inflight = {};
@@ -1509,11 +1563,14 @@ function centerChip(){
   const left = b.offsetLeft - (row.clientWidth - b.offsetWidth) / 2;
   try { row.scrollTo({ left: Math.max(0, left), behavior: "smooth" }); } catch(e) { row.scrollLeft = Math.max(0, left); }
 }
-function showLV(on){ $("#ex-home").hidden = on; $("#ex-lv").hidden = !on; SC().scrollTo(0, 0); if (on) updLV(); }
+function showLV(on){ $("#ex-home").hidden = on; $("#ex-lv").hidden = !on; SC().scrollTo(0, 0); if (on) { updLV(); if (exView === "map") setTimeout(showMap, 30); } }
 function updLV(){ const c = COLS.find(x => x.id === exType) || {};
   $("#lv-title").textContent = exMode === "search" ? "🔎 “" + exTerm + "”" : (c.emoji || "") + " " + L(c.label || "");
-  $("#lv-sub").textContent = locStr(); }
+  const w = typeof wxInfo === "function" ? wxInfo() : null;
+  $("#lv-sub").textContent = locStr() + (w && w.badge && exMode !== "search" ? " · " + w.ic + " " + L(w.badge) : ""); }
 $("#lv-back").onclick = () => { exMode = "browse"; listTok++; showLV(false); syncChips(); };
+$("#lv-view").onclick = () => setView(exView === "map" ? "list" : "map");
+$("#map-me").onclick = () => locateMe();
 function selectType(id){ exType = id; ls.set("gidelim-type", id); ls.set("gidelim-type-at", Date.now()); exMode = "browse"; syncChips(); showLV(true); loadList(); }
 function openCol(c){ if (c && !c.guide) selectType(c.id); }
 function xrow(p, where){
@@ -1536,6 +1593,7 @@ function drawList(items, where, loading, opts = {}){
   drawListNow(items, where, loading, opts);
 }
 function drawListNow(items, where, loading, opts = {}){
+  mapItems = items; mapWhere = where; if (mapSel && !items.includes(mapSel)) mapSel = null; if (exView === "map") drawMarkers(!loading);
   const box = $("#ex-list"); box.innerHTML = "";
   if (loading) { const c = COLS.find(x => x.id === exType) || {}; const ld = el("div","xload"); ld.append(el("span","spin"));
     ld.append(document.createTextNode(exMode === "search" ? (LANG === "en" ? `Searching “${exTerm}”…` : `“${exTerm}” aranıyor…`) : (items.length ? L("Daha fazla yer geliyor…") : `${c.emoji || ""} ${L(c.label || "")} ${L("aranıyor…")}`)));
@@ -1943,6 +2001,147 @@ Emin olmadığın alanı boş metin yap, asla uydurma. "guven" (1-5): bu mekan h
     .finally(() => { userBusy = Math.max(0, userBusy - 1); });
 }
 
+
+/* ---------- Hava durumu (Open-Meteo, ücretsiz) ---------- */
+let wx = null;
+async function locCoords(){
+  const key = "gidelim-lc|" + snorm(locStr()); const c = ls.get(key, null); if (c) return c;
+  const parts = (loc.city || "").split(",").map(x => x.trim()).filter(Boolean);
+  const name = parts[0] || cname(loc.code);
+  const cc = /^[A-Z]{2}$/.test(loc.code) ? "&countryCode=" + loc.code : "";
+  const j = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=8&language=${LANG}&format=json${cc}`)).json();
+  const rs = j.results || []; let r = rs[0];
+  if (parts[1]) { const m = rs.find(x => snorm(x.admin1 || "").includes(snorm(parts[1])) || snorm(x.admin2 || "").includes(snorm(parts[1]))); if (m) r = m; }
+  if (!r) return null; const v = { lat: r.latitude, lng: r.longitude }; ls.set(key, v); return v;
+}
+async function loadWeather(){
+  try {
+    const c = await locCoords(); if (!c) { wx = null; renderWx(); return; }
+    const key = "gidelim-wx|" + c.lat.toFixed(2) + "," + c.lng.toFixed(2); const cached = ls.get(key, null);
+    if (cached && Date.now() - cached.at < 30 * 60000) wx = cached;
+    else { const j = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&current=temperature_2m,precipitation,weather_code,is_day&timezone=auto`)).json();
+      const cu = j.current || {}; if (cu.temperature_2m == null) return;
+      wx = { t: Math.round(cu.temperature_2m), p: cu.precipitation || 0, code: cu.weather_code, day: cu.is_day, at: Date.now() }; ls.set(key, wx); }
+    renderWx();
+  } catch(e) {}
+}
+function wxInfo(){
+  if (!wx) return null; const c = wx.code, t = wx.t;
+  const snow = (c >= 71 && c <= 77) || c === 85 || c === 86;
+  const rain = !snow && ((c >= 51 && c <= 67) || (c >= 80 && c <= 82) || c >= 95 || wx.p > 0.2);
+  if (snow) return { k:"snow", ic:"🌨️", tx:"Karlı", badge:"sıcak ve kapalı yerler öne çıktı", hint:"Hava karlı ve soğuk: sıcak, kapalı ve rahat mekanları öne al; açık hava yerlerini sona at." };
+  if (rain) return { k:"rain", ic:"🌧️", tx:"Yağmurlu", badge:"kapalı mekanlar öne çıktı", hint:"Hava yağmurlu: kapalı, sıcak ve rahat mekanları öne al; açık hava ve teras yerlerini sona at." };
+  if (t >= 29) return { k:"hot", ic:"🥵", tx:"Çok sıcak", badge:"serin yerler öne çıktı", hint:"Hava çok sıcak: serin, gölgeli, deniz kenarı ya da klimalı yerleri öne al." };
+  if (t <= 7) return { k:"cold", ic:"🧣", tx:"Soğuk", badge:"sıcak mekanlar öne çıktı", hint:"Hava soğuk: sıcak ve kapalı mekanları öne al." };
+  if (c <= 2) return { k:"sun", ic: wx.day ? "☀️" : "🌙", tx: wx.day ? "Güneşli" : "Açık", badge:"teras ve açık hava yerleri öne çıktı", hint:"Hava güzel: teraslı, bahçeli, manzaralı ve açık hava yerlerini öne al." };
+  return { k:"mild", ic:"⛅", tx:"Bulutlu", badge:"", hint:"" };
+}
+function renderWx(){
+  const w = wxInfo(), e = $("#wxline"); if (!e) return;
+  if (!w) { e.hidden = true; return; }
+  e.hidden = false; e.textContent = `${w.ic} ${wx.t}° · ${L(w.tx)}` + (w.badge ? " · " + L(w.badge) : "");
+  if (!$("#ex-lv").hidden) updLV();
+}
+
+/* ---------- Harita görünümü (OpenStreetMap + Leaflet) ---------- */
+const LF = new Proxy({}, { get: (_, k) => window.L[k] }); // harita kütüphanesi (L adı çeviri fonksiyonunda kullanılıyor)
+let exView = "list", leafletP = null, lmap = null, mLayer = null, meMk = null, meLL = null, mapItems = [], mapWhere = "", mapSel = null, geoQ = [], geoBusy = false;
+const geoCache = ls.get("gidelim-geo", {}) || {};
+function loadLeaflet(){
+  if (window.L && window.L.map) return Promise.resolve();
+  if (leafletP) return leafletP;
+  leafletP = new Promise((res, rej) => {
+    const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; document.head.append(css);
+    const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"; sc.onload = () => res(); sc.onerror = () => { leafletP = null; rej(); }; document.head.append(sc);
+  });
+  return leafletP;
+}
+const isDark = () => THEME === "dark" || (THEME !== "light" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+const gkey = (p, where) => snorm(p.ad) + "|" + snorm(fullWhere(p, where));
+function coordOf(p, where){
+  const g = geoCache[gkey(p, where)]; if (g) return g.miss ? null : [g.lat, g.lng];
+  const la = Number(p.lat), ln = Number(p.lng);
+  return isFinite(la) && isFinite(ln) && Math.abs(la) > 0.1 && Math.abs(ln) > 0.1 ? [la, ln] : null;
+}
+function km(a, b){ const R = 6371, r = x => x * Math.PI / 180; const dLa = r(b[0] - a[0]), dLn = r(b[1] - a[1]);
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(r(a[0])) * Math.cos(r(b[0])) * Math.sin(dLn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+const fmtDist = d => d < 1 ? Math.round(d * 1000 / 10) * 10 + " m" : (Math.round(d * 10) / 10).toString().replace(".", LANG === "en" ? "." : ",") + " km";
+async function pumpGeo(){
+  if (geoBusy) return; geoBusy = true;
+  while (geoQ.length) {
+    const { p, where } = geoQ.shift(); const k = gkey(p, where); if (geoCache[k]) continue;
+    try {
+      const q = [p.ad, p.semt || p.ilce, fullWhere(p, where)].filter(Boolean).join(", ");
+      const cc = /^[A-Z]{2}$/.test(loc.code) ? "&countrycodes=" + loc.code.toLowerCase() : "";
+      const j = await (await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=${LANG}${cc}&q=${encodeURIComponent(q)}`)).json();
+      const r = j && j[0]; const ai = coordOf(p, where);
+      // yapay zekanın verdiği yerden çok uzak bir sonuç geldiyse güvenme
+      if (r && (!ai || km(ai, [+r.lat, +r.lon]) < 8)) geoCache[k] = { lat: +r.lat, lng: +r.lon }; else if (!ai) geoCache[k] = { miss: 1 };
+      const ks = Object.keys(geoCache); if (ks.length > 400) delete geoCache[ks[0]]; ls.set("gidelim-geo", geoCache);
+      if (exView === "map" && mapItems.includes(p)) drawMarkers(false);
+    } catch(e) {}
+    await new Promise(r => setTimeout(r, 1100)); // OpenStreetMap kuralı: saniyede en fazla 1 istek
+  }
+  geoBusy = false;
+}
+function setView(v){
+  exView = v; const b = $("#lv-view"); b.textContent = v === "map" ? L("☰ Liste") : L("🗺️ Harita"); b.setAttribute("aria-pressed", v === "map");
+  $("#ex-list").hidden = v === "map"; $("#ex-map").hidden = v !== "map";
+  if (v === "map") showMap();
+}
+async function showMap(){
+  const box = $("#mapbox");
+  try { await loadLeaflet(); } catch(e) { box.innerHTML = ""; box.append(el("div","status err", L("Harita yüklenemedi. İnternetini kontrol edip tekrar dene."))); return; }
+  if (!lmap) {
+    lmap = LF.map(box, { zoomControl: false, attributionControl: true, tap: true });
+    LF.tileLayer(`https://{s}.basemaps.cartocdn.com/${isDark() ? "dark_all" : "light_all"}/{z}/{x}/{y}{r}.png`, { subdomains: "abcd", maxZoom: 19, attribution: "© OpenStreetMap © CARTO" }).addTo(lmap);
+    LF.control.zoom({ position: "bottomright" }).addTo(lmap);
+    mLayer = LF.layerGroup().addTo(lmap);
+    const c = await locCoords().catch(() => null); lmap.setView(c ? [c.lat, c.lng] : [41.015, 28.98], 13);
+  }
+  setTimeout(() => { lmap.invalidateSize(); drawMarkers(true); }, 30);
+}
+function drawMarkers(fit){
+  if (!lmap || exView !== "map") return;
+  mLayer.clearLayers(); const pts = []; let missing = 0;
+  mapItems.forEach((p, i) => {
+    const ll = coordOf(p, mapWhere);
+    if (!ll) { missing++; if (!geoCache[gkey(p, mapWhere)]) { if (!geoQ.some(x => x.p === p)) geoQ.push({ p, where: mapWhere }); } return; }
+    pts.push(ll);
+    const ic = LF.divIcon({ className: "mpin" + (mapSel === p ? " on" : ""), html: `<span><i>${i + 1}</i></span>`, iconSize: [30, 30], iconAnchor: [15, 30] });
+    LF.marker(ll, { icon: ic, title: p.ad, keyboard: true }).addTo(mLayer).on("click", () => { mapSel = p; drawMarkers(false); mapCard(); });
+  });
+  if (meLL) pts.push(meLL);
+  if (fit && pts.length) lmap.fitBounds(pts, { padding: [36, 36], maxZoom: 16 });
+  pumpGeo();
+  const note = $("#mapnote"); note.textContent = missing ? (LANG === "en" ? `${missing} place(s) still being located…` : `${missing} mekanın yeri bulunuyor…`) : "";
+  if (!mapSel) mapCard();
+}
+function mapCard(){
+  const box = $("#mapcard"); box.innerHTML = "";
+  let p = mapSel;
+  if (!p && meLL) { let best = null, bd = 1e9; mapItems.forEach(x => { const ll = coordOf(x, mapWhere); if (ll) { const d = km(meLL, ll); if (d < bd) { bd = d; best = x; } } }); if (best) { p = best; box.append(el("div","mnear", L("📍 Sana en yakın"))); } }
+  if (!p) { box.append(el("div","hint", L("Bir iğneye dokun, mekanı gör. 📍 ile kendi konumunu göster."))); return; }
+  const ll = coordOf(p, mapWhere), cat = catOf(p.tur);
+  const c = el("div","mcard");
+  const t = el("div","mct"); t.append(notr(el("b",null,p.ad)), el("small",null,[p.semt || p.ilce, p.tur, p.fiyat, meLL && ll ? fmtDist(km(meLL, ll)) : ""].filter(Boolean).join(" · ")));
+  const open = el("button","gbtn",L("Aç")); open.type = "button"; open.onclick = () => openPlace(p, mapWhere);
+  const r1 = el("div","mcr"); r1.append(el("span","em",cat.emoji), t, open); c.append(r1);
+  const acts = el("div","lacts"); const dl = dirLink({ ...p, sehir: fullWhere(p, mapWhere) }); dl.className = "ib"; acts.append(dl); c.append(acts);
+  box.append(c);
+}
+function locateMe(){
+  const b = $("#map-me");
+  if (!navigator.geolocation) { toast(L("Bu cihaz konum paylaşmıyor.")); return; }
+  b.disabled = true;
+  navigator.geolocation.getCurrentPosition(pos => {
+    b.disabled = false; meLL = [pos.coords.latitude, pos.coords.longitude];
+    if (meMk) meMk.remove(); meMk = LF.circleMarker(meLL, { radius: 8, color: "#fff", weight: 3, fillColor: "#1F5FBF", fillOpacity: 1 }).addTo(lmap);
+    mapSel = null; drawMarkers(true); mapCard();
+  }, err => { b.disabled = false; toast(err && err.code === 1 ? L("Konum izni verilmedi. Telefon ayarlarından izin verebilirsin.") : L("Konum bulunamadı, elle yazabilirsin.")); },
+  { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+}
+
 /* ---------- ASİSTAN ---------- */
 const qEl = $("#q"), chatEl = $("#chat");
 let chat = ls.get("nereye-chat", []) || [];
@@ -2028,7 +2227,7 @@ async function send(text){
     : "Asistan: " + m.text + (m.places && m.places.length ? " [Önerdiği mekanlar: " + m.places.map(p => p.ad).join(", ") + "]" : "") + (m.plan && m.plan.length ? " [Plan verdi]" : "")).join("\n");
   const now = new Date(); const gun = now.toLocaleDateString("tr-TR", { weekday:"long" }), saat = now.toLocaleTimeString("tr-TR", { hour:"2-digit", minute:"2-digit" });
   const prompt = `Sen "Gidelim" uygulamasının samimi, enerjik ve kısa konuşan mekan asistanısın. Türkçe konuş, sıcak ve doğal yaz, arada bir emoji kullan ama abartma.
-Şu an: ${gun}, saat ${saat}. Saat ve güne uygun öneriler ver (ör. gece geç saatte kahvaltı yeri önerme).
+Şu an: ${gun}, saat ${saat}.${wxInfo() ? " Hava: " + wx.t + "°C, " + wxInfo().tx.toLocaleLowerCase("tr") + (wxInfo().hint ? " (" + wxInfo().hint + ")" : "") + "." : ""} Saat ve güne uygun öneriler ver (ör. gece geç saatte kahvaltı yeri önerme).
 Kullanıcının seçili konumu: ${where || "belirtilmedi"}
 ${taste}${skippedNames(where).length ? "Kullanıcının daha önce geçtiği (istemediği) yerler, bunları önerme: " + skippedNames(where).join(", ") + "\n" : ""}
 Kurallar:
@@ -2757,6 +2956,26 @@ else if (!ls.get("nereye-loc", null)) setTimeout(() => openSheet(), 400);
     if (any && !locked) { SC().style.overflowY = "hidden"; locked = true; }
     else if (!any && locked) { SC().style.overflowY = ""; locked = false; } };
   const mo = new MutationObserver(sync); ids.forEach(i => { const e = document.getElementById(i); if (e) mo.observe(e, { attributes: true, attributeFilter: ["hidden"] }); }); })();
+/* Ana ekran uygulamasında alt boşluk ölçümü */
+let diag = "";
+function calibrate(){
+  const root = document.documentElement;
+  const sa = navigator.standalone === true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+  const pr = getComputedStyle($("#sa-probe")); const envT = parseFloat(pr.paddingTop) || 0, envB = parseFloat(pr.paddingBottom) || 0;
+  const portrait = window.innerHeight >= window.innerWidth;
+  const sh = portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
+  const d = Math.round(sh - window.innerHeight);
+  let gap = 0, sab = null;
+  if (sa && portrait) {
+    if (envT > 0 && d > 0 && d <= 60) gap = d;                       // tam ekran modunda alt kısım eksik kalmış
+    else if (envT === 0 && envB === 0 && d >= 70) { gap = 34; sab = "14px"; } // ana ekran çizgisi bölgesi sayfaya verilmemiş
+  }
+  root.style.setProperty("--gap", gap + "px");
+  if (sab) root.style.setProperty("--sab", sab); else root.style.removeProperty("--sab");
+  diag = `${sa ? "A" : "W"}·${Math.round(envT)}·${Math.round(envB)}·${d}·${gap}`;
+  const av = document.querySelector(".appver small"); if (av) av.textContent = diag;
+}
+calibrate(); addEventListener("resize", () => { if (!document.documentElement.classList.contains("kb")) calibrate(); }); addEventListener("orientationchange", () => setTimeout(calibrate, 300));
 /* Klavye: yazarken alt çubuğu gizle, kutuları klavyenin üstünde tut */
 (() => { const root = document.documentElement, vv = window.visualViewport;
   const isField = e => e && (e.tagName === "TEXTAREA" || (e.tagName === "INPUT" && !/^(checkbox|radio|button|submit|range|color)$/i.test(e.type || "")));
