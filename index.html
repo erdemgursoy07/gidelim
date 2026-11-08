@@ -586,6 +586,11 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .mapapp-btn:active{transform:scale(.99)}
 #mapapp{z-index:45}
 
+/* Liste | Harita seçici */
+.segv{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:12px 16px 0;padding:4px;background:var(--soft);border:1px solid var(--line);border-radius:14px}
+.segv button{border:0;background:none;border-radius:10px;padding:8px;font-weight:800;font-size:.88rem;color:var(--muted);cursor:pointer}
+.segv button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -637,7 +642,8 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     </div>
 
     <div id="ex-lv" hidden>
-      <div class="deckbar"><button class="back" id="lv-back" type="button" aria-label="Türlere dön">‹</button><div class="t"><b id="lv-title"></b><small id="lv-sub"></small></div><button class="viewbtn" id="lv-view" type="button" aria-pressed="false">🗺️ Harita</button></div>
+      <div class="deckbar"><button class="back" id="lv-back" type="button" aria-label="Türlere dön">‹</button><div class="t"><b id="lv-title"></b><small id="lv-sub"></small></div></div>
+      <div class="segv" id="lv-seg" role="group" aria-label="Görünüm"><button type="button" data-view="list" aria-pressed="true">☰ Liste</button><button type="button" data-view="map" aria-pressed="false">🗺️ Harita</button></div>
       <div id="ex-list" aria-live="polite"></div>
       <div id="ex-map" hidden>
         <div class="mapwrap"><div id="mapbox" role="application" aria-label="Harita"></div><button class="mapme" id="map-me" type="button" aria-label="Konumumu göster">📍</button></div>
@@ -685,6 +691,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
       <div class="stats"><span id="st-all">0</span> kayıtlı · <span id="st-want">0</span> gidilecek · <span id="st-been">0</span> gidildi</div>
     </div>
     <div class="listtop">
+      <div class="segv" id="l-seg" role="group" aria-label="Görünüm" style="margin:0 0 12px"><button type="button" data-view="list" aria-pressed="true">☰ Liste</button><button type="button" data-view="map" aria-pressed="false">🗺️ Harita</button></div>
       <div class="seg" role="group" aria-label="Filtre">
         <button type="button" data-f="all" aria-pressed="true">Hepsi</button>
         <button type="button" data-f="want" aria-pressed="false">📌 Gidilecek</button>
@@ -700,6 +707,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
       <p class="hint" id="savedhint"></p>
     </div>
     <div id="savedlist" class="grid"></div>
+    <div id="l-mapslot"></div>
     <div id="sharecard-wrap"></div>
   </section>
 </main>
@@ -753,7 +761,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="segset" id="set-map" role="group" aria-label="Harita uygulaması"><button type="button" data-val="apple">🍎 Apple</button><button type="button" data-val="google">🗺️ Google</button><button type="button" data-val="yandex">🟡 Yandex</button></div>
     <div class="hint">Yol tarifi ve harita bağlantıları bu uygulamada açılır.</div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.3.1<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.4.0<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -999,7 +1007,7 @@ const EN = {
   "🔔 Bildirim almak için Gidelim’i ana ekrana ekle (Safari’de Paylaş → Ana Ekrana Ekle) ve oradan aç.":"🔔 To get notifications, add Gidelim to your Home Screen (Safari: Share → Add to Home Screen) and open it from there.","🔕 Bildirimlere izin verilmedi. Telefonun ayarlarından Gidelim için bildirimleri açabilirsin.":"🔕 Notifications are blocked. You can turn them on for Gidelim in your phone settings.","Bildirimleri aç":"Turn on notifications","Biri oy verince, yorum yazınca haberin olsun":"Know when someone votes or comments","🔔 Bildirimler açıldı":"🔔 Notifications on","Bildirim izni verilmedi.":"Notification permission denied.","Bildirimler açılamadı, tekrar dene.":"Couldn’t turn on notifications, try again.",
   "Fırın":"Bakery","Müze":"Museum","Park":"Park","Çarşı":"Market","Sanat":"Arts","Bar":"Bar","Uygun":"Affordable","Temizle":"Clear","Listen boş. Keşfet’te beğendiğin mekanın ♡’sine dokun, buraya gelsin.":"Your list is empty. Tap ♡ on a place in Explore to save it here.",
   "Temizle":"Clear",
-  "Doğa":"Nature","Park, sahil, orman, göl":"Parks, beaches, forests & lakes","Çarşı & AVM":"Markets & malls","Çarşı, pazar, AVM, butik":"Bazaars, markets, malls & boutiques","Bilgiler yapay zekaya dayanır; gitmeden haritadan kontrol et.":"Info is AI-generated; check the map before you go.","Ek bilgiler şu an getirilemedi; yol tarifi ve haritayla devam edebilirsin.":"Couldn’t load details right now; you can still use directions and the map.",
+  "Doğa":"Nature","Park, sahil, orman, göl":"Parks, beaches, forests & lakes","Çarşı & AVM":"Markets & malls","Çarşı, pazar, AVM, butik":"Bazaars, markets, malls & boutiques","Bilgiler yapay zekaya dayanır; saatler ve fiyatlar değişmiş olabilir.":"Info is AI-generated; hours and prices may have changed.","Ek bilgiler şu an getirilemedi; yol tarifiyle devam edebilirsin.":"Couldn’t load details right now; you can still get directions.",
   "Türlere dön":"Back to types",
   "✨ Yeni sürüm hazır":"✨ New version ready","Yenile":"Reload",
   "🗺️ Harita":"🗺️ Map","☰ Liste":"☰ List","Harita":"Map","Konumumu göster":"Show my location","Aç":"Open","📍 Sana en yakın":"📍 Closest to you","Bir iğneye dokun, mekanı gör. 📍 ile kendi konumunu göster.":"Tap a pin to see the place. Use 📍 to show where you are.","Harita yüklenemedi. İnternetini kontrol edip tekrar dene.":"Couldn’t load the map. Check your connection and try again.",
@@ -1007,6 +1015,7 @@ const EN = {
   "sıcak ve kapalı yerler öne çıktı":"cosy indoor spots first","kapalı mekanlar öne çıktı":"indoor spots first","serin yerler öne çıktı":"cool spots first","sıcak mekanlar öne çıktı":"warm spots first","teras ve açık hava yerleri öne çıktı":"terraces & outdoor spots first",
   "Sen buradasın":"You are here",
   "Hangi harita uygulamasında açalım?":"Which map app should we use?","Seçimin hatırlanır. Ayarlar’dan istediğin zaman değiştirebilirsin.":"We’ll remember your choice. You can change it anytime in Settings.","Vazgeç":"Cancel","Önerilen":"Recommended","Harita uygulaması":"Map app","Yol tarifi ve harita bağlantıları bu uygulamada açılır.":"Directions and map links open in this app.","Apple Haritalar":"Apple Maps","Google Haritalar":"Google Maps","Yandex Haritalar":"Yandex Maps",
+  "Görünüm":"View",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1316,6 +1325,9 @@ function show(v){
   if (v === "list") renderSaved();
   if (v === "group") { gRender(); if (!location.hash.startsWith("#oy-")) setHash("grup"); } else if (location.hash) setHash("");
   if (v === "ask") { renderChat(); scrollEnd(false); } else SC().scrollTo(0, 0);
+  // harita, açılan sekmenin görünümüne taşınsın
+  try { if (v === "list" && lView === "map") setTimeout(() => setLView("map"), 30);
+        else if (v === "explore" && !$("#ex-lv").hidden && exView === "map") setTimeout(() => setView("map"), 30); } catch(e) {}
 }
 document.querySelectorAll(".tb").forEach(b => b.onclick = () => show(b.dataset.v));
 
@@ -1349,7 +1361,7 @@ function removeWithUndo(k){ const v = saved[k]; if (!v) return; remove(k); buzz(
 function fullWhere(p, where){ return p.sehir && !norm(where).includes(norm(p.sehir)) ? [p.sehir, where].filter(Boolean).join(", ") : (where || p.sehir || ""); }
 function savePlace(p, where){
   const k = keyOf(p, where); if (saved[k]) return k;
-  put(k, { ad:String(p.ad||"").slice(0,120), tur:String(p.tur||"").slice(0,60), semt:String(p.semt||"").slice(0,80),
+  put(k, { ...(isFinite(+p.lat) && isFinite(+p.lng) && Math.abs(+p.lat) > 0.1 ? { lat: +p.lat, lng: +p.lng } : {}), ad:String(p.ad||"").slice(0,120), tur:String(p.tur||"").slice(0,60), semt:String(p.semt||"").slice(0,80),
     sehir:fullWhere(p, where).slice(0,80), fiyat:String(p.fiyat||"").slice(0,12), neden:String(p.neden||"").slice(0,400),
     durum:"want", puan:0, not:"", eklendi:Date.now() });
   return k;
@@ -1374,7 +1386,8 @@ const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform
 const mapPref = () => { const v = ls.get("gidelim-mapapp", null); return MAP_APPS[v] ? v : null; };
 function mapUrl(app, kind, p){
   const q = [p.ad, p.semt, p.sehir].filter(Boolean).join(", ");
-  let ll = null; try { ll = typeof coordOf === "function" ? coordOf(p, p.sehir || "") : null; } catch(e) {}
+  // Koordinatı sadece OpenStreetMap'ten doğrulanmışsa kullan; yapay zekanın tahmini sapabilir, o zaman ad + semtle arat
+  let ll = null; try { const g = geoCache[gkey(p, p.sehir || "")]; if (g && !g.miss) ll = [g.lat, g.lng]; } catch(e) {}
   const e = encodeURIComponent;
   if (app === "apple") return kind === "dir"
     ? "https://maps.apple.com/?daddr=" + (ll ? ll[0] + "," + ll[1] : e(q)) + "&dirflg=d" + (ll ? "&q=" + e(p.ad) : "")
@@ -1413,7 +1426,7 @@ function dirLink(p, short){
   const a = extLink("maplink dir", short ? "🧭 Yol" : "🧭 Yol tarifi", "dir", p);
   a.setAttribute("aria-label", p.ad + " için yol tarifi"); return a;
 }
-function mapLink(p){ return extLink("maplink", "🗺️ Harita", "map", p); }
+function mapLink(p){ return document.createDocumentFragment(); } // dış "Harita" düğmesi kaldırıldı; tek düğme: Yol tarifi
 function askAbout(p, where){
   if (!$("#place").hidden) { $("#place").hidden = true; pdOpen = null; }
   newChat(); curTab = "x";
@@ -1632,13 +1645,14 @@ function centerChip(){
   const left = b.offsetLeft - (row.clientWidth - b.offsetWidth) / 2;
   try { row.scrollTo({ left: Math.max(0, left), behavior: "smooth" }); } catch(e) { row.scrollLeft = Math.max(0, left); }
 }
-function showLV(on){ $("#ex-home").hidden = on; $("#ex-lv").hidden = !on; SC().scrollTo(0, 0); if (on) { updLV(); if (exView === "map") setTimeout(showMap, 30); } }
+function showLV(on){ $("#ex-home").hidden = on; $("#ex-lv").hidden = !on; SC().scrollTo(0, 0); if (on) { updLV(); if (exView === "map") setTimeout(() => setView("map"), 30); } }
 function updLV(){ const c = COLS.find(x => x.id === exType) || {};
   $("#lv-title").textContent = exMode === "search" ? "🔎 “" + exTerm + "”" : (c.emoji || "") + " " + L(c.label || "");
   const w = typeof wxInfo === "function" ? wxInfo() : null;
   $("#lv-sub").textContent = locStr() + (w && w.badge && exMode !== "search" ? " · " + w.ic + " " + L(w.badge) : ""); }
 $("#lv-back").onclick = () => { exMode = "browse"; listTok++; showLV(false); syncChips(); };
-$("#lv-view").onclick = () => setView(exView === "map" ? "list" : "map");
+document.querySelectorAll("#lv-seg button").forEach(b => b.onclick = () => setView(b.dataset.view));
+document.querySelectorAll("#l-seg button").forEach(b => b.onclick = () => setLView(b.dataset.view));
 $("#map-me").onclick = () => locateMe();
 function selectType(id){ exType = id; ls.set("gidelim-type", id); ls.set("gidelim-type-at", Date.now()); exMode = "browse"; syncChips(); showLV(true); loadList(); }
 function openCol(c){ if (c && !c.guide) selectType(c.id); }
@@ -1662,7 +1676,8 @@ function drawList(items, where, loading, opts = {}){
   drawListNow(items, where, loading, opts);
 }
 function drawListNow(items, where, loading, opts = {}){
-  mapItems = items; mapWhere = where; if (mapSel && !items.includes(mapSel)) mapSel = null; if (exView === "map") drawMarkers(!loading);
+  exItems = items; exWhere = where;
+  if (mapCtx === "ex") { mapItems = items; mapWhere = where; if (mapSel && !items.includes(mapSel)) mapSel = null; if (mapActive()) drawMarkers(!loading); }
   const box = $("#ex-list"); box.innerHTML = "";
   if (loading) { const c = COLS.find(x => x.id === exType) || {}; const ld = el("div","xload"); ld.append(el("span","spin"));
     ld.append(document.createTextNode(exMode === "search" ? (LANG === "en" ? `Searching “${exTerm}”…` : `“${exTerm}” aranıyor…`) : (items.length ? L("Daha fazla yer geliyor…") : `${c.emoji || ""} ${L(c.label || "")} ${L("aranıyor…")}`)));
@@ -2036,7 +2051,7 @@ function openPlace(p, where, opts = {}){
   acts.append(dl, mapLink({ ...p, sehir: fw }), sb, shareBtn(p, where || ""));
   if (!opts.noAsk) acts.append(askBtn(p, where || ""));
   box.append(acts);
-  box.append(el("div","pnote", L("Bilgiler yapay zekaya dayanır; gitmeden haritadan kontrol et.")));
+  box.append(el("div","pnote", L("Bilgiler yapay zekaya dayanır; saatler ve fiyatlar değişmiş olabilir.")));
   $("#place").hidden = false; setTimeout(() => x.focus({ preventScroll: true }), 30);
   const render = d => {
     info.innerHTML = "";
@@ -2044,7 +2059,7 @@ function openPlace(p, where, opts = {}){
       const l1 = el("div","pskel"), l2 = el("div","pskel short"), tg = el("div","ptags2");
       for (let i = 0; i < 3; i++) tg.append(el("span","ptag sk"));
       info.append(l1, l2, tg); return; }
-    if (!d || d === "error") { info.append(el("p","plead muted", L("Ek bilgiler şu an getirilemedi; yol tarifi ve haritayla devam edebilirsin."))); return; }
+    if (!d || d === "error") { info.append(el("p","plead muted", L("Ek bilgiler şu an getirilemedi; yol tarifiyle devam edebilirsin."))); return; }
     info.append(el("p","plead", d.meshur || d.ne_yapilir));
     const tg = el("div","ptags2");
     const add = (ic, v) => { if (v && String(v).trim()) tg.append(el("span","ptag", ic + " " + v)); };
@@ -2147,16 +2162,32 @@ async function pumpGeo(){
       // yapay zekanın verdiği yerden çok uzak bir sonuç geldiyse güvenme
       if (r && (!ai || km(ai, [+r.lat, +r.lon]) < 8)) geoCache[k] = { lat: +r.lat, lng: +r.lon }; else if (!ai) geoCache[k] = { miss: 1 };
       const ks = Object.keys(geoCache); if (ks.length > 400) delete geoCache[ks[0]]; ls.set("gidelim-geo", geoCache);
-      if (exView === "map" && mapItems.includes(p)) drawMarkers(false);
+      if (mapActive() && mapItems.includes(p)) drawMarkers(false);
     } catch(e) {}
     await new Promise(r => setTimeout(r, 1100)); // OpenStreetMap kuralı: saniyede en fazla 1 istek
   }
   geoBusy = false;
 }
+let mapCtx = "ex", lView = "list", exItems = [], exWhere = "";
+function savedFiltered(){
+  return Object.values(saved).filter(v => filterMode === "all" || v.durum === filterMode)
+    .filter(v => !lQ || norm([v.ad, v.tur, v.semt, v.sehir, v.not].join(" ")).includes(norm(lQ)));
+}
+function mapActive(){ return mapCtx === "ex" ? (!$("#ex-lv").hidden && exView === "map") : (!$("#v-list").hidden && lView === "map"); }
 function setView(v){
-  exView = v; const b = $("#lv-view"); b.textContent = v === "map" ? L("☰ Liste") : L("🗺️ Harita"); b.setAttribute("aria-pressed", v === "map");
-  $("#ex-list").hidden = v === "map"; $("#ex-map").hidden = v !== "map";
-  if (v === "map") showMap();
+  exView = v; document.querySelectorAll("#lv-seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === v));
+  $("#ex-list").hidden = v === "map";
+  if (v === "map") { mapCtx = "ex"; $("#ex-list").after($("#ex-map")); $("#ex-map").hidden = false; mapItems = exItems; mapWhere = exWhere; mapSel = null; showMap(); }
+  else $("#ex-map").hidden = true;
+}
+function setLView(v){
+  lView = v; document.querySelectorAll("#l-seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === v));
+  const isMap = v === "map";
+  $("#savedlist").hidden = isMap; $("#sharecard-wrap").hidden = isMap; $(".sortrow").hidden = isMap; $("#savedhint").hidden = isMap;
+  if (isMap) { mapCtx = "list"; $("#l-mapslot").append($("#ex-map")); $("#ex-map").hidden = false; mapItems = savedFiltered(); mapWhere = ""; mapSel = null;
+    if (!mapItems.length) { $("#mapcard").innerHTML = ""; $("#mapcard").append(el("div","empty", Object.keys(saved).length ? L("Bu filtrede ya da aramada mekan yok.") : L("Listen boş. Keşfet’te beğendiğin mekanın ♡’sine dokun, buraya gelsin."))); }
+    showMap(); }
+  else if (mapCtx === "list") $("#ex-map").hidden = true;
 }
 /* Harita sağlayıcısı: önce Apple Haritalar, olmazsa OpenStreetMap */
 let mapKind = null, mkMap = null, mkAnns = [], mkMe = null, mkP = null, mkFailed = false, mkWhy = "";
@@ -2212,7 +2243,7 @@ async function showOsmMap(){
 }
 function accentColor(){ return (getComputedStyle(document.documentElement).getPropertyValue("--accent") || "").trim() || "#1F5FBF"; }
 function drawMarkers(fit){
-  if (exView !== "map" || (mapKind === "apple" ? !mkMap : !lmap)) return;
+  if (!mapActive() || (mapKind === "apple" ? !mkMap : !lmap)) return;
   let missing = 0; const pts = [];
   if (mapKind === "apple") { if (mkAnns.length) mkMap.removeAnnotations(mkAnns); mkAnns = []; } else mLayer.clearLayers();
   mapItems.forEach((p, i) => {
@@ -2244,13 +2275,15 @@ function mapCard(){
   const box = $("#mapcard"); box.innerHTML = "";
   let p = mapSel;
   if (!p && meLL) { let best = null, bd = 1e9; mapItems.forEach(x => { const ll = coordOf(x, mapWhere); if (ll) { const d = km(meLL, ll); if (d < bd) { bd = d; best = x; } } }); if (best) { p = best; box.append(el("div","mnear", L("📍 Sana en yakın"))); } }
+  if (!p && !mapItems.length && mapCtx === "list") { box.append(el("div","empty", Object.keys(saved).length ? L("Bu filtrede ya da aramada mekan yok.") : L("Listen boş. Keşfet’te beğendiğin mekanın ♡’sine dokun, buraya gelsin."))); return; }
   if (!p) { box.append(el("div","hint", L("Bir iğneye dokun, mekanı gör. 📍 ile kendi konumunu göster."))); return; }
+  const W = mapWhere || p.sehir || "";
   const ll = coordOf(p, mapWhere), cat = catOf(p.tur);
   const c = el("div","mcard");
   const t = el("div","mct"); t.append(notr(el("b",null,p.ad)), el("small",null,[p.semt || p.ilce, p.tur, p.fiyat, meLL && ll ? fmtDist(km(meLL, ll)) : ""].filter(Boolean).join(" · ")));
-  const open = el("button","gbtn",L("Aç")); open.type = "button"; open.onclick = () => openPlace(p, mapWhere);
+  const open = el("button","gbtn",L("Aç")); open.type = "button"; open.onclick = () => openPlace(p, W);
   const r1 = el("div","mcr"); r1.append(el("span","em",cat.emoji), t, open); c.append(r1);
-  const acts = el("div","lacts"); const dl = dirLink({ ...p, sehir: fullWhere(p, mapWhere) }); dl.className = "ib"; acts.append(dl); c.append(acts);
+  const acts = el("div","lacts"); const dl = dirLink({ ...p, sehir: fullWhere(p, W) }); dl.className = "ib"; acts.append(dl); c.append(acts);
   box.append(c);
 }
 function locateMe(){
@@ -2411,6 +2444,7 @@ document.querySelectorAll("[data-s]").forEach(b => b.onclick = () => {
 const openCards = new Set();
 function cityOf(v){ const p = (v.sehir || "").split(",").map(x => x.trim()).filter(Boolean); return p.length > 1 ? p[p.length - 2] : (p[0] || "Diğer"); }
 function renderSaved(){
+  try { if (lView === "map" && mapCtx === "list") { mapItems = savedFiltered(); mapSel = null; if (mapActive()) drawMarkers(true); } } catch(e) {}
   const list = $("#savedlist"); list.innerHTML = ""; list.className = "";
   renderShareCard();
   const items = Object.entries(saved)
@@ -3111,12 +3145,18 @@ calibrate(); addEventListener("resize", () => { if (!document.documentElement.cl
 (() => { const root = document.documentElement, vv = window.visualViewport;
   const isField = e => e && (e.tagName === "TEXTAREA" || (e.tagName === "INPUT" && !/^(checkbox|radio|button|submit|range|color)$/i.test(e.type || "")));
   // Klavye yüksekliği: görünen alan, sayfanın tamamından belirgin şekilde kısaldıysa klavye açıktır
+  // iPhone uygulamada klavye açılınca sayfanın boyunu da kısaltabiliyor; bu yüzden klavyesiz tam boyu hatırla
+  let fullH = Math.max(window.innerHeight, vv ? vv.height : 0);
   const upd = () => {
     const field = isField(document.activeElement);
-    const kb = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : (field ? 1 : 0);
-    const on = field && (vv ? kb > 120 : true);
-    root.classList.toggle("kb", on); root.style.setProperty("--kb", (on && vv ? kb : 0) + "px");
+    if (!field) fullH = Math.max(window.innerHeight, vv ? vv.height + vv.offsetTop : 0);
+    const seen = vv ? vv.height + vv.offsetTop : window.innerHeight;
+    const shrink = Math.max(fullH - seen, fullH - window.innerHeight);               // klavye ne kadar yer kaplıyor
+    const overlap = vv ? Math.max(0, Math.round(window.innerHeight - seen)) : 0;      // sayfanın klavye altında kalan kısmı
+    const on = field && shrink > 120;
+    root.classList.toggle("kb", on); root.style.setProperty("--kb", (on ? overlap : 0) + "px");
   };
+  addEventListener("orientationchange", () => setTimeout(() => { fullH = 0; upd(); }, 400));
   document.addEventListener("focusin", e => { if (isField(e.target)) { upd(); setTimeout(upd, 250); setTimeout(upd, 600); } });
   document.addEventListener("focusout", () => setTimeout(upd, 60));
   if (vv) { vv.addEventListener("resize", upd); vv.addEventListener("scroll", upd); } })();
