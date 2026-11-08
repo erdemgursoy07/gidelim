@@ -63,7 +63,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 [hidden]{display:none!important}
-main{position:fixed;top:0;left:0;right:0;bottom:calc(var(--tbh) + var(--sab));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-top:env(safe-area-inset-top,0px);padding-bottom:24px}
+main{position:fixed;top:0;left:0;right:0;bottom:calc(var(--tbh) + var(--sab));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:none;padding-top:env(safe-area-inset-top,0px);padding-bottom:24px}
 main > section{max-width:720px;margin:0 auto}
 
 /* Başlık */
@@ -518,9 +518,9 @@ main > section{max-width:720px;margin:0 auto}
 .clrwrap .field{padding-right:40px}
 .clrwrap .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);margin:0}
 /* Keşfet: sade tür ızgarası ve tek parça filtre */
-.tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px 16px 0}
+.tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px 16px 0}
 @media (min-width:620px){.tgrid{grid-template-columns:repeat(4,1fr)}}
-.tcell{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:14px 12px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow);min-height:64px}
+.tcell{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:11px 12px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow);min-height:58px}
 .tcell span{font-size:1.6rem;line-height:1;flex:none}
 .tcell b{display:block;font-weight:800;font-size:.92rem;line-height:1.2}
 .tcell small{display:block;color:var(--muted);font-size:.72rem;font-weight:600;line-height:1.25;margin-top:2px}
@@ -624,6 +624,17 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .joinrow{margin:10px 16px 0}
 .joinrow .field{text-transform:uppercase;letter-spacing:.12em}
 
+/* Aşağı çekip yenileme */
+.swrap{position:relative}
+#ex-home .head{position:relative}
+.ptr{position:absolute;left:50%;top:-6px;z-index:5;width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center;font-weight:800;color:var(--accent);opacity:0;transform:translate(-50%,0);pointer-events:none;transition:opacity .15s}
+.ptr.show{opacity:1}
+.ptr.ready{background:var(--accent);color:var(--accent-ink)}
+@media (prefers-reduced-motion:no-preference){.ptr.spin{animation:ptrspin .6s linear infinite}@keyframes ptrspin{from{transform:translate(-50%,40px) rotate(0)}to{transform:translate(-50%,40px) rotate(360deg)}}}
+.ptrhint{margin:6px 2px 0;font-size:.76rem;font-weight:700;color:var(--muted);text-align:center}
+.citycard{transition:opacity .18s ease}
+.citycard.fade{opacity:.35}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -665,7 +676,9 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
           </div>
           <div class="sbox" id="ex-sug" role="listbox" hidden></div>
         </div>
+        <div class="ptr" id="ptr" aria-hidden="true">↻</div>
         <div class="citycard" id="citycard" role="button" tabindex="0" hidden></div>
+        <div class="ptrhint" id="ptrhint" hidden>↓ Aşağı çek, yeni fotoğraf gelsin</div>
         <div class="wxline" id="wxline" hidden></div>
         <div class="travel" id="travel" hidden></div>
       </div>
@@ -673,7 +686,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
       <div class="fseg" id="filterchips" role="group" aria-label="Filtre" hidden></div>
       <button class="tipbar" id="loc-tip" type="button" hidden style="display:block;width:calc(100% - 32px);text-align:left;border:0;cursor:pointer"></button>
       <div class="tipbar" id="ai-warn" hidden></div>
-      <button class="helpbtn" id="help" type="button">❔ Nasıl kullanılır?</button>
+
     </div>
 
     <div id="ex-lv" hidden>
@@ -798,10 +811,10 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="segset" id="set-map" role="group" aria-label="Harita uygulaması"><button type="button" data-val="apple">🍎 Apple</button><button type="button" data-val="google">🗺️ Google</button><button type="button" data-val="yandex">🟡 Yandex</button></div>
     <div class="hint">Yol tarifi ve harita bağlantıları bu uygulamada açılır.</div>
     <div class="lbl">Kişisel</div>
-    <div class="setrow2"><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
+    <div class="setrow2"><button class="pill-btn" id="set-help" type="button">❔ Nasıl kullanılır?</button><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.7.2<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.8.0<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -810,7 +823,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="tin">
       <h2 id="tour-h"></h2>
       <p id="tour-p"></p>
-      <div class="dots" id="tour-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="dots" id="tour-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="tbtns"><button class="skip" id="tour-skip" type="button">Atla</button><button class="next" id="tour-next" type="button">İleri</button></div>
     </div>
   </div>
@@ -1063,6 +1076,9 @@ const EN = {
   "✨ Neleri seversin?":"✨ What do you like?","Önerileri sana göre sıralamak için. İstediğin zaman Ayarlar’dan değiştirebilirsin.":"So we can rank suggestions for you. You can change this anytime in Settings.","Bütçe":"Budget","₺ Uygun":"₺ Budget","₺₺ Orta":"₺₺ Mid","₺₺₺ Keyif":"₺₺₺ Treat","Ortam":"Vibe","🌿 Sakin":"🌿 Calm","🎉 Hareketli":"🎉 Lively","🤷 Fark etmez":"🤷 Either","En sevdiğin türler":"Favourite types","Kaydet":"Save","Şimdi değil":"Not now","✨ Önerilerin artık sana göre":"✨ Suggestions are now tailored to you",
   "Kişisel":"Personal","✨ Zevklerim":"✨ My tastes","🔔 Bildirimler":"🔔 Notifications","🔔 Bildirimler açık":"🔔 Notifications on","Grup oylaması ve cuma akşamı hafta sonu hatırlatıcısı için.":"For group votes and the Friday weekend reminder.",
   "🔑 Kodla katıl":"🔑 Join with code","6 haneli davet kodu":"6-character invite code","Davet kodu":"Invite code","Katıl":"Join","Kod 6 karakter olmalı.":"The code should be 6 characters.","🎉 Oylamaya katıldın":"🎉 You joined the vote","Bu kodla bir oylama bulunamadı.":"No vote found with this code.","Şu an katılamadık, tekrar dene.":"Couldn’t join right now, try again.","🔑 Davet kodu":"🔑 Invite code","📋 Kod kopyalandı":"📋 Code copied",
+  "↓ Aşağı çek, yeni fotoğraf gelsin":"↓ Pull down for a new photo","❔ Nasıl kullanılır?":"❔ How it works",
+  "Bir mekan türü seç (Restoran, Kafe, Bar, Doğa…), bölgendeki en sevilen yerler listelenir. ♡ ile kaydet, mekana dokunup yol tarifine bak. Üstteki fotoğraf her açılışta değişir; sayfayı aşağı çekip yenisini görebilir, havayı tazeleyebilirsin.":"Pick a place type (Restaurant, Café, Bar, Nature…) to see the best-loved spots nearby. Save with ♡, tap a place for directions. The photo at the top changes every time you open the app; pull the page down for a new one and fresh weather.",
+  "Arkadaşlarınla nereye gideceğinize birlikte karar verin: oylama başlat, mekan ekle, 📤 Davet et ile paylaş. Arkadaşın bağlantıyı açabilir ya da kendi uygulamasında 🔑 Kodla katıl ile davet kodunu yazabilir.":"Decide together where to go: start a vote, add places and share with 📤 Invite. Friends can open the link or enter the invite code with 🔑 Join with code in their app.",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1535,6 +1551,7 @@ let sample = null;
     sample.json = (input, o) => raw(typeof input === "string" ? input.replace(/Tüm metinler Türkçe olsun\./g, "").replace(/açıklamaları Türkçe yaz/g, "write descriptions in English").replace(/Türkçe yaz[.;]?/g, "") + "\n\nIMPORTANT: The user's app language is English. Write ALL text values in natural English (keep place names in their original local form). Prices: use relative $ / $$ / $$$ instead of ₺." : input, o); }
   if (sample) setTimeout(prefetchAll, 4000);
   setTimeout(() => { try { checkTravel(); } catch(e) {} }, 2600);
+  ls.set("gidelim-opens", (Number(ls.get("gidelim-opens", 0)) || 0) + 1);
   loadWeather(); setTimeout(() => { try { loadCityCard(); } catch(e) {} }, 300);
   if (!sample) { const w = $("#ai-warn"); w.hidden = false; w.textContent = "⚠️ Yapay zeka bağlantısı kurulamadı. index.html içindeki AI_URL ayarını kontrol et."; $("#send").disabled = true; }
 })();
@@ -2176,11 +2193,11 @@ async function locCoords(){
   if (parts[1]) { const m = rs.find(x => snorm(x.admin1 || "").includes(snorm(parts[1])) || snorm(x.admin2 || "").includes(snorm(parts[1]))); if (m) r = m; }
   if (!r) return null; const v = { lat: r.latitude, lng: r.longitude }; ls.set(key, v); return v;
 }
-async function loadWeather(){
+async function loadWeather(force){
   try {
     const c = await locCoords(); if (!c) { wx = null; renderWx(); return; }
     const key = "gidelim-wx|" + c.lat.toFixed(2) + "," + c.lng.toFixed(2); const cached = ls.get(key, null);
-    if (cached && Date.now() - cached.at < 30 * 60000) wx = cached;
+    if (!force && cached && Date.now() - cached.at < 30 * 60000) wx = cached;
     else { const j = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&current=temperature_2m,precipitation,weather_code,is_day&timezone=auto`)).json();
       const cu = j.current || {}; if (cu.temperature_2m == null) return;
       wx = { t: Math.round(cu.temperature_2m), p: cu.precipitation || 0, code: cu.weather_code, day: cu.is_day, at: Date.now() }; ls.set(key, wx); }
@@ -2210,51 +2227,94 @@ function renderWx(){
 
 /* ---------- Şehir kartı: bulunduğun yerin simgesi (Wikipedia fotoğrafı) + hava ---------- */
 let cityCard = null;
-async function loadCityCard(){
+async function loadCityCard(opts = {}){
   const box = $("#citycard"); if (!box) return;
   const where = locStr(); if (!where || !sample) { box.hidden = true; renderWx(); return; }
-  const key = "gidelim-city3|" + LANG + "|" + snorm(where);
+  const key = "gidelim-city4|" + LANG + "|" + snorm(where), ikey = "gidelim-cityi|" + snorm(where);
   const area = (loc.city || cname(loc.code) || "").split(",")[0].trim();
   let c = ls.get(key, null);
-  if (!c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000)) {
+  const stale = !c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000);
+  // Havuz yoksa: ilk uygun fotoğraf gelir gelmez göster, havuzun kalanını arkada doldur
+  if (stale) {
     try {
       const r = await sample.json(`Konum: ${where}
-Bu konumun (semt ya da ilçe verildiyse o semtin/ilçenin, yoksa şehrin ya da ülkenin) en tanınan, simge olmuş 3 yerini önem sırasıyla seç (ör. Erzurum → Çifte Minareli Medrese, Palandöken, Üç Kümbetler; Üsküdar → Kız Kulesi). Doğal güzellik de olabilir. Her birinin Wikipedia'da sayfası olmalı.
-SADECE şu JSON'u döndür: {"yerler":[{"yer":"Yerin adı","tur":"Kısa tür, ör. Tarihi medrese","ara":"Wikipedia araması için yerin adı ve şehri, ör. Çifte Minareli Medrese Erzurum"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
-      const cands = (r && Array.isArray(r.yerler) ? r.yerler : r && r.yer ? [{ yer: r.yer, tur: r.tur, ara: r.yer + " " + area }] : []).filter(x => x && x.yer).slice(0, 3);
-      let pick = null, firstAny = null;
-      // yatay fotoğrafı olan ilk adayı seç; hiç yatay yoksa fotoğrafı olan ilk aday
+Bu konumun (semt ya da ilçe verildiyse o semtin/ilçenin, yoksa şehrin ya da ülkenin) en tanınan, simge olmuş 5 yerini önem sırasıyla seç (ör. İstanbul → Ayasofya, Kız Kulesi, Galata Kulesi, Sultanahmet Camii, Boğaziçi Köprüsü; Erzurum → Çifte Minareli Medrese, Palandöken, Üç Kümbetler…). Doğal güzellik de olabilir. Her birinin Wikipedia'da sayfası olmalı.
+SADECE şu JSON'u döndür: {"yerler":[{"yer":"Yerin adı","tur":"Kısa tür, ör. Tarihi medrese","ara":"Wikipedia araması için yerin adı ve şehri"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
+      const cands = (r && Array.isArray(r.yerler) ? r.yerler : []).filter(x => x && x.yer).slice(0, 5);
+      const pool = []; let firstAny = null, shown = false;
       for (const x of cands) {
         const img = await wikiSearchImage(x.ara || x.yer, "tr") || await wikiSearchImage(x.ara || x.yer, "en");
         if (!img) continue;
-        const it = { yer: x.yer, tur: x.tur || "", ...img };
-        if (img.w / img.h >= 1.15) { pick = it; break; }
-        if (!firstAny) firstAny = it;
+        const it = { yer: x.yer, tur: x.tur || "", img: img.src, alt: img.alt, page: img.page };
+        if (img.w / img.h >= 1.15) {
+          if (pool.some(p => p.img === it.img)) continue;
+          pool.push(it); c = { pool: pool.slice(), at: Date.now() }; ls.set(key, c);
+          if (!shown && where === locStr()) { shown = true; ls.set(ikey, 0); showCity(box, it, area); }
+        } else if (!firstAny) firstAny = it;
       }
-      pick = pick || firstAny;
-      if (!pick && area) { const img = await wikiSearchImage(area, "tr") || await wikiSearchImage(area, "en"); if (img) pick = { yer: area, tur: "", ...img }; }   // son çare: şehrin kendi fotoğrafı
-      c = pick ? { yer: pick.yer, tur: pick.tur, img: pick.src, alt: pick.alt, page: pick.page, at: Date.now() } : { none: 1, at: Date.now() };
-      ls.set(key, c);
+      if (!pool.length) {
+        let only = firstAny;
+        if (!only && area) { const img = await wikiSearchImage(area, "tr") || await wikiSearchImage(area, "en"); if (img) only = { yer: area, tur: "", img: img.src, alt: img.alt, page: img.page }; }
+        c = only ? { pool: [only], at: Date.now() } : { none: 1, at: Date.now() }; ls.set(key, c);
+      }
+      if (shown) return;
     } catch(e) { c = null; }
   }
   if (where !== locStr()) return;
-  if (!c || c.none) { box.hidden = true; cityCard = null; renderWx(); return; }
-  cityCard = c;
+  if (!c || c.none || !c.pool || !c.pool.length) { box.hidden = true; cityCard = null; renderWx(); return; }
+  // Her açılışta (ya da aşağı çekince) sıradaki fotoğraf
+  let i = Number(ls.get(ikey, -1)); if (!isFinite(i)) i = -1;
+  i = (i + 1) % c.pool.length; ls.set(ikey, i);
+  showCity(box, c.pool[i], area);
+}
+function showCity(box, it, area){
+  cityCard = it;
   const im = new Image();
   im.onload = () => {
-    box.innerHTML = ""; box.style.backgroundImage = `url("${im.src}")`;
-    const cap = el("div","cc-cap"); cap.append(el("b",null, "📍 " + (area || c.yer)), el("span",null, area && snorm(area) !== snorm(c.yer) ? c.yer : (c.tur || "")));
-    const wxc = el("div","cc-wx"); wxc.id = "cc-wx";
-    const cr = el("a","cc-credit","Wikipedia"); cr.href = c.page; cr.target = "_blank"; cr.rel = "noopener"; cr.addEventListener("click", e => e.stopPropagation());
-    box.append(cap, wxc, cr); box.hidden = false;
-    box.setAttribute("aria-label", c.yer); box.onclick = () => openPlace({ ad: c.yer, tur: c.tur || "" }, locStr());
-    renderWx();
+    const apply = () => {
+      box.innerHTML = ""; box.style.backgroundImage = `url("${im.src}")`;
+      const cap = el("div","cc-cap"); cap.append(el("b",null, "📍 " + (area || it.yer)), el("span",null, area && snorm(area) !== snorm(it.yer) ? it.yer : (it.tur || "")));
+      const wxc = el("div","cc-wx"); wxc.id = "cc-wx";
+      const cr = el("a","cc-credit","Wikipedia"); cr.href = it.page; cr.target = "_blank"; cr.rel = "noopener"; cr.addEventListener("click", e => e.stopPropagation());
+      box.append(cap, wxc, cr); box.hidden = false; box.classList.remove("fade");
+      box.setAttribute("aria-label", it.yer); box.onclick = () => openPlace({ ad: it.yer, tur: it.tur || "" }, locStr());
+      renderWx(); ptrHint();
+    };
+    if (!box.hidden && box.style.backgroundImage) { box.classList.add("fade"); setTimeout(apply, 180); } else apply();
   };
-  im.onerror = () => {
-    if (c.alt && im.src !== c.alt) { im.src = c.alt; return; }
-    ls.set(key, { none: 1, at: Date.now() }); box.hidden = true; cityCard = null; renderWx(); };
-  im.src = c.img;
+  im.onerror = () => { if (it.alt && im.src !== it.alt) { im.src = it.alt; return; } box.hidden = true; cityCard = null; renderWx(); };
+  im.src = it.img;
 }
+/* Bir kereye mahsus ipucu: "aşağı çek" */
+function ptrHint(){
+  const h = $("#ptrhint"); if (!h) return;
+  const n = Number(ls.get("gidelim-opens", 0)) || 0;
+  h.hidden = !!ls.get("gidelim-ptr-used", 0) || n > 3 || $("#citycard").hidden;
+}
+/* Keşfet'i aşağı çekince: yeni fotoğraf + taze hava */
+(function setupPull(){
+  const sc = document.querySelector("main"), ind = $("#ptr");
+  let y0 = null, dy = 0, busy = false;
+  const active = () => !$("#v-explore").hidden && !$("#ex-home").hidden && sc.scrollTop <= 0 && !document.documentElement.classList.contains("kb") && cityCard;
+  sc.addEventListener("touchstart", e => { if (busy || !active()) { y0 = null; return; } y0 = e.touches[0].clientY; dy = 0; }, { passive: true });
+  sc.addEventListener("touchmove", e => {
+    if (y0 === null) return;
+    dy = e.touches[0].clientY - y0;
+    if (dy <= 0) { ind.style.transform = ""; ind.classList.remove("show"); return; }
+    if (e.cancelable) e.preventDefault();
+    const p = Math.min(dy * 0.5, 80);
+    ind.classList.add("show"); ind.style.transform = `translate(-50%, ${p}px) rotate(${p * 4}deg)`; ind.classList.toggle("ready", dy > 110);
+  }, { passive: false });
+  const end = async () => {
+    if (y0 === null) return; const go = dy > 110; y0 = null; dy = 0;
+    if (!go) { ind.style.transform = ""; ind.classList.remove("show","ready"); return; }
+    busy = true; ind.classList.add("spin"); buzz(12);
+    ls.set("gidelim-ptr-used", 1); const h = $("#ptrhint"); if (h) h.hidden = true;
+    try { await Promise.all([loadCityCard(), loadWeather(true)]); } catch(e) {}
+    setTimeout(() => { ind.classList.remove("show","ready","spin"); ind.style.transform = ""; busy = false; }, 450);
+  };
+  sc.addEventListener("touchend", end); sc.addEventListener("touchcancel", end);
+})();
 /* Wikipedia'nın kendi aramasıyla fotoğraf bul (sayfa adı birebir tutmasa da) */
 async function wikiSearchImage(q, lang){
   if (!q) return null;
@@ -3453,8 +3513,9 @@ function calLinks(p, place){
 
 /* ---------- Tanıtım turu ---------- */
 const TOUR = [
-  { e:"🧭", h:"Keşfet", p:"Bir mekan türü seç (Restoran, Kafe, Bar, Doğa…). Bölgendeki en sevilen yerler listelenir. ♡ ile kaydet, mekana dokunup neyiyle meşhur olduğuna ve yol tarifine bak." },
+  { e:"🧭", h:"Keşfet", p:"Bir mekan türü seç (Restoran, Kafe, Bar, Doğa…), bölgendeki en sevilen yerler listelenir. ♡ ile kaydet, mekana dokunup yol tarifine bak. Üstteki fotoğraf her açılışta değişir; sayfayı aşağı çekip yenisini görebilir, havayı tazeleyebilirsin." },
   { e:"💬", h:"Asistan", p:"Ne istediğini yaz: “bu akşam sakin bir yer”, “arkadaşlarla plan yap” gibi. Mekan önerir, saatleriyle akşam planı çıkarır. Eski sohbetlerin 🕘 Geçmiş’te durur." },
+  { e:"🗳️", h:"Grup oylaması", p:"Arkadaşlarınla nereye gideceğinize birlikte karar verin: oylama başlat, mekan ekle, 📤 Davet et ile paylaş. Arkadaşın bağlantıyı açabilir ya da kendi uygulamasında 🔑 Kodla katıl ile davet kodunu yazabilir." },
   { e:"❤️", h:"Listem", p:"Kaydettiğin yerler burada. Gittiklerini ✅ işaretle, yıldız ver, not al; öneriler zevkine göre iyileşir. 3 yer olunca listeni arkadaşlarınla paylaşabilirsin." }
 ];
 let tourI = 0;
@@ -3478,7 +3539,7 @@ document.addEventListener("keydown", e => { if ($("#tour").hidden) return;
   t.addEventListener("pointerdown", e => sx = e.clientX);
   t.addEventListener("pointerup", e => { if (sx == null) return; const dx = e.clientX - sx; sx = null;
     if (dx < -60) $("#tour-next").click(); else if (dx > 60 && tourI > 0) { tourI--; renderTour(); } }); })();
-$("#help").onclick = openTour;
+$("#set-help").onclick = () => { $("#settings").hidden = true; openTour(); };
 markReady();
 updateSkipInfo();
 
