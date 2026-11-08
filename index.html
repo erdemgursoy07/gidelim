@@ -591,8 +591,12 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .segv button{border:0;background:none;border-radius:10px;padding:8px;font-weight:800;font-size:.88rem;color:var(--muted);cursor:pointer}
 .segv button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 
-.travel{display:flex;align-items:center;gap:8px;margin-top:10px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:12px;padding:8px 8px 8px 12px;font-size:.84rem;font-weight:700}
-.travel span{flex:1;min-width:0}
+.travel{display:flex;align-items:center;gap:10px;margin-top:12px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:16px;padding:12px 8px 12px 14px;box-shadow:var(--shadow)}
+.tw-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tw-h{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:1.02rem;letter-spacing:-.01em}
+.tw-wx{font-family:"Figtree",system-ui,sans-serif;font-weight:700;color:var(--muted);font-size:.9rem}
+.tw-s{font-size:.84rem;color:var(--muted);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.travel:not([hidden]){animation:twin .45s cubic-bezier(.2,.9,.3,1.2) both}@keyframes twin{from{transform:translateY(-8px) scale(.97);opacity:0}}}
 .travel .gbtn{padding:6px 12px;font-size:.82rem}
 .travx{border:0;background:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px 6px}
 .simlink{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;color:var(--accent);font-weight:800;font-size:.9rem;padding:12px 2px 4px;margin-top:12px;cursor:pointer}
@@ -781,7 +785,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="setrow2"><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.6.0<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.6.1<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2437,17 +2441,48 @@ async function checkTravel(){
     const j = await (await fetch(base + "/whereami")).json();
     let city = String(j.city || "").trim(), code = String(j.country || "").toUpperCase();
     if (!city || !code) return;
+    const rawCity = city;
+    let gc = null;
     if (code === "TR") { const il = Object.keys(GEO.tr).find(k => snorm(k) === snorm(city)); if (il) city = il; }
-    if (snorm(locStr()).includes(snorm(city))) return;                         // zaten oradasın
-    const no = ls.get("gidelim-travel-no", []) || []; if (no.includes(snorm(city))) return;  // bu şehir için "hayır" dedin
+    else { gc = await geoCity(city, code).catch(() => null); if (gc && gc.name) city = gc.name; }
+    if (snorm(locStr()).includes(snorm(city)) || snorm(locStr()).includes(snorm(rawCity))) return;   // zaten oradasın
+    const no = ls.get("gidelim-travel-no", []) || []; if (no.includes(snorm(city)) || no.includes(snorm(rawCity))) return;  // bu şehir için "hayır" dedin
     const box = $("#travel"); box.innerHTML = ""; box.hidden = false;
-    box.append(el("span",null, LANG === "en" ? `🧳 Looks like you’re in ${city}. Switch Explore to ${city}?` : `🧳 ${city}’desin galiba. Keşfet’i ${city}’e çevireyim mi?`));
+    const abroad = code !== loc.code && code !== "TR";
+    const flag = /^[A-Z]{2}$/.test(code) ? String.fromCodePoint(...[...code].map(c => 127397 + c.charCodeAt(0))) : "🎉";
+    const title = el("b","tw-h", (abroad ? flag : "🎉") + " " + (LANG === "en" ? `Welcome to ${city}!` : `${dativeTR(city)} hoş geldin!`));
+    const sub = el("span","tw-s", LANG === "en" ? `Switch Explore to ${city}?` : `Keşfet’i ${dativeTR(city)} çevireyim mi?`);
+    const txt = el("div","tw-t"); txt.append(title, sub);
     const yes = el("button","gbtn", L("Çevir")); yes.type = "button";
     const nob = el("button","travx","✕"); nob.type = "button"; nob.setAttribute("aria-label", L("Kapat"));
     yes.onclick = () => { box.hidden = true; cSel.value = GEO.codes.includes(code) ? code : loc.code; $("#cityin").value = city; closeSheet(true); };
     nob.onclick = () => { box.hidden = true; ls.set("gidelim-travel-no", [snorm(city), ...no].slice(0, 30)); };
-    box.append(yes, nob);
+    box.append(txt, yes, nob);
+    buzz(20);
+    // o şehrin havası (varsa) başlığın yanına
+    wxFor(city, code, gc).then(w => { if (w && !box.hidden) title.append(el("span","tw-wx", ` ${w.ic} ${w.t}°`)); }).catch(() => {});
   } catch(e) {}
+}
+
+/* Türkçe yönelme eki: İzmir'e, Ankara'ya, Roma'ya, Eskişehir'e */
+function dativeTR(name){
+  const n = String(name).trim(); const m = n.toLocaleLowerCase("tr").match(/[aeıioöuü](?=[^aeıioöuü]*$)/);
+  const back = m && "aıou".includes(m[0]); const endsVowel = /[aeıioöuü]$/i.test(n.toLocaleLowerCase("tr"));
+  return n + "’" + (endsVowel ? "y" : "") + (back ? "a" : "e");
+}
+/* Şehrin uygulama dilindeki adı ve konumu (Rome → Roma) */
+async function geoCity(city, code){
+  const cc = /^[A-Z]{2}$/.test(code) ? "&countryCode=" + code : "";
+  const g = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=${LANG}&format=json${cc}`)).json();
+  const r = (g.results || [])[0]; return r ? { name: r.name || city, lat: r.latitude, lon: r.longitude } : null;
+}
+async function wxFor(city, code, known){
+  const r0 = known || await geoCity(city, code); if (!r0) return null; const r = { latitude: r0.lat, longitude: r0.lon };
+  const j = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${r.latitude}&longitude=${r.longitude}&current=temperature_2m,weather_code,is_day&timezone=auto`)).json();
+  const cu = j.current || {}; if (cu.temperature_2m == null) return null;
+  const c = cu.weather_code;
+  const ic = (c >= 71 && c <= 77) || c === 85 || c === 86 ? "🌨️" : ((c >= 51 && c <= 67) || (c >= 80 && c <= 82) || c >= 95) ? "🌧️" : c <= 1 ? (cu.is_day ? "☀️" : "🌙") : c <= 3 ? "⛅" : "☁️";
+  return { ic, t: Math.round(cu.temperature_2m) };
 }
 
 /* ---- 🔗 Listeni bağlantıyla paylaş ---- */
