@@ -553,7 +553,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .viewbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 11px;font-weight:800;font-size:.8rem;cursor:pointer;color:var(--ink)}
 .viewbtn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-line)}
 .mapwrap{position:relative;margin:12px 16px 0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
-#mapbox{height:min(58vh,520px);min-height:300px;background:var(--soft)}
+#mapbox{height:min(44vh,400px);min-height:260px;background:var(--soft)}
 .mapme{position:absolute;top:10px;right:10px;z-index:500;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:1.05rem;cursor:pointer;box-shadow:var(--shadow)}
 .mapme:disabled{opacity:.6}
 .mapnote{margin:8px 18px 0;font-size:.78rem;color:var(--muted);min-height:1em}
@@ -665,7 +665,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
   <section id="v-ask" hidden>
     <div class="head">
       <div class="brandrow"><div class="brand-dot" aria-hidden="true">💬</div><div class="brand">Asistan</div><button class="locchip" type="button"></button><button class="setbtn" type="button" aria-label="Ayarları aç">⚙️</button></div>
-      <div class="brandrow" style="margin-top:10px"><span class="sub" style="color:var(--muted);font-size:.85rem">Planla, sor, karar ver.</span><button class="newchat" id="newchat" type="button">＋ Yeni sohbet</button><button class="histbtn" id="histbtn" type="button">🕘 Geçmiş</button><button class="setbtn" type="button" aria-label="Ayarları aç">⚙️</button></div>
+      <div class="brandrow" style="margin-top:10px"><span class="sub" style="color:var(--muted);font-size:.85rem">Planla, sor, karar ver.</span><button class="newchat" id="newchat" type="button">＋ Yeni sohbet</button><button class="histbtn" id="histbtn" type="button">🕘 Geçmiş</button></div>
     </div>
     <div id="chat" class="chat" aria-live="polite"></div>
     <div class="composer"><div class="composer-in">
@@ -761,7 +761,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="segset" id="set-map" role="group" aria-label="Harita uygulaması"><button type="button" data-val="apple">🍎 Apple</button><button type="button" data-val="google">🗺️ Google</button><button type="button" data-val="yandex">🟡 Yandex</button></div>
     <div class="hint">Yol tarifi ve harita bağlantıları bu uygulamada açılır.</div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.4.0<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.5.0<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -800,7 +800,7 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
       const key = tier + "|" + prompt;
       if (o.cache !== false && cache.has(key) && Date.now() - cache.get(key).at < 5 * 60 * 1000) { const c = cache.get(key); if (o.onText) o.onText({ text: c.text, delta: c.text }); return c.v; }
       let res;
-      try { res = await fetch(AI_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, tier, ground }), signal: o.signal }); }
+      try { res = await fetch(AI_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, tier, ground, share: o.share || 0 }), signal: o.signal }); }
       catch(e) { throw { code: e && e.name === "AbortError" ? "cancelled" : "network", message: String(e) }; }
       if (!res.ok) { let j = {}; try { j = await res.json(); } catch(e) {}
         const code = j.error || (res.status === 429 ? "rate_limited" : res.status === 403 ? "forbidden" : "upstream");
@@ -1588,7 +1588,7 @@ function fetchList(t, f, where, more, onStream, signal){
   const take = arr => { let n = 0; (arr || []).forEach(p => { if (okPlace(p) && inLoc(p) && fitsType(p, t) && !seen.has(norm(p.ad)) && !isSkipped(p, where)) { seen.add(norm(p.ad)); items.push(p); n++; } }); return n; };
   if (onStream) userBusy++;
   const pr = sample.json(listPrompt(where, c, fl, 8, items.map(p => p.ad)), Object.assign({ ...QUICKAI, fast: onStream ? "auto" : false, signal,
-      onText: ({ text }) => { if (take(partialObjects(text)) && onStream) onStream(items); } }, more ? { cache: false } : {}))
+      onText: ({ text }) => { if (take(partialObjects(text)) && onStream) onStream(items); } }, more ? { cache: false } : { share: 12 * 3600 }))
     .then(r => { const arr = Array.isArray(r) ? r : []; take(arr);
       if (!items.length && arr.length) arr.forEach(p => { if (okPlace(p) && inLoc(p) && !seen.has(norm(p.ad))) { seen.add(norm(p.ad)); items.push(p); } });
       lists[key] = { items, at: Date.now(), done: more && items.length === base.length }; persistLists(); return items; })
@@ -1696,7 +1696,7 @@ async function loadList(more){
   if (exMode !== "browse" || $("#ex-lv").hidden) return;
   const where = locStr(), t = exType, f = exFilter, key = lkey(t, f, where), tok = ++listTok;
   const cached = lists[key];
-  if (cached && cached.items.length && !more) { drawList(cached.items, where, false, { done: cached.done }); return; }
+  if (cached && cached.items.length && !more) { drawList(cached.items, where, false, { done: cached.done }); prefetchDetails(cached.items, where); return; }
   if (!sample) { drawList([], where, false, { err: L("Yapay zeka bu görünümde çalışmıyor.") }); return; }
   const base = (cached && cached.items) || [];
   drawList(more ? base : [], where, true);
@@ -1705,6 +1705,7 @@ async function loadList(more){
     if (tok !== listTok) return;
     const c2 = lists[key] || {};
     drawList(items, where, false, { done: c2.done });
+    if (!more) prefetchDetails(items, where);
     if (more && c2.done) toast(L("Emin olduğum başka yer kalmadı"));
   } catch(e) { if (tok === listTok) drawList(base, where, false, { err: errText[e?.code] || L("Liste getirilemedi. Tekrar dene.") }); }
 }
@@ -1966,7 +1967,7 @@ Konum: ${where || "belirtilmedi (dünyanın her yeri olabilir, en bilinen eşle�
 3) Tam eşleşme yoksa en çok benzeyenleri getir.
 En fazla 8 mekan. Yemek ya da ürün değil, sadece mekan döndür.
 ${LIST_RULES}
-${LIST_FORMAT}`, { ...QUICKAI, onText: ({ text }) => { if (tok === listTok && take(partialObjects(text))) drawList(items, where, true); } }).finally(() => { userBusy = Math.max(0, userBusy - 1); });
+${LIST_FORMAT}`, { ...QUICKAI, share: 12 * 3600, onText: ({ text }) => { if (tok === listTok && take(partialObjects(text))) drawList(items, where, true); } }).finally(() => { userBusy = Math.max(0, userBusy - 1); });
     take(Array.isArray(r) ? r : []);
     if (tok === listTok) drawList(items, where, false);
   } catch(e) { if (tok === listTok) drawList(items, where, false, { err: errText[e?.code] || L("Arama yapılamadı. Tekrar dene.") }); }
@@ -2030,6 +2031,25 @@ let pdOpen = null, pdLastFocus = null;
 function closePlace(){ $("#place").hidden = true; pdOpen = null; if (pdLastFocus && pdLastFocus.focus) pdLastFocus.focus(); }
 $("#place").addEventListener("click", e => { if (e.target.id === "place") closePlace(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#place").hidden) closePlace(); });
+const pdInflight = {};
+function detailPrompt(p, fw){
+  return `Mekan: ${p.ad}${p.tur ? " (" + p.tur + ")" : ""}
+Yer: ${[p.semt, fw].filter(Boolean).join(", ")}
+Bu mekan için çok kısa bilgi kartı hazırla. SADECE şu JSON nesnesini döndür:
+{"meshur":"Tek cümle, en fazla 18 kelime: bu mekan neyiyle meşhur, nasıl bir yer","zaman":"En fazla 4 kelime, ör. Hafta içi öğlen","butce":"Kişi başı yaklaşık, ör. 300–600 ₺","rezervasyon":"Gerekmez / Önerilir / Şart","kimlerle":["En fazla 2 tane: Arkadaşlarla / Çiftler / Ailece / Tek başına / İş"],"guven":5}
+Emin olmadığın alanı boş metin yap, asla uydurma. "guven" (1-5): bu mekan hakkındaki bilginden ne kadar eminsin. Türkçe yaz.`;
+}
+/* Listenin ilk mekanlarının kartını arka planda hazırla (sen dokunmadan önce) */
+function prefetchDetails(items, where){
+  if (!sample) return;
+  items.slice(0, 2).forEach((p, i) => setTimeout(() => {
+    const fw = fullWhere(p, where || ""), pk = LK + "p2|" + keyOf(p, where || "");
+    if (pdCache[pk] || pdInflight[pk] || userBusy) return;
+    pdInflight[pk] = sample.json(detailPrompt(p, fw), { ...QUICKAI, share: 7 * 86400, fast: false })
+      .then(r => { const d = r && typeof r === "object" && !Array.isArray(r) ? r : null; if (d) { pdCache[pk] = d; const ks = Object.keys(pdCache); if (ks.length > 80) delete pdCache[ks[0]]; ls.set("gidelim-pd", pdCache); } return d; })
+      .catch(() => null).finally(() => { delete pdInflight[pk]; });
+  }, 600 + i * 900));
+}
 function openPlace(p, where, opts = {}){
   pdLastFocus = document.activeElement;
   const fw = fullWhere(p, where || ""), k = keyOf(p, where || ""), pk = LK + "p2|" + k;
@@ -2069,12 +2089,10 @@ function openPlace(p, where, opts = {}){
   };
   if (pdCache[pk]) return render(pdCache[pk]);
   if (!sample) return render("error");
-  render("loading"); userBusy++; yieldBg();
-  sample.json(`Mekan: ${p.ad}${p.tur ? " (" + p.tur + ")" : ""}
-Yer: ${[p.semt, fw].filter(Boolean).join(", ")}
-Bu mekan için çok kısa bilgi kartı hazırla. SADECE şu JSON nesnesini döndür:
-{"meshur":"Tek cümle, en fazla 18 kelime: bu mekan neyiyle meşhur, nasıl bir yer","zaman":"En fazla 4 kelime, ör. Hafta içi öğlen","butce":"Kişi başı yaklaşık, ör. 300–600 ₺","rezervasyon":"Gerekmez / Önerilir / Şart","kimlerle":["En fazla 2 tane: Arkadaşlarla / Çiftler / Ailece / Tek başına / İş"],"guven":5}
-Emin olmadığın alanı boş metin yap, asla uydurma. "guven" (1-5): bu mekan hakkındaki bilginden ne kadar eminsin. Türkçe yaz.`, { ...QUICKAI, onText: ({ text }) => {
+  render("loading");
+  if (pdInflight[pk]) { pdInflight[pk].then(d => { if (pdOpen === pk) render(d || "error"); }); return; }  // arka planda hazırlanıyorsa onu bekle
+  userBusy++; yieldBg();
+  sample.json(detailPrompt(p, fw), { ...QUICKAI, share: 7 * 86400, onText: ({ text }) => {
       if (pdOpen !== pk) return;
       const d = {}; ["meshur","zaman","butce","rezervasyon"].forEach(f => { const v = partialField(text, f); if (v) d[f] = v; });
       const km = text.match(/"kimlerle"\s*:\s*\[([^\]]*)\]/); if (km) { try { d.kimlerle = JSON.parse("[" + km[1] + "]"); } catch(e) {} }
@@ -2262,7 +2280,8 @@ function drawMarkers(fit){
   if (mapKind === "apple") {
     if (mkAnns.length) mkMap.addAnnotations(mkAnns);
     const all = mkMe ? mkAnns.concat([mkMe]) : mkAnns;
-    if (fit && all.length) mkMap.showItems(all, { animate: true, padding: new mapkit.Padding(60, 40, 40, 40) });
+    if (fit && all.length) { const go = () => { try { mkMap.showItems(all, { animate: false, padding: new mapkit.Padding(50, 36, 36, 36) }); } catch(e) {} };
+      requestAnimationFrame(() => requestAnimationFrame(go)); setTimeout(go, 350); }
   } else {
     if (meLL) pts.push(meLL);
     if (fit && pts.length) lmap.fitBounds(pts, { padding: [40, 40], maxZoom: 16.5 });
@@ -2283,7 +2302,6 @@ function mapCard(){
   const t = el("div","mct"); t.append(notr(el("b",null,p.ad)), el("small",null,[p.semt || p.ilce, p.tur, p.fiyat, meLL && ll ? fmtDist(km(meLL, ll)) : ""].filter(Boolean).join(" · ")));
   const open = el("button","gbtn",L("Aç")); open.type = "button"; open.onclick = () => openPlace(p, W);
   const r1 = el("div","mcr"); r1.append(el("span","em",cat.emoji), t, open); c.append(r1);
-  const acts = el("div","lacts"); const dl = dirLink({ ...p, sehir: fullWhere(p, W) }); dl.className = "ib"; acts.append(dl); c.append(acts);
   box.append(c);
 }
 function locateMe(){
@@ -2383,7 +2401,7 @@ async function send(text){
       (wantL.length ? "\nGitmek istediği yerler: " + wantL.slice(0,20).map(v => `${v.ad} (${v.tur || ""}, ${v.sehir || ""})`).join("; ") : "") +
       "\nDüşük puan verdiklerine benzeyenlerden kaçın. Kullanıcı 'listemden seç' derse gitmek istediği yerlerden seç.\n";
   }
-  const transcript = chat.slice(-12).map(m => m.role === "user" ? "Kullanıcı: " + m.text
+  const transcript = chat.slice(-8).map(m => m.role === "user" ? "Kullanıcı: " + m.text
     : "Asistan: " + m.text + (m.places && m.places.length ? " [Önerdiği mekanlar: " + m.places.map(p => p.ad).join(", ") + "]" : "") + (m.plan && m.plan.length ? " [Plan verdi]" : "")).join("\n");
   const now = new Date(); const gun = now.toLocaleDateString("tr-TR", { weekday:"long" }), saat = now.toLocaleTimeString("tr-TR", { hour:"2-digit", minute:"2-digit" });
   const prompt = `Sen "Gidelim" uygulamasının samimi, enerjik ve kısa konuşan mekan asistanısın. Türkçe konuş, sıcak ve doğal yaz, arada bir emoji kullan ama abartma.
