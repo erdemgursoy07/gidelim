@@ -610,7 +610,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .setrow2{display:flex;gap:8px;flex-wrap:wrap}
 
 /* Şehir kartı */
-.citycard{position:relative;margin-top:12px;height:clamp(112px,17vh,150px);border-radius:18px;overflow:hidden;background:var(--soft) center/cover no-repeat;box-shadow:var(--shadow);cursor:pointer}
+.citycard{position:relative;margin-top:12px;height:clamp(150px,26vh,230px);border-radius:18px;overflow:hidden;background:var(--soft) 50% 35%/cover no-repeat;box-shadow:var(--shadow);cursor:pointer}
 .citycard::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,15,30,.05) 20%,rgba(5,15,30,.72) 100%)}
 .cc-cap{position:absolute;left:14px;right:90px;bottom:11px;color:#fff;display:flex;flex-direction:column;gap:1px;text-shadow:0 1px 6px rgba(0,0,0,.35)}
 .cc-cap b{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:1.08rem;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -801,7 +801,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="setrow2"><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.7.1<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.7.2<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2213,25 +2213,36 @@ let cityCard = null;
 async function loadCityCard(){
   const box = $("#citycard"); if (!box) return;
   const where = locStr(); if (!where || !sample) { box.hidden = true; renderWx(); return; }
-  const key = "gidelim-city2|" + LANG + "|" + snorm(where);
+  const key = "gidelim-city3|" + LANG + "|" + snorm(where);
+  const area = (loc.city || cname(loc.code) || "").split(",")[0].trim();
   let c = ls.get(key, null);
   if (!c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000)) {
     try {
       const r = await sample.json(`Konum: ${where}
-Bu konumun (semt ya da ilçe verildiyse o semtin/ilçenin, yoksa şehrin ya da ülkenin) en tanınan, simge olmuş TEK yerini seç (ör. Üsküdar → Kız Kulesi, İstanbul → Ayasofya, Ankara → Anıtkabir, Roma → Kolezyum). Doğal güzellik de olabilir.
-Bu yerin Wikipedia'da kendi sayfası olmalı. SADECE şu JSON'u döndür: {"yer":"Yerin adı","tur":"Kısa tür, ör. Tarihi kule","wiki_tr":"Türkçe Wikipedia sayfa başlığı ya da boş","wiki_en":"English Wikipedia page title"}`, { ...QUICKAI, share: 30 * 86400, fast: false });
-      const img = await wikiImage(r && r.wiki_tr, "tr") || await wikiImage(r && r.wiki_en, "en") || await wikiImage(r && r.yer, "tr") || await wikiImage(r && r.yer, "en");
-      c = img && r && r.yer ? { yer: r.yer, tur: r.tur || "", img: img.src, alt: img.alt, page: img.page, at: Date.now() } : { none: 1, at: Date.now() };
+Bu konumun (semt ya da ilçe verildiyse o semtin/ilçenin, yoksa şehrin ya da ülkenin) en tanınan, simge olmuş 3 yerini önem sırasıyla seç (ör. Erzurum → Çifte Minareli Medrese, Palandöken, Üç Kümbetler; Üsküdar → Kız Kulesi). Doğal güzellik de olabilir. Her birinin Wikipedia'da sayfası olmalı.
+SADECE şu JSON'u döndür: {"yerler":[{"yer":"Yerin adı","tur":"Kısa tür, ör. Tarihi medrese","ara":"Wikipedia araması için yerin adı ve şehri, ör. Çifte Minareli Medrese Erzurum"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
+      const cands = (r && Array.isArray(r.yerler) ? r.yerler : r && r.yer ? [{ yer: r.yer, tur: r.tur, ara: r.yer + " " + area }] : []).filter(x => x && x.yer).slice(0, 3);
+      let pick = null, firstAny = null;
+      // yatay fotoğrafı olan ilk adayı seç; hiç yatay yoksa fotoğrafı olan ilk aday
+      for (const x of cands) {
+        const img = await wikiSearchImage(x.ara || x.yer, "tr") || await wikiSearchImage(x.ara || x.yer, "en");
+        if (!img) continue;
+        const it = { yer: x.yer, tur: x.tur || "", ...img };
+        if (img.w / img.h >= 1.15) { pick = it; break; }
+        if (!firstAny) firstAny = it;
+      }
+      pick = pick || firstAny;
+      if (!pick && area) { const img = await wikiSearchImage(area, "tr") || await wikiSearchImage(area, "en"); if (img) pick = { yer: area, tur: "", ...img }; }   // son çare: şehrin kendi fotoğrafı
+      c = pick ? { yer: pick.yer, tur: pick.tur, img: pick.src, alt: pick.alt, page: pick.page, at: Date.now() } : { none: 1, at: Date.now() };
       ls.set(key, c);
     } catch(e) { c = null; }
   }
-  if (where !== locStr()) return;                   // bu arada konum değiştiyse eskisini gösterme
+  if (where !== locStr()) return;
   if (!c || c.none) { box.hidden = true; cityCard = null; renderWx(); return; }
   cityCard = c;
   const im = new Image();
   im.onload = () => {
-    box.innerHTML = ""; box.style.backgroundImage = `url("${c.img}")`;
-    const area = (loc.city || cname(loc.code) || "").split(",")[0].trim();
+    box.innerHTML = ""; box.style.backgroundImage = `url("${im.src}")`;
     const cap = el("div","cc-cap"); cap.append(el("b",null, "📍 " + (area || c.yer)), el("span",null, area && snorm(area) !== snorm(c.yer) ? c.yer : (c.tur || "")));
     const wxc = el("div","cc-wx"); wxc.id = "cc-wx";
     const cr = el("a","cc-credit","Wikipedia"); cr.href = c.page; cr.target = "_blank"; cr.rel = "noopener"; cr.addEventListener("click", e => e.stopPropagation());
@@ -2240,18 +2251,21 @@ Bu yerin Wikipedia'da kendi sayfası olmalı. SADECE şu JSON'u döndür: {"yer"
     renderWx();
   };
   im.onerror = () => {
-    if (c.alt && im.src !== c.alt) { c.img = c.alt; im.src = c.alt; return; }                 // standart boyut olmadıysa varsayılan fotoğraf
+    if (c.alt && im.src !== c.alt) { im.src = c.alt; return; }
     ls.set(key, { none: 1, at: Date.now() }); box.hidden = true; cityCard = null; renderWx(); };
   im.src = c.img;
 }
-async function wikiImage(title, lang){
-  if (!title) return null;
+/* Wikipedia'nın kendi aramasıyla fotoğraf bul (sayfa adı birebir tutmasa da) */
+async function wikiSearchImage(q, lang){
+  if (!q) return null;
   try {
-    const j = await (await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(String(title).replace(/ /g, "_"))}`)).json();
-    const t = j && j.thumbnail && j.thumbnail.source; if (!t) return null;
-    // Wikipedia sadece standart genişlikleri veriyor; 960 telefonda net ve yeterince küçük
-    const src = /\/\d+px-/.test(t) ? t.replace(/\/\d+px-/, "/960px-") : t;
-    return { src, alt: t, page: (j.content_urls && j.content_urls.mobile && j.content_urls.mobile.page) || `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}` };
+    const u = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrlimit=4&prop=pageimages|info&piprop=thumbnail&pithumbsize=960&inprop=url`;
+    const j = await (await fetch(u)).json();
+    const pages = Object.values((j.query && j.query.pages) || {}).sort((a, b) => (a.index || 0) - (b.index || 0));
+    const pg = pages.find(p => p.thumbnail && p.thumbnail.source && !/\.svg/i.test(p.thumbnail.source) && !/(harita|map|logo|amblem|bayrak|flag|seal|arma)/i.test(p.thumbnail.source));
+    if (!pg) return null;
+    const t = pg.thumbnail;
+    return { src: t.source, alt: t.source.replace(/\/\d+px-/, "/500px-"), w: t.width || 4, h: t.height || 3, page: pg.fullurl || `https://${lang}.wikipedia.org/?curid=${pg.pageid}` };
   } catch(e) { return null; }
 }
 
