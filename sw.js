@@ -1,7 +1,7 @@
 // Gidelim – uygulamayı telefonda saklayan katman (servis çalışanı)
 // Sayfa: telefondaki hali anında açılır, güncel hali arkada indirilir (yeni sürüm bir sonraki açılışta) → hızlı ve internetsiz açılış
 // Simgeler ve yazı tipleri: saklanandan anında
-const V = "gidelim-v8";
+const V = "gidelim-v9";
 const API = "https://gidelim-ai.erdemgursoy07.workers.dev";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
@@ -69,14 +69,14 @@ self.addEventListener("push", e => {
         items = ((await r.json()) || {}).items || [];
       }
     } catch {}
-    const n = items[0] || { title: "Grup oylaması", text: "Oylamanda yeni bir şey var" };
-    await self.registration.showNotification("🗳️ " + (n.title || "Grup oylaması"), { body: n.text, icon: "icon-192.png", badge: "icon-192.png", tag: "g" + (n.id || Date.now()), data: { poll: n.poll || "" } });
+    const n = items[0] || { title: "Gidelim", text: "Yeni bir gelişme var" };
+    await self.registration.showNotification((n.poll ? "🗳️ " : "") + (n.title || "Gidelim"), { body: n.text, icon: "icon-192.png", badge: "icon-192.png", tag: "g" + (n.id || Date.now()), data: { poll: n.poll || "" } });
   })());
 });
 self.addEventListener("notificationclick", e => {
   e.notification.close();
   const poll = e.notification.data && e.notification.data.poll;
-  const url = new URL("./" + (poll ? "#oy-" + poll : "#grup"), self.registration.scope).href;
+  const url = new URL("./" + (poll ? "#oy-" + poll : "#listem"), self.registration.scope).href;
   e.waitUntil((async () => {
     const cs = await clients.matchAll({ type: "window", includeUncontrolled: true });
     for (const c of cs) { try { if ("navigate" in c) await c.navigate(url); return c.focus(); } catch {} }

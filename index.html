@@ -591,6 +591,20 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .segv button{border:0;background:none;border-radius:10px;padding:8px;font-weight:800;font-size:.88rem;color:var(--muted);cursor:pointer}
 .segv button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 
+.travel{display:flex;align-items:center;gap:8px;margin-top:10px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:12px;padding:8px 8px 8px 12px;font-size:.84rem;font-weight:700}
+.travel span{flex:1;min-width:0}
+.travel .gbtn{padding:6px 12px;font-size:.82rem}
+.travx{border:0;background:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px 6px}
+.simlink{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;color:var(--accent);font-weight:800;font-size:.9rem;padding:12px 2px 4px;margin-top:12px;cursor:pointer}
+.rep{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center;vertical-align:middle}
+.replink{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:inherit;padding:0;cursor:pointer}
+.replbl{font-weight:700}
+.repopt{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--ink)}
+.repopt.ghost{border-color:transparent;color:var(--muted)}
+.foryou{color:var(--accent);font-weight:800}
+.prefchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px}
+.setrow2{display:flex;gap:8px;flex-wrap:wrap}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -633,6 +647,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
           <div class="sbox" id="ex-sug" role="listbox" hidden></div>
         </div>
         <div class="wxline" id="wxline" hidden></div>
+        <div class="travel" id="travel" hidden></div>
       </div>
       <div class="tgrid" id="typechips" role="group" aria-label="Mekan türü"></div>
       <div class="fseg" id="filterchips" role="group" aria-label="Filtre" hidden></div>
@@ -749,6 +764,8 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <button class="pill-btn" id="mapapp-x" type="button" style="margin-top:10px">Vazgeç</button>
   </div>
 </div>
+<div class="sheet-bg" id="shared" hidden><div class="sheet" role="dialog" aria-modal="true"><div id="shared-in"></div></div></div>
+<div class="sheet-bg" id="prefs" hidden><div class="sheet" role="dialog" aria-modal="true"><div id="prefs-in"></div></div></div>
 <div class="sheet-bg" id="settings" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="set-h">
     <h2 id="set-h">Ayarlar</h2>
@@ -760,8 +777,11 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="lbl">Harita uygulaması</div>
     <div class="segset" id="set-map" role="group" aria-label="Harita uygulaması"><button type="button" data-val="apple">🍎 Apple</button><button type="button" data-val="google">🗺️ Google</button><button type="button" data-val="yandex">🟡 Yandex</button></div>
     <div class="hint">Yol tarifi ve harita bağlantıları bu uygulamada açılır.</div>
+    <div class="lbl">Kişisel</div>
+    <div class="setrow2"><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
+    <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.5.0<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.6.0<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -915,6 +935,8 @@ const AI_URL = "https://gidelim-ai.erdemgursoy07.workers.dev/ai";
   };
   window.gidelimJoinPoll = id => { if (/^[A-Za-z0-9_\-]{4,80}$/.test(id)) { addPoll(id); sync(); } };
   window.gidelimSetName = name => { try { localStorage.setItem("gidelim-name", name); } catch(e) {} return post("/db/me", { id: DEV, name }); };
+  window.gidelimPost = (path, body) => post(path, body);
+  window.gidelimDev = DEV;
   window.gidelimName = () => { try { return localStorage.getItem("gidelim-name") || ""; } catch(e) { return ""; } };
   // Grup ekranı açıkken birkaç saniyede bir yenile
   setInterval(() => { const g = document.getElementById("v-group"); if (ready && synced && g && !g.hidden && document.visibilityState === "visible") sync(); }, 4000);
@@ -1016,6 +1038,10 @@ const EN = {
   "Sen buradasın":"You are here",
   "Hangi harita uygulamasında açalım?":"Which map app should we use?","Seçimin hatırlanır. Ayarlar’dan istediğin zaman değiştirebilirsin.":"We’ll remember your choice. You can change it anytime in Settings.","Vazgeç":"Cancel","Önerilen":"Recommended","Harita uygulaması":"Map app","Yol tarifi ve harita bağlantıları bu uygulamada açılır.":"Directions and map links open in this app.","Apple Haritalar":"Apple Maps","Google Haritalar":"Google Maps","Yandex Haritalar":"Yandex Maps",
   "Görünüm":"View",
+  "✨ sana göre":"✨ for you","🚩 Bilgi yanlış mı?":"🚩 Something wrong?","Ne yanlış?":"What’s wrong?","Kapanmış":"Closed","Yanlış yer ya da bilgi":"Wrong place or info","Teşekkürler 🙏 Bu mekanı listenden kaldırdım.":"Thanks 🙏 I removed this place from your list.",
+  "🔁 Buna benzer yerler →":"🔁 Similar places →","Çevir":"Switch","🔗 Bağlantı kopyalandı":"🔗 Link copied","📋 Paylaşılan liste":"📋 Shared list","Bir mekana dokunup bakabilir, ♡ ile kendi listene ekleyebilirsin.":"Tap a place to look, use ♡ to add it to your list.","Hepsini listeme ekle":"Add all to my list","❤️ Hepsi listene eklendi":"❤️ All added to your list","Bu liste bulunamadı ya da artık yok.":"This list couldn’t be found.",
+  "✨ Neleri seversin?":"✨ What do you like?","Önerileri sana göre sıralamak için. İstediğin zaman Ayarlar’dan değiştirebilirsin.":"So we can rank suggestions for you. You can change this anytime in Settings.","Bütçe":"Budget","₺ Uygun":"₺ Budget","₺₺ Orta":"₺₺ Mid","₺₺₺ Keyif":"₺₺₺ Treat","Ortam":"Vibe","🌿 Sakin":"🌿 Calm","🎉 Hareketli":"🎉 Lively","🤷 Fark etmez":"🤷 Either","En sevdiğin türler":"Favourite types","Kaydet":"Save","Şimdi değil":"Not now","✨ Önerilerin artık sana göre":"✨ Suggestions are now tailored to you",
+  "Kişisel":"Personal","✨ Zevklerim":"✨ My tastes","🔔 Bildirimler":"🔔 Notifications","🔔 Bildirimler açık":"🔔 Notifications on","Grup oylaması ve cuma akşamı hafta sonu hatırlatıcısı için.":"For group votes and the Friday weekend reminder.",
   // hatalar
   "Yapay zekayı kullanma izni verilmedi. Sayfayı yenileyip izin verirsen devam edebiliriz.":"AI access wasn’t granted. Reload and allow it to continue.","Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.":"Usage limit reached. Wait a bit and try again.","Durduruldu.":"Stopped.","Cevap düzgün gelmedi, bir kez daha dener misin?":"The answer came back garbled — try once more?","Bu isteğe cevap veremedim, biraz farklı sorar mısın?":"I can’t answer that — could you ask differently?","Oturum süresi doldu. Sayfayı yenileyip tekrar dene.":"Session expired. Reload and try again.","Yapay zeka şu an bu uygulamada kapalı.":"AI is turned off for this app right now.","İstek çok uzun oldu. Yeni sohbet başlatıp tekrar dene.":"The request got too long. Start a new chat and try again."
 };
@@ -1367,6 +1393,7 @@ function savePlace(p, where){
   return k;
 }
 function refresh(){
+  if (typeof syncWantCount === "function") try { syncWantCount(); } catch(e) {}
   const all = Object.values(saved), n = all.length, c = $("#count");
   c.textContent = n; c.hidden = !n;
   $("#st-all").textContent = n; $("#st-want").textContent = all.filter(v => v.durum === "want").length; $("#st-been").textContent = all.filter(v => v.durum === "been").length;
@@ -1486,6 +1513,7 @@ let sample = null;
   if (sample && LANG === "en") { const raw = sample.json.bind(sample);
     sample.json = (input, o) => raw(typeof input === "string" ? input.replace(/Tüm metinler Türkçe olsun\./g, "").replace(/açıklamaları Türkçe yaz/g, "write descriptions in English").replace(/Türkçe yaz[.;]?/g, "") + "\n\nIMPORTANT: The user's app language is English. Write ALL text values in natural English (keep place names in their original local form). Prices: use relative $ / $$ / $$$ instead of ₺." : input, o); }
   if (sample) setTimeout(prefetchAll, 4000);
+  setTimeout(() => { try { checkTravel(); } catch(e) {} }, 2600);
   loadWeather();
   if (!sample) { const w = $("#ai-warn"); w.hidden = false; w.textContent = "⚠️ Yapay zeka bağlantısı kurulamadı. index.html içindeki AI_URL ayarını kontrol et."; $("#send").disabled = true; }
 })();
@@ -1628,7 +1656,8 @@ const TYPE_OK = {
 const fitsType = (p, t) => { const f = TYPE_OK[t]; if (!f) return true; const s = ((p.tur || "") + " " + (p.ad || "")).toLocaleLowerCase("tr"); return f(s); };
 function renderChips(){
   const tc = $("#typechips"), fc = $("#filterchips"); tc.innerHTML = ""; fc.innerHTML = "";
-  COLS.filter(c => !c.guide).forEach(c => { const b = el("button","tcell"); b.type = "button"; b.dataset.t = c.id; b.setAttribute("aria-pressed", exMode === "browse" && exType === c.id);
+  const favs = ((ls.get("gidelim-prefs", null) || {}).turler) || [];
+  COLS.filter(c => !c.guide).sort((a, b) => (favs.includes(b.id) ? 1 : 0) - (favs.includes(a.id) ? 1 : 0)).forEach(c => { const b = el("button","tcell"); b.type = "button"; b.dataset.t = c.id; b.setAttribute("aria-pressed", exMode === "browse" && exType === c.id);
     b.setAttribute("aria-label", L(c.label)); const tx = el("div"); tx.append(el("b",null,L(c.label)), el("small",null,L(c.sub)));
     b.append(el("span",null,c.emoji), tx); b.onclick = () => selectType(c.id); tc.append(b); });
   FILTERS.forEach(f => { const b = el("button",null, L(f.id === "ucuz" ? "Uygun" : f.label)); b.type = "button"; b.dataset.f = f.id; b.setAttribute("aria-pressed", exFilter === f.id);
@@ -1661,6 +1690,7 @@ function xrow(p, where){
   const r = el("div","xrow");
   const m = el("button","xmain"); m.type = "button";
   const t = el("div","pt"); t.append(notr(el("b",null,p.ad)), el("small",null,[p.semt || p.ilce, p.tur].filter(Boolean).join(" · ")));
+  if (drawPicks.has(p)) t.querySelector("small").prepend(el("span","foryou", L("✨ sana göre") + " · "));
   if (exMode === "search") m.append(el("div","em",cat.emoji));
   m.append(t); if (p.fiyat) m.append(el("span","xprice",p.fiyat)); m.onclick = () => openPlace(p, where);
   const h = el("button","xheart"); h.type = "button"; h.dataset.k = k;
@@ -1669,13 +1699,17 @@ function xrow(p, where){
   sync(); r.append(m, h); return r;
 }
 let listTok = 0;
-let drawRaf = 0, drawArgs = null;
+let drawRaf = 0, drawArgs = null, drawPicks = new Set();
 function drawList(items, where, loading, opts = {}){
   if (loading && items.length) { drawArgs = [items, where, loading, opts]; if (!drawRaf) drawRaf = requestAnimationFrame(() => { drawRaf = 0; const a = drawArgs; drawArgs = null; if (a) drawListNow(...a); }); return; }
   if (drawRaf) { cancelAnimationFrame(drawRaf); drawRaf = 0; drawArgs = null; }
   drawListNow(items, where, loading, opts);
 }
 function drawListNow(items, where, loading, opts = {}){
+  items = items.filter(p => !isSkipped(p, where) && !isHidden(p, where));
+  let picks = new Set();
+  if (!loading && exMode === "browse") { const r = personalize(items); items = r.items; picks = r.picks; }
+  drawPicks = picks;
   exItems = items; exWhere = where;
   if (mapCtx === "ex") { mapItems = items; mapWhere = where; if (mapSel && !items.includes(mapSel)) mapSel = null; if (mapActive()) drawMarkers(!loading); }
   const box = $("#ex-list"); box.innerHTML = "";
@@ -1694,6 +1728,7 @@ function drawListNow(items, where, loading, opts = {}){
 }
 async function loadList(more){
   if (exMode !== "browse" || $("#ex-lv").hidden) return;
+  loadHidden(locStr()).then(() => { if (!$("#ex-lv").hidden && exItems.length) drawList(exItems, exWhere, false, {}); }).catch(() => {});
   const where = locStr(), t = exType, f = exFilter, key = lkey(t, f, where), tok = ++listTok;
   const cached = lists[key];
   if (cached && cached.items.length && !more) { drawList(cached.items, where, false, { done: cached.done }); prefetchDetails(cached.items, where); return; }
@@ -1965,6 +2000,7 @@ Konum: ${where || "belirtilmedi (dünyanın her yeri olabilir, en bilinen eşle�
 1) Bir mekan adıysa (yaklaşık ya da hatalı yazılmış olabilir) o mekanı ve varsa şubelerini bul; en iyi eşleşme ilk sırada.
 2) Bir mekan türü, semt ya da istekse (ör. "kitap kafe", "Moda", "çatı bar") buna uyan en iyi mekanları getir.
 3) Tam eşleşme yoksa en çok benzeyenleri getir.
+4) Aranan ifade "benzeri" ya da "like" içeriyorsa, adı geçen mekanın kendisini listeye KOYMA; ona tarz, fiyat ve ortam olarak benzeyen başka mekanları getir.
 En fazla 8 mekan. Yemek ya da ürün değil, sadece mekan döndür.
 ${LIST_RULES}
 ${LIST_FORMAT}`, { ...QUICKAI, share: 12 * 3600, onText: ({ text }) => { if (tok === listTok && take(partialObjects(text))) drawList(items, where, true); } }).finally(() => { userBusy = Math.max(0, userBusy - 1); });
@@ -2071,7 +2107,9 @@ function openPlace(p, where, opts = {}){
   acts.append(dl, mapLink({ ...p, sehir: fw }), sb, shareBtn(p, where || ""));
   if (!opts.noAsk) acts.append(askBtn(p, where || ""));
   box.append(acts);
-  box.append(el("div","pnote", L("Bilgiler yapay zekaya dayanır; saatler ve fiyatlar değişmiş olabilir.")));
+  if (!opts.noAsk) box.append(similarRow(p, where || ""));
+  const nt = el("div","pnote"); nt.append(document.createTextNode(L("Bilgiler yapay zekaya dayanır; saatler ve fiyatlar değişmiş olabilir.") + " "));
+  box.append(nt); if (!opts.noAsk) nt.append(reportRow(p, where || ""));
   $("#place").hidden = false; setTimeout(() => x.focus({ preventScroll: true }), 30);
   const render = d => {
     info.innerHTML = "";
@@ -2320,6 +2358,165 @@ function locateMe(){
   { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
 }
 
+
+/* ===================== Kişiselleştirme ve topluluk özellikleri ===================== */
+const gpost = (path, body) => (window.gidelimPost ? window.gidelimPost(path, body) : Promise.reject(new Error("no_db")));
+const myDev = () => window.gidelimDev || "";
+
+/* ---- ✨ Sana göre sıralama (zevk tamamen telefonda öğrenilir) ---- */
+function tasteProfile(){
+  const sv = Object.values(saved), prefs = ls.get("gidelim-prefs", null);
+  if (sv.length < 3 && !prefs) return null;
+  const words = {};
+  const add = (t, w) => String(t || "").toLocaleLowerCase("tr").split(/[^a-zçğıöşü]+/).filter(x => x.length > 3).forEach(x => words[x] = (words[x] || 0) + w);
+  sv.forEach(v => add(v.tur, v.durum === "been" ? 1 + (v.puan || 0) / 2 : 1));
+  const ps = sv.map(v => (v.fiyat || "").length).filter(Boolean);
+  let price = ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : null;
+  if (prefs && prefs.butce) price = price ? (price + prefs.butce) / 2 : prefs.butce;
+  return { words, price, vibe: prefs && prefs.ortam, types: (prefs && prefs.turler) || [] };
+}
+function tasteScore(p, prof){
+  let s = 0; const t = String(p.tur || "").toLocaleLowerCase("tr");
+  for (const [w, c] of Object.entries(prof.words)) if (t.includes(w)) s += Math.min(c, 3);
+  if (prof.price && p.fiyat) { const d = Math.abs(p.fiyat.length - prof.price); s += d < 0.5 ? 2 : d < 1.2 ? 0.5 : -1; }
+  if (prof.vibe === "sakin" && /kitap|çay|kahve|bahçe|park|sahil|müze|galeri|koru/.test(t)) s += 1.5;
+  if (prof.vibe === "hareketli" && /bar|pub|canlı|müzik|meyhane|kokteyl|gece|club|kulüp/.test(t)) s += 1.5;
+  return s;
+}
+/* Listeyi baştan değiştirmez: sadece sana en uyan en fazla 2 mekanı öne alır ve işaretler */
+function personalize(items){
+  const prof = tasteProfile(); if (!prof || items.length < 4) return { items, picks: new Set() };
+  const sc = items.map((p, i) => ({ p, i, s: tasteScore(p, prof) }));
+  const top = sc.filter(x => x.s >= 3).sort((a, b) => b.s - a.s || a.i - b.i).slice(0, 2);
+  if (!top.length) return { items, picks: new Set() };
+  const picks = new Set(top.map(x => x.p));
+  return { items: [...top.map(x => x.p), ...items.filter(p => !picks.has(p))], picks };
+}
+
+/* ---- 🚩 Bilgi yanlış mı? ---- */
+const hiddenCache = {};
+async function loadHidden(where){
+  const area = snorm(cityPart({ ad: "" }, where)); if (!area) return [];
+  const c = hiddenCache[area]; if (c && Date.now() - c.at < 10 * 60000) return c.names;
+  try { const r = await gpost("/db/hidden", { area }); hiddenCache[area] = { names: (r.names || []).map(snorm), at: Date.now() }; return hiddenCache[area].names; }
+  catch(e) { return (c && c.names) || []; }
+}
+function isHidden(p, where){ const c = hiddenCache[snorm(cityPart(p, where))]; return !!(c && c.names.includes(snorm(p.ad))); }
+function reportRow(p, where){
+  const w = el("div","rep");
+  const b = el("button","replink", L("🚩 Bilgi yanlış mı?")); b.type = "button";
+  b.onclick = () => {
+    w.innerHTML = ""; w.append(el("span","replbl", L("Ne yanlış?")));
+    [["kapandi", L("Kapanmış")], ["yanlis", L("Yanlış yer ya da bilgi")]].forEach(([why, lbl]) => {
+      const o = el("button","repopt", lbl); o.type = "button";
+      o.onclick = async () => {
+        addSkip(p, where); closePlace();
+        toast(L("Teşekkürler 🙏 Bu mekanı listenden kaldırdım."));
+        if (!$("#ex-lv").hidden) drawList(exItems, exWhere, false, {});
+        try { await gpost("/db/report", { uid: myDev(), area: snorm(cityPart(p, where)), ad: p.ad, why }); } catch(e) {}
+      };
+      w.append(o);
+    });
+    const x = el("button","repopt ghost", L("Vazgeç")); x.type = "button"; x.onclick = () => { w.replaceWith(reportRow(p, where)); }; w.append(x);
+  };
+  w.append(b); return w;
+}
+
+/* ---- 🔁 Benzer yerler ---- */
+function similarRow(p, where){
+  const b = el("button","simlink", L("🔁 Buna benzer yerler →")); b.type = "button";
+  b.onclick = () => { closePlace(); show("explore"); exQi.value = (LANG === "en" ? `places like ${p.ad}` : `${p.ad} benzeri ${p.tur || "mekanlar"}`); placeSearch(); };
+  return b;
+}
+
+/* ---- 🧳 Seyahat algılama (izin istemeden, bağlantının geldiği şehirden) ---- */
+async function checkTravel(){
+  if (!window.gidelimPost || !loc) return;
+  try {
+    const base = (typeof AI_URL === "string" ? AI_URL : "").replace(/\/ai$/, "");
+    const j = await (await fetch(base + "/whereami")).json();
+    let city = String(j.city || "").trim(), code = String(j.country || "").toUpperCase();
+    if (!city || !code) return;
+    if (code === "TR") { const il = Object.keys(GEO.tr).find(k => snorm(k) === snorm(city)); if (il) city = il; }
+    if (snorm(locStr()).includes(snorm(city))) return;                         // zaten oradasın
+    const no = ls.get("gidelim-travel-no", []) || []; if (no.includes(snorm(city))) return;  // bu şehir için "hayır" dedin
+    const box = $("#travel"); box.innerHTML = ""; box.hidden = false;
+    box.append(el("span",null, LANG === "en" ? `🧳 Looks like you’re in ${city}. Switch Explore to ${city}?` : `🧳 ${city}’desin galiba. Keşfet’i ${city}’e çevireyim mi?`));
+    const yes = el("button","gbtn", L("Çevir")); yes.type = "button";
+    const nob = el("button","travx","✕"); nob.type = "button"; nob.setAttribute("aria-label", L("Kapat"));
+    yes.onclick = () => { box.hidden = true; cSel.value = GEO.codes.includes(code) ? code : loc.code; $("#cityin").value = city; closeSheet(true); };
+    nob.onclick = () => { box.hidden = true; ls.set("gidelim-travel-no", [snorm(city), ...no].slice(0, 30)); };
+    box.append(yes, nob);
+  } catch(e) {}
+}
+
+/* ---- 🔗 Listeni bağlantıyla paylaş ---- */
+async function shareListLink(items){
+  try {
+    const name = (window.gidelimName && window.gidelimName()) || "";
+    const r = await gpost("/db/sharelist", { uid: myDev(), name, items });
+    const url = APP_URL + "#liste=" + r.id;
+    const text = (LANG === "en" ? `📍 ${name ? name + "’s" : "My"} Gidelim list (${items.length} places)` : `📍 ${name ? name + "’in" : "Benim"} Gidelim listem (${items.length} mekan)`) + "\n👉 " + url;
+    try { if (navigator.share) { await navigator.share({ text }); return true; } } catch(e) { if (e && e.name === "AbortError") return true; }
+    try { await navigator.clipboard.writeText(text); toast(L("🔗 Bağlantı kopyalandı")); return true; } catch(e) {}
+    const box = $("#sharebox"); box.value = text; box.hidden = false; box.focus(); box.select(); toast(L("Metni seçip kopyala.")); return true;
+  } catch(e) { return false; }
+}
+async function openSharedList(id){
+  const sh = $("#shared"), box = $("#shared-in"); box.innerHTML = ""; sh.hidden = false;
+  { const ld = el("div","xload"); ld.append(el("span","spin")); box.append(ld); }
+  try {
+    const d = await gpost("/db/getlist", { id });
+    box.innerHTML = "";
+    box.append(el("h2",null, d.from ? (LANG === "en" ? `📋 ${d.from}’s list` : `📋 ${d.from} listesini paylaştı`) : L("📋 Paylaşılan liste")));
+    box.append(el("p","hint", L("Bir mekana dokunup bakabilir, ♡ ile kendi listene ekleyebilirsin.")));
+    const list = el("div","xlist");
+    (d.items || []).forEach(p => { const r = xrow(p, p.sehir || ""); r.querySelector(".xmain").onclick = () => openPlace(p, p.sehir || ""); list.append(r); });
+    box.append(list);
+    const all = el("button","cta", L("Hepsini listeme ekle")); all.type = "button";
+    all.onclick = () => { (d.items || []).forEach(p => savePlace(p, p.sehir || "")); toast(L("❤️ Hepsi listene eklendi")); sh.hidden = true; show("list"); };
+    const x = el("button","pill-btn", L("Kapat")); x.type = "button"; x.style.marginTop = "8px"; x.onclick = () => { sh.hidden = true; };
+    box.append(all, x);
+  } catch(e) { box.innerHTML = ""; box.append(el("div","status err", L("Bu liste bulunamadı ya da artık yok."))); const x = el("button","pill-btn", L("Kapat")); x.type = "button"; x.onclick = () => { sh.hidden = true; }; box.append(x); }
+}
+
+/* ---- 🎯 İlk açılışta 3 soru (Zevklerim) ---- */
+let prefsDone = null;
+function openPrefs(after){
+  prefsDone = after || null; ls.set("gidelim-prefs-asked", 1);
+  const pr = ls.get("gidelim-prefs", null) || { butce: 0, ortam: "", turler: [] };
+  const box = $("#prefs-in"); box.innerHTML = "";
+  box.append(el("h2",null, L("✨ Neleri seversin?")), el("p","hint", L("Önerileri sana göre sıralamak için. İstediğin zaman Ayarlar’dan değiştirebilirsin.")));
+  const seg = (label, opts, key) => { box.append(el("div","lbl", L(label))); const g = el("div","segset");
+    opts.forEach(([v, t]) => { const b = el("button",null, L(t)); b.type = "button"; b.setAttribute("aria-pressed", pr[key] === v);
+      b.onclick = () => { pr[key] = v; g.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); }; g.append(b); });
+    box.append(g); };
+  seg("Bütçe", [[1, "₺ Uygun"], [2, "₺₺ Orta"], [3, "₺₺₺ Keyif"]], "butce");
+  seg("Ortam", [["sakin", "🌿 Sakin"], ["hareketli", "🎉 Hareketli"], ["", "🤷 Fark etmez"]], "ortam");
+  box.append(el("div","lbl", L("En sevdiğin türler")));
+  const chips = el("div","prefchips");
+  COLS.filter(c => !c.guide).forEach(c => { const b = el("button","fchip", c.emoji + " " + L(SHORT[c.id] || c.label)); b.type = "button";
+    b.setAttribute("aria-pressed", pr.turler.includes(c.id));
+    b.onclick = () => { const i = pr.turler.indexOf(c.id); if (i >= 0) pr.turler.splice(i, 1); else pr.turler.push(c.id); b.setAttribute("aria-pressed", pr.turler.includes(c.id)); };
+    chips.append(b); });
+  box.append(chips);
+  const ok = el("button","cta", L("Kaydet")); ok.type = "button";
+  ok.onclick = () => { ls.set("gidelim-prefs", pr); closePrefs(); toast(L("✨ Önerilerin artık sana göre")); renderChips(); };
+  const skip = el("button","pill-btn", L("Şimdi değil")); skip.type = "button"; skip.style.marginTop = "8px"; skip.onclick = closePrefs;
+  box.append(ok, skip);
+  $("#prefs").hidden = false;
+}
+function closePrefs(){ $("#prefs").hidden = true; const f = prefsDone; prefsDone = null; if (f) f(); }
+
+/* ---- 🔔 Hafta sonu hatırlatıcısı: "gidilecek" sayısını sunucuya bildir (sadece sayı) ---- */
+let wantT = 0;
+function syncWantCount(){
+  clearTimeout(wantT);
+  wantT = setTimeout(() => { if (!window.gidelimPost || !myDev()) return;
+    const n = Object.values(saved).filter(v => v.durum === "want").length;
+    gpost("/db/wantcount", { uid: myDev(), n, lang: LANG }).catch(() => {}); }, 2000);
+}
+
 /* ---------- ASİSTAN ---------- */
 const qEl = $("#q"), chatEl = $("#chat");
 let chat = ls.get("nereye-chat", []) || [];
@@ -2524,6 +2721,7 @@ async function shareList(){
   const items = Object.values(saved).filter(v => filterMode === "all" || v.durum === filterMode).sort((a,b) => (b.puan||0) - (a.puan||0));
   const box = $("#sharebox");
   if (!items.length) { toast("Paylaşılacak mekan yok."); return; }
+  if (await shareListLink(items)) return;   // bağlantı oluşturulamazsa eski metin paylaşımına dön
   const text = (LANG === "en" ? "📍 My Gidelim list\n\n" : "📍 Gidelim listem\n\n") + items.map(v => {
     const stars = v.durum === "been" && v.puan ? " " + "★".repeat(v.puan) : "";
     const link = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(`${v.ad} ${v.semt || ""} ${v.sehir || ""}`);
@@ -2905,6 +3103,8 @@ async function addOption(pid, x, btn){
 }
 function handleHash(){
   const h = location.hash.replace(/^#/, "");
+  if (h.startsWith("liste=")) { const id = h.slice(6); setHash(""); show("list"); setTimeout(() => openSharedList(id), 300); return; }
+  if (h === "listem") { setHash(""); show("list"); return; }
   if (h.startsWith("yer=")) { const p = readPlaceLink(h.slice(4)); setHash("");
     if (p && p.ad) { show("explore"); const tryOpen = (n) => { if (sample || n > 20) openPlace(p, p.sehir || ""); else setTimeout(() => tryOpen(n + 1), 150); }; tryOpen(0); }
     return; }
@@ -2919,11 +3119,17 @@ function syncSettings(){
   document.querySelectorAll("#set-lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.val === LANG));
   document.querySelectorAll("#set-theme button").forEach(b => b.setAttribute("aria-pressed", b.dataset.val === THEME));
   document.querySelectorAll("#set-map button").forEach(b => b.setAttribute("aria-pressed", b.dataset.val === mapPref()));
+  const P = window.gidelimPush, st = P ? P.status() : "none", ph = $("#set-push-h"), pb = $("#set-push");
+  pb.hidden = st === "none"; pb.textContent = st === "on" ? L("🔔 Bildirimler açık") : L("🔔 Bildirimleri aç"); pb.disabled = st === "on" || st === "denied" || st === "install";
+  ph.textContent = st === "install" ? L("🔔 Bildirim almak için Gidelim’i ana ekrana ekle (Safari’de Paylaş → Ana Ekrana Ekle) ve oradan aç.") : st === "denied" ? L("🔕 Bildirimlere izin verilmedi. Telefonun ayarlarından Gidelim için bildirimleri açabilirsin.") : L("Grup oylaması ve cuma akşamı hafta sonu hatırlatıcısı için.");
 }
 document.querySelectorAll(".setbtn").forEach(b => b.onclick = () => { syncSettings(); $("#settings").hidden = false; });
 document.querySelectorAll("#set-theme button").forEach(b => b.onclick = () => { THEME = b.dataset.val; ls.set("gidelim-theme", THEME); applyTheme(); syncSettings(); });
 document.querySelectorAll("#set-map button").forEach(b => b.onclick = () => { ls.set("gidelim-mapapp", b.dataset.val); syncSettings(); toast(MAP_APPS[b.dataset.val].ic + " " + L(MAP_APPS[b.dataset.val].ad)); });
 $("#mapapp-x").onclick = () => { $("#mapapp").hidden = true; mapAppCb = null; };
+$("#set-prefs").onclick = () => { $("#settings").hidden = true; openPrefs(); };
+$("#set-push").onclick = async () => { try { await window.gidelimPush.enable(); toast(L("🔔 Bildirimler açıldı")); syncWantCount(); } catch(e) { toast(e && e.code === "denied" ? L("Bildirim izni verilmedi.") : L("Bildirimler açılamadı, tekrar dene.")); } syncSettings(); };
+["shared","prefs"].forEach(id => $("#" + id).addEventListener("click", e => { if (e.target.id === id) { if (id === "prefs") closePrefs(); else $("#" + id).hidden = true; } }));
 $("#mapapp").addEventListener("click", e => { if (e.target.id === "mapapp") { $("#mapapp").hidden = true; mapAppCb = null; } });
 document.querySelectorAll("#set-lang button").forEach(b => b.onclick = () => { if (b.dataset.val === LANG) return; ls.set("gidelim-lang", b.dataset.val); location.reload(); });
 $("#set-ok").onclick = () => $("#settings").hidden = true;
@@ -3117,7 +3323,9 @@ function renderTour(){
   $("#tour-skip").hidden = tourI === TOUR.length - 1;
 }
 function openTour(){ tourI = 0; renderTour(); $("#tour").hidden = false; $("#tour-next").focus(); }
-function closeTour(){ $("#tour").hidden = true; ls.set("gidelim-tour", 1); if (!ls.get("nereye-loc", null)) setTimeout(() => openSheet(), 200); }
+function closeTour(){ $("#tour").hidden = true; ls.set("gidelim-tour", 1);
+  const thenLoc = () => { if (!ls.get("nereye-loc", null)) setTimeout(() => openSheet(), 200); };
+  if (!ls.get("gidelim-prefs-asked", 0)) setTimeout(() => openPrefs(thenLoc), 200); else thenLoc(); }
 $("#tour-next").onclick = () => { if (tourI < TOUR.length - 1) { tourI++; renderTour(); } else closeTour(); };
 $("#tour-skip").onclick = closeTour;
 document.addEventListener("keydown", e => { if ($("#tour").hidden) return;
@@ -3134,7 +3342,7 @@ if (!ls.get("gidelim-tour", 0) && !location.hash.startsWith("#oy-")) setTimeout(
 else if (!ls.get("nereye-loc", null)) setTimeout(() => openSheet(), 400);
 
 /* Pencere açıkken arka sayfa kaymasın */
-(() => { let y = 0, locked = false; const ids = ["place","sheet","settings","hist","tour","mapapp"];
+(() => { let y = 0, locked = false; const ids = ["place","sheet","settings","hist","tour","mapapp","shared","prefs"];
   const sync = () => { const any = ids.some(i => { const e = document.getElementById(i); return e && !e.hidden; }); const b = document.body;
     if (any && !locked) { SC().style.overflowY = "hidden"; locked = true; }
     else if (!any && locked) { SC().style.overflowY = ""; locked = false; } };
