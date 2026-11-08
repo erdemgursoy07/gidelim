@@ -570,7 +570,8 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .mpin.on span{background:var(--ink);color:var(--bg);transform:rotate(-45deg) scale(1.15)}
 .leaflet-container{font-family:"Figtree",system-ui,sans-serif}
 
-.osm-dark{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9) saturate(.8)}
+.osm-dark{filter:invert(1) hue-rotate(185deg) brightness(1.05) contrast(.95) saturate(.55)}
+.leaflet-tile{image-rendering:auto}
 .leaflet-container .leaflet-control-attribution{background:color-mix(in srgb,var(--surface) 85%,transparent);color:var(--muted);font-size:10px}
 .leaflet-container .leaflet-control-attribution a{color:var(--muted)}
 .leaflet-bar a{background:var(--surface);color:var(--ink);border-color:var(--line)}
@@ -731,7 +732,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="lbl">Tema</div>
     <div class="segset" id="set-theme" role="group" aria-label="Tema"><button type="button" data-val="auto">🌗 Otomatik</button><button type="button" data-val="light">☀️ Aydınlık</button><button type="button" data-val="dark">🌙 Karanlık</button></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.1.1<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.1.2<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2098,8 +2099,8 @@ async function showMap(){
   const box = $("#mapbox");
   try { await loadLeaflet(); } catch(e) { box.innerHTML = ""; box.append(el("div","status err", L("Harita yüklenemedi. İnternetini kontrol edip tekrar dene."))); return; }
   if (!lmap) {
-    lmap = LF.map(box, { zoomControl: false, attributionControl: true, tap: true });
-    LF.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap", className: isDark() ? "osm-dark" : "" }).addTo(lmap);
+    lmap = LF.map(box, { zoomControl: false, attributionControl: true, zoomSnap: 0.5, wheelPxPerZoomLevel: 90, fadeAnimation: true, zoomAnimation: true, markerZoomAnimation: true });
+    LF.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 20, maxNativeZoom: 19, detectRetina: true, keepBuffer: 4, crossOrigin: true, attribution: "© OpenStreetMap", className: isDark() ? "osm-dark" : "" }).addTo(lmap);
     LF.control.zoom({ position: "bottomright" }).addTo(lmap);
     mLayer = LF.layerGroup().addTo(lmap);
     const c = await locCoords().catch(() => null); lmap.setView(c ? [c.lat, c.lng] : [41.015, 28.98], 13);
@@ -2117,7 +2118,7 @@ function drawMarkers(fit){
     LF.marker(ll, { icon: ic, title: p.ad, keyboard: true }).addTo(mLayer).on("click", () => { mapSel = p; drawMarkers(false); mapCard(); });
   });
   if (meLL) pts.push(meLL);
-  if (fit && pts.length) lmap.fitBounds(pts, { padding: [36, 36], maxZoom: 16 });
+  if (fit && pts.length) lmap.fitBounds(pts, { padding: [40, 40], maxZoom: 16.5 });
   pumpGeo();
   const note = $("#mapnote"); note.textContent = missing ? (LANG === "en" ? `${missing} place(s) still being located…` : `${missing} mekanın yeri bulunuyor…`) : "";
   if (!mapSel) mapCard();
@@ -2984,9 +2985,15 @@ calibrate(); addEventListener("resize", () => { if (!document.documentElement.cl
 /* Klavye: yazarken alt çubuğu gizle, kutuları klavyenin üstünde tut */
 (() => { const root = document.documentElement, vv = window.visualViewport;
   const isField = e => e && (e.tagName === "TEXTAREA" || (e.tagName === "INPUT" && !/^(checkbox|radio|button|submit|range|color)$/i.test(e.type || "")));
-  const upd = () => { const kb = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : 0; root.style.setProperty("--kb", kb + "px"); };
-  document.addEventListener("focusin", e => { if (isField(e.target)) { root.classList.add("kb"); upd(); } });
-  document.addEventListener("focusout", () => setTimeout(() => { if (!isField(document.activeElement)) { root.classList.remove("kb"); root.style.setProperty("--kb", "0px"); } }, 60));
+  // Klavye yüksekliği: görünen alan, sayfanın tamamından belirgin şekilde kısaldıysa klavye açıktır
+  const upd = () => {
+    const field = isField(document.activeElement);
+    const kb = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : (field ? 1 : 0);
+    const on = field && (vv ? kb > 120 : true);
+    root.classList.toggle("kb", on); root.style.setProperty("--kb", (on && vv ? kb : 0) + "px");
+  };
+  document.addEventListener("focusin", e => { if (isField(e.target)) { upd(); setTimeout(upd, 250); setTimeout(upd, 600); } });
+  document.addEventListener("focusout", () => setTimeout(upd, 60));
   if (vv) { vv.addEventListener("resize", upd); vv.addEventListener("scroll", upd); } })();
 /* Arama kutularına ✕ */
 const clears = [];
