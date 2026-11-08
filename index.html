@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Gidelim">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#F2F5F9" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F2740" media="(prefers-color-scheme: light)">
 <style>html{background:#0F2740}</style>
 <meta name="theme-color" content="#0D1520" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📍%3C/text%3E%3C/svg%3E">
@@ -50,7 +50,7 @@ html{touch-action:manipulation}
 main{overflow-x:clip}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
-body::before{background:var(--bg)!important}
+body::before{background:#0F2740!important}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body::before{background:var(--bg)!important}}
 :root[data-theme="dark"] body::before{background:var(--bg)!important}
 main,.tabbar-in,.composer-in{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
@@ -100,7 +100,7 @@ main > section{max-width:720px;margin:0 auto}
 .helpbtn{display:block;margin:18px auto 0;border:0;background:none;color:var(--muted);font-weight:700;font-size:.82rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
 /* Deste */
-.deckbar{position:sticky;top:0;z-index:4;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.deckbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
 .back{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:34px;height:34px;font-size:1.1rem;font-weight:800;cursor:pointer;flex:none}
 .deckbar .t{flex:1;min-width:0}
 .deckbar b{display:block;font-weight:800;font-size:1rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -494,7 +494,7 @@ main > section{max-width:720px;margin:0 auto}
 .sp-wave{position:absolute;left:0;right:0;bottom:0;width:100%;height:18vh}
 .sp-name{font-family:"Bricolage Grotesque",system-ui,-apple-system,sans-serif;font-weight:800;font-size:3.1rem;line-height:1;letter-spacing:-.035em}
 .sp-tag{margin-top:8px;opacity:.92;font-weight:700;font-size:.98rem}
-@media (prefers-reduced-motion:no-preference){.sp-logo{animation:sp-pop .6s cubic-bezier(.2,.9,.3,1.3) both}.sp-name{animation:sp-up .6s .15s ease both}@keyframes sp-pop{from{transform:scale(.7);opacity:0}}@keyframes sp-up{from{transform:translateY(10px);opacity:0}}}
+@media (prefers-reduced-motion:no-preference){.sp-logo{animation:sp-spin 1.1s cubic-bezier(.45,0,.2,1) both}.sp-name{animation:sp-up .55s 1.05s cubic-bezier(.2,.8,.2,1) both}@keyframes sp-spin{from{transform:rotate(0deg) scale(.85);opacity:0}15%{opacity:1}to{transform:rotate(360deg) scale(1);opacity:1}}@keyframes sp-pop{from{transform:scale(.7);opacity:0}}@keyframes sp-up{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}}
 /* Başlık satırı dar ekranda sıkışmasın */
 .brandrow{min-width:0}
 .brand{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -569,6 +569,11 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .mpin span i{font-style:normal;transform:rotate(45deg)}
 .mpin.on span{background:var(--ink);color:var(--bg);transform:rotate(-45deg) scale(1.15)}
 .leaflet-container{font-family:"Figtree",system-ui,sans-serif}
+
+.osm-dark{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9) saturate(.8)}
+.leaflet-container .leaflet-control-attribution{background:color-mix(in srgb,var(--surface) 85%,transparent);color:var(--muted);font-size:10px}
+.leaflet-container .leaflet-control-attribution a{color:var(--muted)}
+.leaflet-bar a{background:var(--surface);color:var(--ink);border-color:var(--line)}
 
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
@@ -726,7 +731,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="lbl">Tema</div>
     <div class="segset" id="set-theme" role="group" aria-label="Tema"><button type="button" data-val="auto">🌗 Otomatik</button><button type="button" data-val="light">☀️ Aydınlık</button><button type="button" data-val="dark">🌙 Karanlık</button></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.1.0<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.1.1<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2094,7 +2099,7 @@ async function showMap(){
   try { await loadLeaflet(); } catch(e) { box.innerHTML = ""; box.append(el("div","status err", L("Harita yüklenemedi. İnternetini kontrol edip tekrar dene."))); return; }
   if (!lmap) {
     lmap = LF.map(box, { zoomControl: false, attributionControl: true, tap: true });
-    LF.tileLayer(`https://{s}.basemaps.cartocdn.com/${isDark() ? "dark_all" : "light_all"}/{z}/{x}/{y}{r}.png`, { subdomains: "abcd", maxZoom: 19, attribution: "© OpenStreetMap © CARTO" }).addTo(lmap);
+    LF.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap", className: isDark() ? "osm-dark" : "" }).addTo(lmap);
     LF.control.zoom({ position: "bottomright" }).addTo(lmap);
     mLayer = LF.layerGroup().addTo(lmap);
     const c = await locCoords().catch(() => null); lmap.setView(c ? [c.lat, c.lng] : [41.015, 28.98], 13);
@@ -3004,7 +3009,7 @@ startI18n();
 /* Açılış ekranını, uygulama hazır olunca (en az ~0.7 sn gösterip) kaldır */
 (() => { const sp = document.getElementById("splash"); if (!sp) return;
   const hide = () => { if (sp.classList.contains("hide")) return; sp.classList.add("hide"); document.documentElement.style.background = ""; setTimeout(() => sp.remove(), 450); };
-  setTimeout(hide, 1600); })();
+  setTimeout(hide, matchMedia("(prefers-reduced-motion: reduce)").matches ? 1200 : 2400); })();
 </script>
 </body>
 </html>
