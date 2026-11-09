@@ -816,7 +816,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="setrow2"><button class="pill-btn" id="set-help" type="button">❔ Nasıl kullanılır?</button><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.8.3<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.8.4<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2232,7 +2232,7 @@ let cityCard = null;
 async function loadCityCard(opts = {}){
   const box = $("#citycard"); if (!box) return;
   const where = locStr(); if (!where || !sample) { box.hidden = true; renderWx(); return; }
-  const key = "gidelim-city5|" + LANG + "|" + snorm(where), ikey = "gidelim-cityi5|" + snorm(where);
+  const key = "gidelim-city7|" + LANG + "|" + snorm(where), ikey = "gidelim-cityi7|" + snorm(where);
   const area = (loc.city || cname(loc.code) || "").split(",")[0].trim();
   let c = ls.get(key, null);
   const stale = !c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000);
@@ -2241,11 +2241,12 @@ async function loadCityCard(opts = {}){
     try {
       const r = await sample.json(`Konum: ${where}
 Bu konumun (semt ya da ilçe verildiyse o semtin/ilçenin, yoksa şehrin ya da ülkenin) en ünlü, herkesin bir bakışta tanıdığı 10 simge yerini önem sırasıyla seç: kartpostallarda ve turist rehberlerinin kapağında olan yerler (ör. İstanbul → Ayasofya, Boğaziçi Köprüsü, Kız Kulesi, Galata Kulesi, Sultanahmet Camii, Topkapı Sarayı, Dolmabahçe Sarayı, Ortaköy Camii, Rumeli Hisarı, Yerebatan Sarnıcı). Sıradan ya da az bilinen yerleri KOYMA; yer sayısı 10'dan azsa sadece gerçekten simge olanları yaz. Doğal güzellik de olabilir. Her birinin Wikipedia'da sayfası olmalı.
-SADECE şu JSON'u döndür: {"yerler":[{"yer":"Yerin adı","tur":"Kısa tür, ör. Tarihi medrese","ara":"Wikipedia araması için yerin adı ve şehri"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
+"yer" alanına yerin Türkçe Wikipedia'daki tam sayfa adını, "en" alanına İngilizce Wikipedia'daki tam sayfa adını yaz.
+SADECE şu JSON'u döndür: {"yerler":[{"yer":"Kız Kulesi","en":"Maiden's Tower","tur":"Kısa tür, ör. Tarihi kule","ara":"Kız Kulesi İstanbul"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
       const cands = (r && Array.isArray(r.yerler) ? r.yerler : []).filter(x => x && x.yer).slice(0, 10);
       const pool = []; let firstAny = null, shown = false;
       for (const x of cands) {
-        const img = await wikiSearchImage(x.ara || x.yer, "tr") || await wikiSearchImage(x.ara || x.yer, "en");
+        const img = await wikiSearchImage(x.ara || x.yer, "tr", x.yer) || await wikiSearchImage(x.ara || x.yer, "en", x.en || x.yer);
         if (!img) continue;
         const it = { yer: x.yer, tur: x.tur || "", img: img.src, alt: img.alt, page: img.page };
         if (img.w / img.h >= 1.15) {
@@ -2256,7 +2257,7 @@ SADECE şu JSON'u döndür: {"yerler":[{"yer":"Yerin adı","tur":"Kısa tür, ö
       }
       if (!pool.length) {
         let only = firstAny;
-        if (!only && area) { const img = await wikiSearchImage(area, "tr") || await wikiSearchImage(area, "en"); if (img) only = { yer: area, tur: "", img: img.src, alt: img.alt, page: img.page }; }
+        if (!only && area) { const img = await wikiSearchImage(area, "tr", area) || await wikiSearchImage(area, "en", area); if (img) only = { yer: area, tur: "", img: img.src, alt: img.alt, page: img.page }; }
         c = only ? { pool: [only], at: Date.now() } : { none: 1, at: Date.now() }; ls.set(key, c);
       }
       if (shown) return;
@@ -2317,17 +2318,30 @@ function ptrHint(){
   };
   sc.addEventListener("touchend", end); sc.addEventListener("touchcancel", end);
 })();
-/* Wikipedia'nın kendi aramasıyla fotoğraf bul (sayfa adı birebir tutmasa da) */
-async function wikiSearchImage(q, lang){
+/* Wikipedia'dan doğru yerin fotoğrafı: önce tam adıyla sayfası, olmazsa arama — ama sadece başlığı yerin adıyla örtüşen sayfa */
+function titleMatches(title, name){
+  const words = t => snorm(t).split(/\s+/).filter(w => w.length > 2 && !["istanbul","ankara","izmir","camii","sarayi","kulesi","kopru","koprusu","the","and","de","di","della"].includes(w));
+  const tw = new Set(snorm(title).split(/\s+/)), nw = words(name);
+  if (!nw.length) return snorm(title).includes(snorm(name)) || snorm(name).includes(snorm(title));
+  const hit = nw.filter(w => [...tw].some(x => x === w || (w.length > 4 && (x.startsWith(w.slice(0, 5)) || w.startsWith(x.slice(0, 5)))))).length;
+  return hit / nw.length >= 0.6;
+}
+function goodThumb(pg){ const t = pg && pg.thumbnail && pg.thumbnail.source; return t && !/\.svg/i.test(t) && !/(harita|map|logo|amblem|bayrak|flag|seal|arma|locator|location)/i.test(t); }
+function wikiPick(pg, lang){ const t = pg.thumbnail; return { src: t.source, alt: t.source.replace(/\/\d+px-/, "/500px-"), w: t.width || 4, h: t.height || 3, page: pg.fullurl || `https://${lang}.wikipedia.org/?curid=${pg.pageid}` }; }
+async function wikiSearchImage(q, lang, name){
   if (!q) return null;
+  name = name || q;
+  const base = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages|info&piprop=thumbnail&pithumbsize=960&inprop=url&redirects=1`;
   try {
-    const u = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrlimit=4&prop=pageimages|info&piprop=thumbnail&pithumbsize=960&inprop=url`;
-    const j = await (await fetch(u)).json();
-    const pages = Object.values((j.query && j.query.pages) || {}).sort((a, b) => (a.index || 0) - (b.index || 0));
-    const pg = pages.find(p => p.thumbnail && p.thumbnail.source && !/\.svg/i.test(p.thumbnail.source) && !/(harita|map|logo|amblem|bayrak|flag|seal|arma)/i.test(p.thumbnail.source));
-    if (!pg) return null;
-    const t = pg.thumbnail;
-    return { src: t.source, alt: t.source.replace(/\/\d+px-/, "/500px-"), w: t.width || 4, h: t.height || 3, page: pg.fullurl || `https://${lang}.wikipedia.org/?curid=${pg.pageid}` };
+    // 1) tam adıyla doğrudan sayfa (yönlendirmeleri izler)
+    const j1 = await (await fetch(base + "&titles=" + encodeURIComponent(name))).json();
+    const p1 = Object.values((j1.query && j1.query.pages) || {}).find(p => !p.missing && goodThumb(p));
+    if (p1) return wikiPick(p1, lang);
+    // 2) arama: sadece başlığı yerin adıyla örtüşen sonuç
+    const j2 = await (await fetch(base + "&generator=search&gsrlimit=6&gsrsearch=" + encodeURIComponent(q))).json();
+    const pages = Object.values((j2.query && j2.query.pages) || {}).sort((a, b) => (a.index || 0) - (b.index || 0));
+    const p2 = pages.find(p => goodThumb(p) && titleMatches(p.title || "", name));
+    return p2 ? wikiPick(p2, lang) : null;
   } catch(e) { return null; }
 }
 
@@ -3587,8 +3601,15 @@ calibrate(); addEventListener("resize", () => { if (!document.documentElement.cl
     const shrink = Math.max(fullH - seen, fullH - window.innerHeight);               // klavye ne kadar yer kaplıyor
     const overlap = vv ? Math.max(0, Math.round(window.innerHeight - seen)) : 0;      // sayfanın klavye altında kalan kısmı
     const on = field && shrink > 120;
+    const was = root.classList.contains("kb");
     root.classList.toggle("kb", on); root.style.setProperty("--kb", (on ? overlap : 0) + "px");
+    // iPhone klavye kapanınca sayfayı yukarıda bırakabiliyor: alt çubuk havada kalmasın diye yerine oturt
+    if (!on && (was || window.scrollY || document.documentElement.scrollTop || document.body.scrollTop)) settle();
   };
+  const settle = () => { const f = () => { if (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } };
+    f(); setTimeout(f, 120); setTimeout(f, 400); };
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") settle(); });
+  addEventListener("pageshow", settle);
   addEventListener("orientationchange", () => setTimeout(() => { fullH = 0; upd(); }, 400));
   document.addEventListener("focusin", e => { if (isField(e.target)) { upd(); setTimeout(upd, 250); setTimeout(upd, 600); } });
   document.addEventListener("focusout", () => setTimeout(upd, 60));
