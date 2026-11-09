@@ -1,12 +1,13 @@
 // Gidelim – uygulamayı telefonda saklayan katman (servis çalışanı)
 // Sayfa: telefondaki hali anında açılır, güncel hali arkada indirilir (yeni sürüm bir sonraki açılışta) → hızlı ve internetsiz açılış
 // Simgeler ve yazı tipleri: saklanandan anında
-const V = "gidelim-v9";
+const V = "gidelim-v10";
 const API = "https://gidelim-ai.erdemgursoy07.workers.dev";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // önbellekleri atlayarak en güncel dosyaları al
+  e.waitUntil(caches.open(V).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== "gidelim-fonts").map(k => caches.delete(k)))).then(() => self.clients.claim()));
@@ -32,7 +33,9 @@ self.addEventListener("fetch", e => {
       const c = await caches.open(V);
       const cached = await c.match(req, { ignoreSearch: true }) || await c.match("./index.html") || await c.match("./");
       const oldText = cached ? await cached.clone().text() : null;
-      const net = fetch(req, { cache: "no-store" }).then(async r => {
+      // GitHub'ın önbelleğini de atla: her kontrolde benzersiz adres
+      const fresh = new URL(req.url); fresh.searchParams.set("_v", Date.now().toString(36));
+      const net = fetch(fresh.href, { cache: "no-store", credentials: "same-origin" }).then(async r => {
         if (r.ok) {
           const txt = await r.clone().text();
           await c.put(req, r.clone()); await c.put("./index.html", r.clone());
