@@ -646,7 +646,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .segset button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 
 /* Sekme çubuğu */
-.tabbar{position:fixed;left:0;right:0;bottom:0;width:100%;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-bottom:var(--sab)}
+.tabbar{position:fixed;left:0;right:0;bottom:calc(-1 * var(--gap, 0px));width:100%;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-bottom:var(--sab)}
 .tabbar-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;height:var(--tbh);padding:0 6px}
 .tb{border:0;background:none;cursor:pointer;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--muted);font-size:.7rem;font-weight:700;position:relative;border-radius:12px;text-align:center;line-height:1.1}
 .tb .ic{font-size:1.15rem;line-height:1.2;filter:grayscale(1);opacity:.6}
@@ -816,7 +816,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="setrow2"><button class="pill-btn" id="set-help" type="button">❔ Nasıl kullanılır?</button><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.8.4<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.9.0<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2232,25 +2232,36 @@ let cityCard = null;
 async function loadCityCard(opts = {}){
   const box = $("#citycard"); if (!box) return;
   const where = locStr(); if (!where || !sample) { box.hidden = true; renderWx(); return; }
-  const key = "gidelim-city7|" + LANG + "|" + snorm(where), ikey = "gidelim-cityi7|" + snorm(where);
+  const key = "gidelim-city8|" + LANG + "|" + snorm(where), ikey = "gidelim-cityi8|" + snorm(where);
   const area = (loc.city || cname(loc.code) || "").split(",")[0].trim();
   let c = ls.get(key, null);
   const stale = !c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000);
   // Havuz yoksa: ilk uygun fotoğraf gelir gelmez göster, havuzun kalanını arkada doldur
   if (stale) {
     try {
+      const parts = (loc.city || "").split(",").map(x => x.trim()).filter(Boolean);
+      const scope = parts.length >= 2 ? `Kullanıcı ${parts[0]} (${parts[1]}) bölgesinde. Önce ${parts[0]}'ın en ünlü 3-4 simge yerini, sonra ${parts[1]} şehrinin herkesin tanıdığı simgelerini yaz.`
+        : parts.length === 1 ? `Kullanıcı ${parts[0]} şehrinde. Bu şehrin herkesin tanıdığı simgelerini yaz.`
+        : `Kullanıcı ${cname(loc.code)} ülkesinde. Bu ülkenin herkesin tanıdığı simgelerini yaz.`;
       const r = await sample.json(`Konum: ${where}
-Bu konumun (semt ya da ilçe verildiyse o semtin/ilçenin, yoksa şehrin ya da ülkenin) en ünlü, herkesin bir bakışta tanıdığı 10 simge yerini önem sırasıyla seç: kartpostallarda ve turist rehberlerinin kapağında olan yerler (ör. İstanbul → Ayasofya, Boğaziçi Köprüsü, Kız Kulesi, Galata Kulesi, Sultanahmet Camii, Topkapı Sarayı, Dolmabahçe Sarayı, Ortaköy Camii, Rumeli Hisarı, Yerebatan Sarnıcı). Sıradan ya da az bilinen yerleri KOYMA; yer sayısı 10'dan azsa sadece gerçekten simge olanları yaz. Doğal güzellik de olabilir. Her birinin Wikipedia'da sayfası olmalı.
+${scope}
+Toplam 15 yer seç: kartpostallarda ve turist rehberlerinin kapağında olan, bir bakışta tanınan yerler (ör. İstanbul → Boğaziçi Köprüsü, Kız Kulesi, Galata Kulesi, Ayasofya, Dolmabahçe Sarayı, Topkapı Sarayı, Ortaköy Camii, Rumeli Hisarı, Yerebatan Sarnıcı, Çamlıca Tepesi, Beylerbeyi Sarayı, Haydarpaşa Garı, İstiklal Caddesi ve tramvay, Pierre Loti Tepesi, Adalar).
+ÇEŞİTLİLİK ŞART: Toplamda en fazla 3 cami ya da dini yapı olsun; geri kalanı köprü, kule, saray, kale, meydan, cadde, manzara noktası, doğa, müze gibi farklı türlerden olsun. En ünlüler başta.
 "yer" alanına yerin Türkçe Wikipedia'daki tam sayfa adını, "en" alanına İngilizce Wikipedia'daki tam sayfa adını yaz.
-SADECE şu JSON'u döndür: {"yerler":[{"yer":"Kız Kulesi","en":"Maiden's Tower","tur":"Kısa tür, ör. Tarihi kule","ara":"Kız Kulesi İstanbul"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
-      const cands = (r && Array.isArray(r.yerler) ? r.yerler : []).filter(x => x && x.yer).slice(0, 10);
+SADECE şu JSON'u döndür: {"yerler":[{"yer":"Kız Kulesi","en":"Maiden's Tower","tur":"Tarihi kule","ara":"Kız Kulesi İstanbul"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
+      const cands = (r && Array.isArray(r.yerler) ? r.yerler : []).filter(x => x && x.yer).slice(0, 15);
+      const religious = x => /cami|mescit|kilise|katedral|sinagog|türbe|tekke|mosque|church|cathedral/i.test((x.yer || "") + " " + (x.tur || ""));
+      let relCount = 0;
       const pool = []; let firstAny = null, shown = false;
       for (const x of cands) {
+        if (pool.length >= 10) break;
+        if (religious(x) && relCount >= 2) continue;                       // en fazla 2 dini yapı
         const img = await wikiSearchImage(x.ara || x.yer, "tr", x.yer) || await wikiSearchImage(x.ara || x.yer, "en", x.en || x.yer);
         if (!img) continue;
         const it = { yer: x.yer, tur: x.tur || "", img: img.src, alt: img.alt, page: img.page };
-        if (img.w / img.h >= 1.15) {
+        if (img.w / img.h >= 1.35) {                                         // sadece belirgin yatay fotoğraflar: karta kesilmeden oturur
           if (pool.some(p => p.img === it.img)) continue;
+          if (religious(x)) relCount++;
           pool.push(it); c = { pool: pool.slice(), at: Date.now() }; ls.set(key, c);
           if (!shown && where === locStr()) { shown = true; ls.set(ikey, 0); showCity(box, it, area); }
         } else if (!firstAny) firstAny = it;
@@ -3584,10 +3595,20 @@ function calibrate(){
   }
   root.style.setProperty("--gap", gap + "px");
   if (sab) root.style.setProperty("--sab", sab); else root.style.removeProperty("--sab");
-  diag = `${sa ? "A" : "W"}·${Math.round(envT)}·${Math.round(envB)}·${d}·${gap}`;
-  const av = document.querySelector(".appver small"); if (av) av.textContent = diag;
+  // Gerçek ölçüm: alt çubuk ekranın en altında mı bitiyor? Bitmiyorsa farkı kapat
+  requestAnimationFrame(() => {
+    const tb = document.querySelector(".tabbar"); if (!tb || root.classList.contains("kb")) return;
+    const r = tb.getBoundingClientRect(); const bottomLine = window.innerHeight;
+    const off = Math.round(bottomLine - r.bottom);
+    if (sa && portrait && off > 3 && off < 120) { gap = Math.min(120, gap + off); root.style.setProperty("--gap", gap + "px"); }
+    const r2 = tb.getBoundingClientRect();
+    diag = `${sa ? "A" : "W"}·${Math.round(envT)}·${Math.round(envB)}·${d}·${gap}·${Math.round(r2.bottom)}/${window.innerHeight}/${sh}`;
+    const av = document.querySelector(".appver small"); if (av) av.textContent = diag;
+  });
 }
-calibrate(); addEventListener("resize", () => { if (!document.documentElement.classList.contains("kb")) calibrate(); }); addEventListener("orientationchange", () => setTimeout(calibrate, 300));
+calibrate(); setTimeout(calibrate, 400); setTimeout(calibrate, 1500);
+addEventListener("resize", () => { if (!document.documentElement.classList.contains("kb")) calibrate(); }); addEventListener("orientationchange", () => setTimeout(calibrate, 300));
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { setTimeout(calibrate, 150); setTimeout(calibrate, 800); } });
 /* Klavye: yazarken alt çubuğu gizle, kutuları klavyenin üstünde tut */
 (() => { const root = document.documentElement, vv = window.visualViewport;
   const isField = e => e && (e.tagName === "TEXTAREA" || (e.tagName === "INPUT" && !/^(checkbox|radio|button|submit|range|color)$/i.test(e.type || "")));
