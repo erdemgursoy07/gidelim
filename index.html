@@ -100,7 +100,7 @@ main > section{max-width:720px;margin:0 auto}
 .helpbtn{display:block;margin:18px auto 0;border:0;background:none;color:var(--muted);font-weight:700;font-size:.82rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
 /* Deste */
-.deckbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.deckbar{position:sticky;top:0;z-index:4;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
 .back{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:34px;height:34px;font-size:1.1rem;font-weight:800;cursor:pointer;flex:none}
 .deckbar .t{flex:1;min-width:0}
 .deckbar b{display:block;font-weight:800;font-size:1rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -537,6 +537,16 @@ html.kb .tabbar{display:none}
 html.kb main{bottom:var(--kb,0px)}
 html.kb .composer{bottom:var(--kb,0px)}
 html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
+/* Klavye açıkken pencere görünen alana sığsın, yazı kutusu kaybolmasın */
+html.kb .sheet{max-height:calc(var(--vvh, 100vh) - env(safe-area-inset-top, 0px) - 12px)}
+/* Ana ekran uygulaması: alta değil üste göre konumlandır (iPhone'un alt kayma hatasını atla) */
+html.anch .tabbar{top:calc(var(--H) - var(--tbh) - var(--sab));bottom:auto!important}
+html.anch main{bottom:auto!important;height:calc(var(--H) - var(--tbh) - var(--sab))}
+html.anch .composer{bottom:auto!important;top:calc(var(--H) - var(--tbh) - var(--sab));transform:translateY(-100%)}
+html.anch .sheet-bg,html.anch .tour-bg{bottom:auto;height:var(--H)}
+html.anch.kb main{height:calc(var(--vvh) + var(--vvt))}
+html.anch.kb .composer{top:calc(var(--vvh) + var(--vvt))}
+html.anch.kb .sheet-bg{height:calc(var(--vvh) + var(--vvt));padding-bottom:0}
 
 .appver{text-align:center;color:var(--muted);font-size:.74rem;font-weight:700;margin-top:12px}
 .brand{flex:none!important;overflow:visible!important}
@@ -637,6 +647,11 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 .citycard{transition:opacity .18s ease}
 .citycard.fade{opacity:.35}
 
+/* Liste sayfası: başlık ve Liste|Harita seçici birlikte sabit kalsın */
+.lvhead{position:sticky;top:0;z-index:4;background:var(--bg);padding-bottom:10px;border-bottom:1px solid var(--line)}
+.lvhead .deckbar{position:static;border-bottom:0}
+.lvhead .segv{margin-top:2px}
+
 /* Ayarlar */
 .setbtn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:30px;height:30px;display:grid;place-items:center;font-size:.85rem;cursor:pointer;margin-left:6px}
 .setbtn.push{margin-left:auto}
@@ -692,8 +707,10 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     </div>
 
     <div id="ex-lv" hidden>
+      <div class="lvhead">
       <div class="deckbar"><button class="back" id="lv-back" type="button" aria-label="Türlere dön">‹</button><div class="t"><b id="lv-title"></b><small id="lv-sub"></small></div></div>
       <div class="segv" id="lv-seg" role="group" aria-label="Görünüm"><button type="button" data-view="list" aria-pressed="true">☰ Liste</button><button type="button" data-view="map" aria-pressed="false">🗺️ Harita</button></div>
+      </div>
       <div id="ex-list" aria-live="polite"></div>
       <div id="ex-map" hidden>
         <div class="mapwrap"><div id="mapbox" role="application" aria-label="Harita"></div><button class="mapme" id="map-me" type="button" aria-label="Konumumu göster">📍</button></div>
@@ -816,7 +833,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="setrow2"><button class="pill-btn" id="set-help" type="button">❔ Nasıl kullanılır?</button><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.9.0<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.9.2<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2232,54 +2249,45 @@ let cityCard = null;
 async function loadCityCard(opts = {}){
   const box = $("#citycard"); if (!box) return;
   const where = locStr(); if (!where || !sample) { box.hidden = true; renderWx(); return; }
-  const key = "gidelim-city8|" + LANG + "|" + snorm(where), ikey = "gidelim-cityi8|" + snorm(where);
-  const area = (loc.city || cname(loc.code) || "").split(",")[0].trim();
+  // Hangi ilçede olursan ol: bağlı olduğun şehrin (yoksa ülkenin) en önemli 10 yeri
+  const parts = (loc.city || "").split(",").map(x => x.trim()).filter(Boolean);
+  const city = parts.length >= 2 ? parts[parts.length - 1] : parts[0] || "";
+  const label = city || cname(loc.code);
+  const scope = city ? `${city}, ${cname(loc.code)}` : cname(loc.code);
+  const key = "gidelim-city9|" + LANG + "|" + snorm(scope), ikey = "gidelim-cityi9|" + snorm(scope);
   let c = ls.get(key, null);
   const stale = !c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000);
-  // Havuz yoksa: ilk uygun fotoğraf gelir gelmez göster, havuzun kalanını arkada doldur
   if (stale) {
     try {
-      const parts = (loc.city || "").split(",").map(x => x.trim()).filter(Boolean);
-      const scope = parts.length >= 2 ? `Kullanıcı ${parts[0]} (${parts[1]}) bölgesinde. Önce ${parts[0]}'ın en ünlü 3-4 simge yerini, sonra ${parts[1]} şehrinin herkesin tanıdığı simgelerini yaz.`
-        : parts.length === 1 ? `Kullanıcı ${parts[0]} şehrinde. Bu şehrin herkesin tanıdığı simgelerini yaz.`
-        : `Kullanıcı ${cname(loc.code)} ülkesinde. Bu ülkenin herkesin tanıdığı simgelerini yaz.`;
-      const r = await sample.json(`Konum: ${where}
-${scope}
-Toplam 15 yer seç: kartpostallarda ve turist rehberlerinin kapağında olan, bir bakışta tanınan yerler (ör. İstanbul → Boğaziçi Köprüsü, Kız Kulesi, Galata Kulesi, Ayasofya, Dolmabahçe Sarayı, Topkapı Sarayı, Ortaköy Camii, Rumeli Hisarı, Yerebatan Sarnıcı, Çamlıca Tepesi, Beylerbeyi Sarayı, Haydarpaşa Garı, İstiklal Caddesi ve tramvay, Pierre Loti Tepesi, Adalar).
-ÇEŞİTLİLİK ŞART: Toplamda en fazla 3 cami ya da dini yapı olsun; geri kalanı köprü, kule, saray, kale, meydan, cadde, manzara noktası, doğa, müze gibi farklı türlerden olsun. En ünlüler başta.
-"yer" alanına yerin Türkçe Wikipedia'daki tam sayfa adını, "en" alanına İngilizce Wikipedia'daki tam sayfa adını yaz.
-SADECE şu JSON'u döndür: {"yerler":[{"yer":"Kız Kulesi","en":"Maiden's Tower","tur":"Tarihi kule","ara":"Kız Kulesi İstanbul"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
-      const cands = (r && Array.isArray(r.yerler) ? r.yerler : []).filter(x => x && x.yer).slice(0, 15);
-      const religious = x => /cami|mescit|kilise|katedral|sinagog|türbe|tekke|mosque|church|cathedral/i.test((x.yer || "") + " " + (x.tur || ""));
-      let relCount = 0;
-      const pool = []; let firstAny = null, shown = false;
-      for (const x of cands) {
-        if (pool.length >= 10) break;
-        if (religious(x) && relCount >= 2) continue;                       // en fazla 2 dini yapı
-        const img = await wikiSearchImage(x.ara || x.yer, "tr", x.yer) || await wikiSearchImage(x.ara || x.yer, "en", x.en || x.yer);
-        if (!img) continue;
-        const it = { yer: x.yer, tur: x.tur || "", img: img.src, alt: img.alt, page: img.page };
-        if (img.w / img.h >= 1.35) {                                         // sadece belirgin yatay fotoğraflar: karta kesilmeden oturur
-          if (pool.some(p => p.img === it.img)) continue;
-          if (religious(x)) relCount++;
-          pool.push(it); c = { pool: pool.slice(), at: Date.now() }; ls.set(key, c);
-          if (!shown && where === locStr()) { shown = true; ls.set(ikey, 0); showCity(box, it, area); }
-        } else if (!firstAny) firstAny = it;
+      const r = await sample.json(`${city ? "Şehir" : "Ülke"}: ${scope}
+Bu ${city ? "şehrin" : "ülkenin"} herkesin bir bakışta tanıdığı, kartpostallardaki simge yerlerini 5 türe ayır. Bu yere uygun 5 tür seç (ör. İstanbul için: Camiler, Saraylar, Köprüler ve kuleler, Manzara ve doğa, Müzeler ve meydanlar; sarayı olmayan bir şehirde onun yerine kale, çarşı, doğa gibi uygun bir tür seç).
+Her türde en ünlüden başlayarak 3 aday yaz. "yer" alanına Türkçe Wikipedia'daki tam sayfa adını, "en" alanına İngilizce Wikipedia'daki tam sayfa adını yaz.
+SADECE şu JSON'u döndür: {"turler":[{"tur":"Camiler","yerler":[{"yer":"Ayasofya","en":"Hagia Sophia","ara":"Ayasofya İstanbul"}]}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
+      const groups = (r && Array.isArray(r.turler) ? r.turler : []).filter(g => g && Array.isArray(g.yerler)).slice(0, 5);
+      const picked = groups.map(() => []); let shown = false;
+      // her türden en fazla 2 yatay fotoğraf
+      for (let gi = 0; gi < groups.length; gi++) {
+        for (const x of groups[gi].yerler.slice(0, 4)) {
+          if (picked[gi].length >= 2 || !x || !x.yer) continue;
+          const img = await wikiSearchImage(x.ara || x.yer, "tr", x.yer) || await wikiSearchImage(x.ara || x.yer, "en", x.en || x.yer);
+          if (!img || img.w / img.h < 1.35) continue;
+          if (picked.some(a => a.some(p => p.img === img.src))) continue;
+          picked[gi].push({ yer: x.yer, tur: groups[gi].tur || "", img: img.src, alt: img.alt, page: img.page });
+          if (!shown && where === locStr()) { shown = true; ls.set(ikey, 0); showCity(box, picked[gi][0], label); }
+        }
       }
-      if (!pool.length) {
-        let only = firstAny;
-        if (!only && area) { const img = await wikiSearchImage(area, "tr", area) || await wikiSearchImage(area, "en", area); if (img) only = { yer: area, tur: "", img: img.src, alt: img.alt, page: img.page }; }
-        c = only ? { pool: [only], at: Date.now() } : { none: 1, at: Date.now() }; ls.set(key, c);
-      }
+      // türleri karıştırarak sırala: 1. türün 1.si, 2. türün 1.si, … sonra 2.leri
+      const pool = []; for (let k = 0; k < 2; k++) picked.forEach(a => { if (a[k]) pool.push(a[k]); });
+      if (!pool.length && label) { const img = await wikiSearchImage(label, "tr", label) || await wikiSearchImage(label, "en", label); if (img) pool.push({ yer: label, tur: "", img: img.src, alt: img.alt, page: img.page }); }
+      c = pool.length ? { pool, at: Date.now() } : { none: 1, at: Date.now() }; ls.set(key, c);
       if (shown) return;
     } catch(e) { c = null; }
   }
   if (where !== locStr()) return;
   if (!c || c.none || !c.pool || !c.pool.length) { box.hidden = true; cityCard = null; renderWx(); return; }
-  // Her açılışta (ya da aşağı çekince) sıradaki fotoğraf
   let i = Number(ls.get(ikey, -1)); if (!isFinite(i)) i = -1;
   i = (i + 1) % c.pool.length; ls.set(ikey, i);
-  showCity(box, c.pool[i], area);
+  showCity(box, c.pool[i], label);
 }
 function showCity(box, it, area){
   cityCard = it;
@@ -3593,6 +3601,10 @@ function calibrate(){
     if (envT > 0 && d > 0 && d <= 60) gap = d;                       // tam ekran modunda alt kısım eksik kalmış
     else if (envT === 0 && envB === 0 && d >= 70) { gap = 34; sab = "14px"; } // ana ekran çizgisi bölgesi sayfaya verilmemiş
   }
+  // iPhone ana ekran uygulamasında alta sabitlenen öğeleri yukarıda çizebiliyor; üstten konumlandır
+  const anch = sa && portrait;
+  root.classList.toggle("anch", anch);
+  if (anch) { root.style.setProperty("--H", Math.max(sh, window.innerHeight) + "px"); gap = 0; }
   root.style.setProperty("--gap", gap + "px");
   if (sab) root.style.setProperty("--sab", sab); else root.style.removeProperty("--sab");
   // Gerçek ölçüm: alt çubuk ekranın en altında mı bitiyor? Bitmiyorsa farkı kapat
@@ -3600,9 +3612,9 @@ function calibrate(){
     const tb = document.querySelector(".tabbar"); if (!tb || root.classList.contains("kb")) return;
     const r = tb.getBoundingClientRect(); const bottomLine = window.innerHeight;
     const off = Math.round(bottomLine - r.bottom);
-    if (sa && portrait && off > 3 && off < 120) { gap = Math.min(120, gap + off); root.style.setProperty("--gap", gap + "px"); }
+    if (!anch && sa && portrait && off > 3 && off < 120) { gap = Math.min(120, gap + off); root.style.setProperty("--gap", gap + "px"); }
     const r2 = tb.getBoundingClientRect();
-    diag = `${sa ? "A" : "W"}·${Math.round(envT)}·${Math.round(envB)}·${d}·${gap}·${Math.round(r2.bottom)}/${window.innerHeight}/${sh}`;
+    diag = `${sa ? "A" : "W"}${anch ? "T" : ""}·${Math.round(envT)}·${Math.round(envB)}·${d}·${gap}·${Math.round(r2.bottom)}/${window.innerHeight}/${sh}`;
     const av = document.querySelector(".appver small"); if (av) av.textContent = diag;
   });
 }
@@ -3624,6 +3636,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
     const on = field && shrink > 120;
     const was = root.classList.contains("kb");
     root.classList.toggle("kb", on); root.style.setProperty("--kb", (on ? overlap : 0) + "px");
+    root.style.setProperty("--vvh", Math.round(vv ? vv.height : window.innerHeight) + "px"); root.style.setProperty("--vvt", Math.round(vv ? vv.offsetTop : 0) + "px");
     // iPhone klavye kapanınca sayfayı yukarıda bırakabiliyor: alt çubuk havada kalmasın diye yerine oturt
     if (!on && (was || window.scrollY || document.documentElement.scrollTop || document.body.scrollTop)) settle();
   };
@@ -3650,6 +3663,7 @@ function addClear(inp, wrap, after){
 addClear($("#ex-q"), false, () => {});
 addClear($("#l-q"), false);
 addClear($("#cityin"), true);
+$("#cityin").addEventListener("focus", () => setTimeout(() => { const sh = $("#sheet .sheet"); if (sh) sh.scrollTop = 0; }, 350));
 /* İki parmakla yakınlaştırmayı engelle (iPhone) */
 ["gesturestart","gesturechange"].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 startI18n();
