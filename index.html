@@ -613,11 +613,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
 
 /* Şehir kartı */
 .citycard{position:relative;margin-top:12px;height:clamp(150px,26vh,230px);border-radius:18px;overflow:hidden;background:var(--soft) 50% 35%/cover no-repeat;box-shadow:var(--shadow);cursor:pointer}
-.citycard::before{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(5,15,30,.05) 20%,rgba(5,15,30,.72) 100%);pointer-events:none}
-.cc-bg{position:absolute;inset:0;z-index:0;background:50% 35%/cover no-repeat}
-.cc-bg.blur{inset:-24px;filter:blur(18px) brightness(.75);transform:scale(1.08)}
-.cc-fit{position:absolute;inset:0;z-index:1;background:50% 50%/contain no-repeat}
-.cc-cap,.cc-wx,.cc-credit{z-index:3}
+.citycard::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,15,30,.05) 20%,rgba(5,15,30,.72) 100%)}
 .cc-cap{position:absolute;left:14px;right:90px;bottom:11px;color:#fff;display:flex;flex-direction:column;gap:1px;text-shadow:0 1px 6px rgba(0,0,0,.35)}
 .cc-cap b{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:1.08rem;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cc-cap span{font-size:.8rem;font-weight:700;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -820,7 +816,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="setrow2"><button class="pill-btn" id="set-help" type="button">❔ Nasıl kullanılır?</button><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.8.2<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.8.3<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2236,7 +2232,7 @@ let cityCard = null;
 async function loadCityCard(opts = {}){
   const box = $("#citycard"); if (!box) return;
   const where = locStr(); if (!where || !sample) { box.hidden = true; renderWx(); return; }
-  const key = "gidelim-city6|" + LANG + "|" + snorm(where), ikey = "gidelim-cityi6|" + snorm(where);
+  const key = "gidelim-city5|" + LANG + "|" + snorm(where), ikey = "gidelim-cityi5|" + snorm(where);
   const area = (loc.city || cname(loc.code) || "").split(",")[0].trim();
   let c = ls.get(key, null);
   const stale = !c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000);
@@ -2251,8 +2247,8 @@ SADECE şu JSON'u döndür: {"yerler":[{"yer":"Yerin adı","tur":"Kısa tür, ö
       for (const x of cands) {
         const img = await wikiSearchImage(x.ara || x.yer, "tr") || await wikiSearchImage(x.ara || x.yer, "en");
         if (!img) continue;
-        const it = { yer: x.yer, tur: x.tur || "", img: img.src, alt: img.alt, page: img.page, w: img.w, h: img.h };
-        if (img.w / img.h >= 1.3) {
+        const it = { yer: x.yer, tur: x.tur || "", img: img.src, alt: img.alt, page: img.page };
+        if (img.w / img.h >= 1.15) {
           if (pool.some(p => p.img === it.img)) continue;
           pool.push(it); c = { pool: pool.slice(), at: Date.now() }; ls.set(key, c);
           if (!shown && where === locStr()) { shown = true; ls.set(ikey, 0); showCity(box, it, area); }
@@ -2260,7 +2256,7 @@ SADECE şu JSON'u döndür: {"yerler":[{"yer":"Yerin adı","tur":"Kısa tür, ö
       }
       if (!pool.length) {
         let only = firstAny;
-        if (!only && area) { const img = await wikiSearchImage(area, "tr") || await wikiSearchImage(area, "en"); if (img) only = { yer: area, tur: "", img: img.src, alt: img.alt, page: img.page, w: img.w, h: img.h }; }
+        if (!only && area) { const img = await wikiSearchImage(area, "tr") || await wikiSearchImage(area, "en"); if (img) only = { yer: area, tur: "", img: img.src, alt: img.alt, page: img.page }; }
         c = only ? { pool: [only], at: Date.now() } : { none: 1, at: Date.now() }; ls.set(key, c);
       }
       if (shown) return;
@@ -2278,20 +2274,15 @@ function showCity(box, it, area){
   const im = new Image();
   im.onload = () => {
     const apply = () => {
-      box.innerHTML = ""; box.style.backgroundImage = "none"; box.hidden = false;
-      const ir = (it.w && it.h) ? it.w / it.h : (im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : 1.6);
-      const cr = box.clientWidth && box.clientHeight ? box.clientWidth / box.clientHeight : 2;
-      const fit = ir < cr * 0.82;                      // kartın oranından belirgin şekilde karemsi: kesme, tamamını göster
-      const bg = el("div","cc-bg" + (fit ? " blur" : "")); bg.style.backgroundImage = `url("${im.src}")`; box.append(bg);
-      if (fit) { const fg = el("div","cc-fit"); fg.style.backgroundImage = `url("${im.src}")`; box.append(fg); }
+      box.innerHTML = ""; box.style.backgroundImage = `url("${im.src}")`;
       const cap = el("div","cc-cap"); cap.append(el("b",null, "📍 " + (area || it.yer)), el("span",null, area && snorm(area) !== snorm(it.yer) ? it.yer : (it.tur || "")));
       const wxc = el("div","cc-wx"); wxc.id = "cc-wx";
-      const cr2 = el("a","cc-credit","Wikipedia"); cr2.href = it.page; cr2.target = "_blank"; cr2.rel = "noopener"; cr2.addEventListener("click", e => e.stopPropagation());
-      box.append(cap, wxc, cr2); box.hidden = false; box.classList.remove("fade");
+      const cr = el("a","cc-credit","Wikipedia"); cr.href = it.page; cr.target = "_blank"; cr.rel = "noopener"; cr.addEventListener("click", e => e.stopPropagation());
+      box.append(cap, wxc, cr); box.hidden = false; box.classList.remove("fade");
       box.setAttribute("aria-label", it.yer); box.onclick = () => openPlace({ ad: it.yer, tur: it.tur || "" }, locStr());
       renderWx(); ptrHint();
     };
-    if (!box.hidden && box.querySelector(".cc-bg")) { box.classList.add("fade"); setTimeout(apply, 180); } else apply();
+    if (!box.hidden && box.style.backgroundImage) { box.classList.add("fade"); setTimeout(apply, 180); } else apply();
   };
   im.onerror = () => { if (it.alt && im.src !== it.alt) { im.src = it.alt; return; } box.hidden = true; cityCard = null; renderWx(); };
   im.src = it.img;
