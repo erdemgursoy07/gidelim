@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Gidelim">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0F2740" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F2F5F9" media="(prefers-color-scheme: light)">
 <style>html{background:#0F2740}</style>
 <meta name="theme-color" content="#0D1520" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📍%3C/text%3E%3C/svg%3E">
@@ -50,7 +50,7 @@ html{touch-action:manipulation}
 main{overflow-x:clip}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
-body::before{background:#0F2740!important}
+body::before{background:var(--bg)!important}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body::before{background:var(--bg)!important}}
 :root[data-theme="dark"] body::before{background:var(--bg)!important}
 main,.tabbar-in,.composer-in{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
@@ -539,14 +539,6 @@ html.kb .composer{bottom:var(--kb,0px)}
 html.kb .sheet-bg{padding-bottom:var(--kb,0px)}
 /* Klavye açıkken pencere görünen alana sığsın, yazı kutusu kaybolmasın */
 html.kb .sheet{max-height:calc(var(--vvh, 100vh) - env(safe-area-inset-top, 0px) - 12px)}
-/* Ana ekran uygulaması: alta değil üste göre konumlandır (iPhone'un alt kayma hatasını atla) */
-html.anch .tabbar{top:calc(var(--H) - var(--tbh) - var(--sab));bottom:auto!important}
-html.anch main{bottom:auto!important;height:calc(var(--H) - var(--tbh) - var(--sab))}
-html.anch .composer{bottom:auto!important;top:calc(var(--H) - var(--tbh) - var(--sab));transform:translateY(-100%)}
-html.anch .sheet-bg,html.anch .tour-bg{bottom:auto;height:var(--H)}
-html.anch.kb main{height:calc(var(--vvh) + var(--vvt))}
-html.anch.kb .composer{top:calc(var(--vvh) + var(--vvt))}
-html.anch.kb .sheet-bg{height:calc(var(--vvh) + var(--vvt));padding-bottom:0}
 
 .appver{text-align:center;color:var(--muted);font-size:.74rem;font-weight:700;margin-top:12px}
 .brand{flex:none!important;overflow:visible!important}
@@ -833,7 +825,7 @@ main{bottom:calc(var(--tbh) + var(--sab) - var(--gap, 0px))}
     <div class="setrow2"><button class="pill-btn" id="set-help" type="button">❔ Nasıl kullanılır?</button><button class="pill-btn" id="set-prefs" type="button">✨ Zevklerim</button><button class="pill-btn" id="set-push" type="button">🔔 Bildirimler</button></div>
     <div class="hint" id="set-push-h"></div>
     <button class="cta" id="set-ok" type="button">Tamam</button>
-    <div class="appver" data-notr>Gidelim · Sürüm 1.9.2<br><small style="opacity:.6;font-weight:600"></small></div>
+    <div class="appver" data-notr>Gidelim · Sürüm 1.9.3<br><small style="opacity:.6;font-weight:600"></small></div>
   </div>
 </div>
 <div class="tour-bg" id="tour" hidden>
@@ -2249,35 +2241,35 @@ let cityCard = null;
 async function loadCityCard(opts = {}){
   const box = $("#citycard"); if (!box) return;
   const where = locStr(); if (!where || !sample) { box.hidden = true; renderWx(); return; }
-  // Hangi ilçede olursan ol: bağlı olduğun şehrin (yoksa ülkenin) en önemli 10 yeri
   const parts = (loc.city || "").split(",").map(x => x.trim()).filter(Boolean);
   const city = parts.length >= 2 ? parts[parts.length - 1] : parts[0] || "";
   const label = city || cname(loc.code);
   const scope = city ? `${city}, ${cname(loc.code)}` : cname(loc.code);
-  const key = "gidelim-city9|" + LANG + "|" + snorm(scope), ikey = "gidelim-cityi9|" + snorm(scope);
+  const key = "gidelim-city10|" + LANG + "|" + snorm(scope), ikey = "gidelim-cityi10|" + snorm(scope);
   let c = ls.get(key, null);
   const stale = !c || Date.now() - (c.at || 0) > (c.none ? 3600000 : 30 * 86400000);
   if (stale) {
     try {
       const r = await sample.json(`${city ? "Şehir" : "Ülke"}: ${scope}
-Bu ${city ? "şehrin" : "ülkenin"} herkesin bir bakışta tanıdığı, kartpostallardaki simge yerlerini 5 türe ayır. Bu yere uygun 5 tür seç (ör. İstanbul için: Camiler, Saraylar, Köprüler ve kuleler, Manzara ve doğa, Müzeler ve meydanlar; sarayı olmayan bir şehirde onun yerine kale, çarşı, doğa gibi uygun bir tür seç).
-Her türde en ünlüden başlayarak 3 aday yaz. "yer" alanına Türkçe Wikipedia'daki tam sayfa adını, "en" alanına İngilizce Wikipedia'daki tam sayfa adını yaz.
-SADECE şu JSON'u döndür: {"turler":[{"tur":"Camiler","yerler":[{"yer":"Ayasofya","en":"Hagia Sophia","ara":"Ayasofya İstanbul"}]}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
-      const groups = (r && Array.isArray(r.turler) ? r.turler : []).filter(g => g && Array.isArray(g.yerler)).slice(0, 5);
-      const picked = groups.map(() => []); let shown = false;
-      // her türden en fazla 2 yatay fotoğraf
-      for (let gi = 0; gi < groups.length; gi++) {
-        for (const x of groups[gi].yerler.slice(0, 4)) {
-          if (picked[gi].length >= 2 || !x || !x.yer) continue;
-          const img = await wikiSearchImage(x.ara || x.yer, "tr", x.yer) || await wikiSearchImage(x.ara || x.yer, "en", x.en || x.yer);
-          if (!img || img.w / img.h < 1.35) continue;
-          if (picked.some(a => a.some(p => p.img === img.src))) continue;
-          picked[gi].push({ yer: x.yer, tur: groups[gi].tur || "", img: img.src, alt: img.alt, page: img.page });
-          if (!shown && where === locStr()) { shown = true; ls.set(ikey, 0); showCity(box, picked[gi][0], label); }
-        }
+Bu ${city ? "şehrin" : "ülkenin"} EN ÜNLÜ 14 simge yerini ünlülük sırasıyla yaz: dünyanın tanıdığı, en çok fotoğraflanan, kartpostallarda olan yerler. (İstanbul için örnek sıra: Boğaziçi Köprüsü, Galata Kulesi, Ayasofya, Kız Kulesi, Sultanahmet Camii, Topkapı Sarayı, Dolmabahçe Sarayı, Ortaköy Camii, Rumeli Hisarı, Yerebatan Sarnıcı, Kapalıçarşı, Galata Köprüsü, Haydarpaşa Garı, Çamlıca Tepesi.)
+"tip" alanına şunlardan birini yaz: cami, saray, köprü, kule, kale, manzara, doğa, müze, çarşı, meydan, diğer.
+"yer" alanına Türkçe Wikipedia'daki tam sayfa adını, "en" alanına İngilizce Wikipedia'daki tam sayfa adını yaz.
+SADECE şu JSON'u döndür: {"yerler":[{"yer":"Galata Kulesi","en":"Galata Tower","tip":"kule","ara":"Galata Kulesi İstanbul"}]}`, { ...QUICKAI, share: 30 * 86400, fast: false });
+      const cands = (r && Array.isArray(r.yerler) ? r.yerler : []).filter(x => x && x.yer).slice(0, 14);
+      const perType = {}; const pool = []; let shown = false;
+      for (const x of cands) {
+        if (pool.length >= 10) break;
+        const tip = snorm(x.tip || "diger");
+        if ((perType[tip] || 0) >= 2) continue;                                   // her türden en fazla 2 (en fazla 2 cami)
+        const img = await landmarkPhoto(x);
+        if (!img || pool.some(p => p.img === img.src)) continue;
+        perType[tip] = (perType[tip] || 0) + 1;
+        const it = { yer: x.yer, tur: x.tip || "", img: img.src, alt: img.alt, page: img.page };
+        pool.push(it);
+        if (!shown && where === locStr()) { shown = true; ls.set(ikey, 0); showCity(box, it, label); }
       }
-      // türleri karıştırarak sırala: 1. türün 1.si, 2. türün 1.si, … sonra 2.leri
-      const pool = []; for (let k = 0; k < 2; k++) picked.forEach(a => { if (a[k]) pool.push(a[k]); });
+      // aynı türden iki fotoğraf arka arkaya gelmesin
+      for (let i = 1; i < pool.length; i++) if (snorm(pool[i].tur) === snorm(pool[i - 1].tur)) { const j = pool.findIndex((p, k) => k > i && snorm(p.tur) !== snorm(pool[i].tur)); if (j > 0) [pool[i], pool[j]] = [pool[j], pool[i]]; }
       if (!pool.length && label) { const img = await wikiSearchImage(label, "tr", label) || await wikiSearchImage(label, "en", label); if (img) pool.push({ yer: label, tur: "", img: img.src, alt: img.alt, page: img.page }); }
       c = pool.length ? { pool, at: Date.now() } : { none: 1, at: Date.now() }; ls.set(key, c);
       if (shown) return;
@@ -2288,6 +2280,31 @@ SADECE şu JSON'u döndür: {"turler":[{"tur":"Camiler","yerler":[{"yer":"Ayasof
   let i = Number(ls.get(ikey, -1)); if (!isFinite(i)) i = -1;
   i = (i + 1) % c.pool.length; ls.set(ikey, i);
   showCity(box, c.pool[i], label);
+}
+/* Bir simge yerin YATAY fotoğrafı: önce sayfanın ana fotoğrafı; dikeyse aynı sayfadaki yatay fotoğraflardan biri */
+async function landmarkPhoto(x){
+  for (const [lang, name] of [["tr", x.yer], ["en", x.en || x.yer]]) {
+    const lead = await wikiSearchImage(x.ara || name, lang, name);
+    if (lead && lead.w / lead.h >= 1.35) return lead;
+    const title = lead && lead.title ? lead.title : name;
+    const alt = await wikiLandscape(title, lang, name);
+    if (alt) return alt;
+  }
+  return null;
+}
+async function wikiLandscape(title, lang, name){
+  try {
+    const u = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&generator=images&gimlimit=40&titles=${encodeURIComponent(title)}&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=960`;
+    const j = await (await fetch(u)).json();
+    const words = snorm(name).split(/\s+/).filter(w => w.length > 3);
+    const files = Object.values((j.query && j.query.pages) || {}).map(p => ({ t: p.title || "", i: (p.imageinfo || [])[0] })).filter(f => f.i && /jpeg|jpg/i.test(f.i.mime || "") && f.i.width >= 900
+      && f.i.width / f.i.height >= 1.35 && f.i.width / f.i.height <= 2.6 && !/(map|harita|plan|logo|flag|bayrak|seal|arma|locator|diagram|chart|interior|i̇ç)/i.test(f.t));
+    if (!files.length) return null;
+    // dosya adında yerin adı geçenler öne, sonra en büyük çözünürlük
+    files.sort((a, b) => { const am = words.some(w => snorm(a.t).includes(w)) ? 1 : 0, bm = words.some(w => snorm(b.t).includes(w)) ? 1 : 0; return bm - am || (b.i.width * b.i.height) - (a.i.width * a.i.height); });
+    const f = files[0];
+    return { src: f.i.thumburl || f.i.url, alt: f.i.thumburl || f.i.url, w: f.i.thumbwidth || f.i.width, h: f.i.thumbheight || f.i.height, page: `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}` };
+  } catch(e) { return null; }
 }
 function showCity(box, it, area){
   cityCard = it;
@@ -2346,7 +2363,7 @@ function titleMatches(title, name){
   return hit / nw.length >= 0.6;
 }
 function goodThumb(pg){ const t = pg && pg.thumbnail && pg.thumbnail.source; return t && !/\.svg/i.test(t) && !/(harita|map|logo|amblem|bayrak|flag|seal|arma|locator|location)/i.test(t); }
-function wikiPick(pg, lang){ const t = pg.thumbnail; return { src: t.source, alt: t.source.replace(/\/\d+px-/, "/500px-"), w: t.width || 4, h: t.height || 3, page: pg.fullurl || `https://${lang}.wikipedia.org/?curid=${pg.pageid}` }; }
+function wikiPick(pg, lang){ const t = pg.thumbnail; return { title: pg.title || "", src: t.source, alt: t.source.replace(/\/\d+px-/, "/500px-"), w: t.width || 4, h: t.height || 3, page: pg.fullurl || `https://${lang}.wikipedia.org/?curid=${pg.pageid}` }; }
 async function wikiSearchImage(q, lang, name){
   if (!q) return null;
   name = name || q;
@@ -3601,10 +3618,11 @@ function calibrate(){
     if (envT > 0 && d > 0 && d <= 60) gap = d;                       // tam ekran modunda alt kısım eksik kalmış
     else if (envT === 0 && envB === 0 && d >= 70) { gap = 34; sab = "14px"; } // ana ekran çizgisi bölgesi sayfaya verilmemiş
   }
-  // iPhone ana ekran uygulamasında alta sabitlenen öğeleri yukarıda çizebiliyor; üstten konumlandır
-  const anch = sa && portrait;
-  root.classList.toggle("anch", anch);
-  if (anch) { root.style.setProperty("--H", Math.max(sh, window.innerHeight) + "px"); gap = 0; }
+  // Üstten konumlandırma kaldırıldı: iPhone bazen uygulamaya ekrandan kısa bir alan veriyor; çubuk o alanın en altında dursun
+  root.classList.remove("anch"); gap = 0;
+  // Alan ekrandan kısaysa (alt çizgi uygulama alanının dışında kalıyor) çubuğa ekstra alt boşluk verme
+  // Saydam modda alan kısa kalmışsa (üst pay sayfada, alt şerit dışarıda): alt çizgi bizim alanımızda değil, ekstra boşluk verme
+  if (sa && portrait && envT > 0 && d >= 30 && d <= 120) sab = "4px";
   root.style.setProperty("--gap", gap + "px");
   if (sab) root.style.setProperty("--sab", sab); else root.style.removeProperty("--sab");
   // Gerçek ölçüm: alt çubuk ekranın en altında mı bitiyor? Bitmiyorsa farkı kapat
@@ -3612,9 +3630,8 @@ function calibrate(){
     const tb = document.querySelector(".tabbar"); if (!tb || root.classList.contains("kb")) return;
     const r = tb.getBoundingClientRect(); const bottomLine = window.innerHeight;
     const off = Math.round(bottomLine - r.bottom);
-    if (!anch && sa && portrait && off > 3 && off < 120) { gap = Math.min(120, gap + off); root.style.setProperty("--gap", gap + "px"); }
     const r2 = tb.getBoundingClientRect();
-    diag = `${sa ? "A" : "W"}${anch ? "T" : ""}·${Math.round(envT)}·${Math.round(envB)}·${d}·${gap}·${Math.round(r2.bottom)}/${window.innerHeight}/${sh}`;
+    diag = `${sa ? "A" : "W"}D·${Math.round(envT)}·${Math.round(envB)}·${d}·${sab || "-"}·${Math.round(r2.bottom)}/${window.innerHeight}/${sh}`;
     const av = document.querySelector(".appver small"); if (av) av.textContent = diag;
   });
 }
