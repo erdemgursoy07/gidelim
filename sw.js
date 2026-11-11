@@ -1,7 +1,7 @@
 // Gidelim – uygulamayı telefonda saklayan katman (servis çalışanı)
 // Sayfa: telefondaki hali anında açılır, güncel hali arkada indirilir (yeni sürüm bir sonraki açılışta) → hızlı ve internetsiz açılış
 // Simgeler ve yazı tipleri: saklanandan anında
-const V = "gidelim-v10";
+const V = "gidelim-v11";
 const API = "https://gidelim-ai.erdemgursoy07.workers.dev";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
