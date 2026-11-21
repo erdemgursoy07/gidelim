@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gidelim · Gizlilik ve veriler</title>
+<style>
+:root{--bg:#F2F5F9;--surface:#fff;--ink:#0F2740;--muted:#5B6B7E;--line:#D8E1EC;--accent:#1F5FBF;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0B1624;--surface:#132235;--ink:#E8EEF6;--muted:#9AABBF;--line:#22364D;--accent:#6EA1F0;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:720px;margin:0 auto;padding:24px 18px 48px}
+h1{font-size:1.6rem;margin:8px 0 4px}
+h2{font-size:1.1rem;margin:28px 0 6px}
+p,li{color:var(--ink)}
+.muted{color:var(--muted);font-size:.9rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+ul{padding-left:20px}
+a{color:var(--accent)}
+.en{border-top:1px solid var(--line);margin-top:36px;padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+<p class="muted"><a href="./">← Gidelim’e dön</a></p>
+<h1>Gizlilik ve veriler</h1>
+<p class="muted">Son güncelleme: [GG.AA.YYYY] · Sürüm 1.19.4</p>
+
+<div class="card">
+<p><b>Kısaca:</b> Gidelim’i kullanmak için hesap açman gerekmez. Listen, notların ve zevklerin telefonunda durur. Reklam göstermiyoruz, verini satmıyoruz ve seni uygulamalar arasında takip etmiyoruz. Sunucuya yalnızca bir özelliği çalıştırmak için gereken bilgi gider.</p>
+</div>
+
+<h2>Veri sorumlusu ve iletişim</h2>
+<p>[Ad Soyad] · [e-posta adresi]<br>Verilerinle ilgili her soru, düzeltme ya da silme isteği için bu adrese yazabilirsin. En geç 30 gün içinde cevap veririz.</p>
+
+<h2>Telefonunda kalan bilgiler</h2>
+<p>Kaydettiğin mekanlar, puanların, notların, zevk tercihlerin, sohbet geçmişin ve uygulama ayarların sadece telefonunda saklanır. Uygulamayı silersen bunlar da silinir.</p>
+
+<h2>Hangi bilgi, ne için nereye gider?</h2>
+<ul>
+<li><b>Seçtiğin konum:</b> Mekan önerileri, hava durumu ve harita için seçtiğin semt ya da şehir adı kullanılır. Bu ad, öneriler için yapay zeka servisine (Google Gemini), hava durumu için Open-Meteo’ya, harita ve mekan araması için Apple Haritalar’a ve adres eşleştirme için OpenStreetMap’e gönderilir.</li>
+<li><b>Telefonunun konumu (izin verirsen):</b> Haritada nerede olduğunu göstermek, yakındaki mekanları sıralamak ve başka bir şehre gittiğinde Keşfet’i oraya çevirmeyi önermek için kullanılır. Konum, harita için Apple’a, semt adını bulmak için OpenStreetMap’e gönderilir. Konum geçmişin tutulmaz ve sunucumuzda saklanmaz.</li>
+<li><b>Asistana yazdıkların:</b> Mesajın, seçili konumun ve daha iyi öneri için listendeki mekanların kısa özeti (ad, tür, puan, not), yanıt üretmesi için Google Gemini’ye gönderilir. Sohbet geçmişin sunucumuzda saklanmaz.</li>
+<li><b>Grup oylamaları:</b> Oylamaya katıldığında yazdığın takma ad, eklediğin mekanlar, oyların, yorumların, katılım ve hesap bölme bilgileri sunucumuzda saklanır. Bunları sadece oylamanın davet bağlantısına ya da koduna sahip olanlar görebilir.</li>
+<li><b>Yedek ve taşıma:</b> Yedek almayı seçersen listen, tercihlerin, takma adın ve katıldığın oylamalar sunucumuzda bir yedek koduyla saklanır.</li>
+<li><b>Liste paylaşma:</b> Listeni bağlantıyla paylaştığında paylaştığın mekanlar ve adın sunucumuzda saklanır; bağlantıya sahip olan herkes görebilir.</li>
+<li><b>Bildirimler (izin verirsen):</b> Bildirim gönderebilmek için telefonunun bildirim adresi ve listendeki “gidilecek” mekan sayısı saklanır. Bu sayı, cuma akşamı hatırlatıcısı için kullanılır.</li>
+<li><b>Konum ve bilgi düzeltmeleri:</b> “Konum yanlış mı?” ya da “Bilgi yanlış mı?” ile gönderdiğin düzeltmeler, herkesin haritası doğru olsun diye ortak hafızada saklanır.</li>
+<li><b>Hata kayıtları ve geri bildirim:</b> Uygulama hata verirse hata mesajı ve uygulama sürümü kaydedilir. Geri bildirim gönderirsen yazdığın metin, takma adın ve uygulama sürümü kaydedilir.</li>
+<li><b>Fotoğraflar:</b> Mekan ve şehir fotoğrafları Wikipedia ve Wikimedia Commons’tan yüklenir. Bu sırada bu sitelere mekan adı gönderilir.</li>
+</ul>
+
+<h2>Kimlik bilgisi</h2>
+<p>Ad, telefon numarası ya da e-posta istemiyoruz. Uygulama, oylama ve yedek gibi özellikler için telefonunda rastgele bir cihaz kimliği oluşturur. Bu kimlik seni kişi olarak tanımlamaz.</p>
+
+<h2>Sunucu ve hizmet sağlayıcılar</h2>
+<p>Sunucumuz Cloudflare’de çalışır. Cloudflare, kötüye kullanımı önlemek için (dakika ve gün başına istek sınırı) IP adresini kısa süreliğine işler. Kullandığımız hizmet sağlayıcılar: Cloudflare (sunucu ve veritabanı), Google Gemini (yapay zeka), Apple Haritalar (harita ve mekan arama), OpenStreetMap / Nominatim (adres eşleştirme), Open-Meteo (hava durumu), Wikipedia / Wikimedia (fotoğraflar), GitHub Pages (uygulamanın kendisi). Bu sağlayıcıların bir kısmı verileri yurt dışında işler.</p>
+
+<h2>Ne kadar süre saklanır?</h2>
+<p>Grup oylamaları, paylaşılan listeler ve yedekler sen ya da oylamayı başlatan kişi silene kadar ya da [12 ay] kullanılmadıklarında silinene kadar saklanır. Hata kayıtları ve geri bildirimler en fazla [6 ay] saklanır.</p>
+
+<h2>Hakların</h2>
+<p>6698 sayılı KVKK’nın 11. maddesi kapsamında verilerinin işlenip işlenmediğini öğrenme, düzeltilmesini ya da silinmesini isteme ve itiraz etme hakkın var. İsteklerini yukarıdaki e-posta adresine yazabilirsin.</p>
+
+<h2>Çocuklar</h2>
+<p>Gidelim 13 yaşın altındaki çocuklar için tasarlanmamıştır ve bilerek onlardan veri toplamaz.</p>
+
+<h2>Değişiklikler</h2>
+<p>Bu metin değişirse güncel hali bu sayfada yayınlanır ve üstteki tarih güncellenir.</p>
+
+<div class="en">
+<h2>Privacy summary (English)</h2>
+<p>Gidelim needs no account. Your saved places, notes and settings stay on your phone. We show no ads, sell no data and do no cross-app tracking. To make features work we send: your chosen area to Google Gemini (suggestions), Open-Meteo (weather), Apple Maps and OpenStreetMap (maps and search); your device location, only with permission, to Apple and OpenStreetMap; assistant messages with a short summary of your saved list to Google Gemini. Group votes, backups, shared lists, push subscriptions, location fixes, error logs and feedback are stored on our Cloudflare server under a random device ID. Contact: [e-mail address].</p>
+</div>
+</main>
+</body>
+</html>
